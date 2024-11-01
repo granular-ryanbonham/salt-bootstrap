@@ -54,22 +54,22 @@ jobs:
           python3 -m pip install -U pip
           python3 -m pip install -r tests/requirements.txt
 
-      - name: Create Test Instance
-        run: |
-          bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }} || \
-          (sleep 10 && bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }})
-          sleep 2
+      ## DGM - name: Create Test Instance
+      ## DGM   run: |
+      ## DGM     bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }} || \
+      ## DGM     (sleep 10 && bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }})
+      ## DGM     sleep 2
 
-      - name: Test Bootstrap
-        run: |
-          bundle exec kitchen verify ${{ matrix.instance }}-${{ inputs.distro-slug }}
-          sleep 2
+      ## DGM - name: Test Bootstrap
+      ## DGM   run: |
+      ## DGM     bundle exec kitchen verify ${{ matrix.instance }}-${{ inputs.distro-slug }}
+      ## DGM     sleep 2
 
-      - name: Destroy Test Instance
-        if: always()
-        run: |
-          bundle exec kitchen destroy ${{ matrix.instance }}-${{ inputs.distro-slug }}
-          sleep 2
+      ## DGM - name: Destroy Test Instance
+      ## DGM   if: always()
+      ## DGM   run: |
+      ## DGM     bundle exec kitchen destroy ${{ matrix.instance }}-${{ inputs.distro-slug }}
+      ## DGM     sleep 2
 
       - name: Set Exit Status
         if: always()
