@@ -75,15 +75,6 @@ param(
     [String]$Master = "not-specified",
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
-    [Alias("r")]
-    # URL to the windows packages. Will look for a file named repo.json at the
-    # root of the URL. This file is used to determine the name and location of
-    # the installer in the repo. If repo.json is not found, it will look for the
-    # file under the minor directory.
-    # Default is "https://repo.saltproject.io/salt/py3/windows"
-    [String]$RepoUrl = "https://repo.saltproject.io/salt/py3/windows",
-
-    [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
     [Alias("c")]
     # Vagrant only
     # Vagrant files are placed in "C:\tmp". Copies Salt config files from
@@ -303,14 +294,26 @@ if (!(Get-IsAdministrator)) {
 #===============================================================================
 # Change RepoUrl for older versions
 #===============================================================================
-$defaultUrl = "https://repo.saltproject.io/salt/py3/windows"
-$oldRepoUrl = "https://repo.saltproject.io/windows"
 $majorVersion = Get-MajorVersion -Version $Version
-if ( [Uri]($RepoUrl).AbsoluteUri -eq $defaultUrl ) {
-    # No customURL passed, let's check for a pre 3006 version
-    if ($majorVersion -lt "3006") {
-        # This is an older version, use the old URL
-        $RepoUrl = $oldRepoUrl
+if ($majorVersion -lt "3006") {
+    # This is an older version, use the old URL
+    Write-Host "Versions older than 3006 are not available" -ForegroundColor Red
+    exit 1
+}
+
+#===============================================================================
+# Declare variables
+#===============================================================================
+$ConfDir = "$RootDir\conf"
+$PkiDir  = "$ConfDir\pki\minion"
+$RootDir = "$env:ProgramData\Salt Project\Salt"
+$ApiUrl  = "https://packages.broadcom.com/artifactory/api/storage/saltproject-generic/windows"
+
+# Check for existing installation where RootDir is stored in the registry
+$SaltRegKey = "HKLM:\SOFTWARE\Salt Project\Salt"
+if (Test-Path -Path $SaltRegKey) {
+    if ($null -ne (Get-ItemProperty $SaltRegKey).root_dir) {
+        $RootDir = (Get-ItemProperty $SaltRegKey).root_dir
     }
 }
 
@@ -324,7 +327,9 @@ Write-Verbose "version: $Version"
 Write-Verbose "runservice: $RunService"
 Write-Verbose "master: $Master"
 Write-Verbose "minion: $Minion"
-Write-Verbose "repourl: $RepoUrl"
+Write-Verbose "apiurl: $ApiUrl"
+Write-Verbose "ConfDir: $ConfDir"
+Write-Verbose "RootDir: $RootDir"
 
 if ($RunService.ToLower() -eq "true") {
     Write-Verbose "Windows service will be set to run"
@@ -339,33 +344,10 @@ if ($RunService.ToLower() -eq "true") {
 }
 
 #===============================================================================
-# Ensure Directories are present, copy Vagrant Configs if found
+# Copy Vagrant Files to their proper location.
 #===============================================================================
 
 $ConfiguredAnything = $False
-
-# Detect older version of Salt to determing default RootDir
-if ($majorVersion -lt 3004) {
-    $RootDir = "$env:SystemDrive`:\salt"
-} else {
-    $RootDir = "$env:ProgramData\Salt Project\Salt"
-}
-
-# Check for existing installation where RootDir is stored in the registry
-$SaltRegKey = "HKLM:\SOFTWARE\Salt Project\Salt"
-if (Test-Path -Path $SaltRegKey) {
-    if ($null -ne (Get-ItemProperty $SaltRegKey).root_dir) {
-        $RootDir = (Get-ItemProperty $SaltRegKey).root_dir
-    }
-}
-
-$ConfDir = "$RootDir\conf"
-$PkiDir = "$ConfDir\pki\minion"
-Write-Verbose "ConfDir: $ConfDir"
-
-#===============================================================================
-# Copy Vagrant Files to their proper location.
-#===============================================================================
 
 # Vagrant files will be placed in C:\tmp
 # Check if minion keys have been uploaded, copy to correct location
@@ -413,145 +395,63 @@ if ([IntPtr]::Size -eq 4) {
 }
 
 #===============================================================================
+# Getting version information from the repo
+#===============================================================================
+Write-Verbose "Getting version information from Artifactory"
+$response = Invoke-WebRequest $ApiUrl
+# Convert the output to a powershell object
+$psobj = $response.ToString() | ConvertFrom-Json
+
+# Filter the object for folders
+$filtered = $psobj.children | Where-Object -Property folder -EQ $true
+
+# Get each uri and add it to the list of versions
+$versions = [System.Collections.ArrayList]@()
+$filtered | Select-Object -Property uri | ForEach-Object {
+    $versions.Add($_.uri.Trim("/")) | Out-Null
+}
+
+# last one in the list is the latest
+$latest = $versions | Select-Object -Last 1
+
+Write-Verbose "Available versions:"
+$versions | ForEach-Object {
+    Write-Verbose $_
+}
+Write-Verbose "Latest version: $latest"
+
+if ( $Version -EQ "latest") {
+    $Version = $latest
+}
+
+#===============================================================================
+# Validate passed version
+#===============================================================================
+if ( $versions -notcontains $Version ) {
+    Write-Host "Version $Version is not available" -ForegroundColor Red
+    Write-Host "Available versions are:" -ForegroundColor Yellow
+    $versions | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    exit 1
+}
+
+#===============================================================================
 # Get file name to download
 #===============================================================================
-$saltFileName = ""
-$saltVersion = ""
-$saltSha512= ""
-$saltFileUrl = ""
-# Look for a repo.json file
-try {
-    Write-Verbose "Looking for $RepoUrl/repo.json"
-    $response = Invoke-WebRequest "$RepoUrl/repo.json" `
-    -DisableKeepAlive `
-    -UseBasicParsing `
-    -Method Head
-    if ( $response.StatusCode -eq "200" ) {
-        Write-Verbose "Found $RepoUrl/repo.json"
-        # This URL contains a repo.json file, let's use it
-        $use_repo_json = $true
-    } else {
-        Write-Verbose "Did not find $RepoUrl/repo.json"
-        # No repo.json file found at the default location
-        $use_repo_json = $false
-    }
-} catch {
-    Write-Verbose "There was an error looking up $RepoUrl/repo.json"
-    Write-Verbose "ERROR: $_"
-    $use_repo_json = $false
-}
-if ( $use_repo_json ) {
-    # We will use the json file to get the name of the installer
-    $enc = [System.Text.Encoding]::UTF8
-    try {
-        Write-Verbose "Downloading $RepoUrl/repo.json"
-        $response = Invoke-WebRequest -Uri "$RepoUrl/repo.json" -UseBasicParsing
-        if ($response.Content.GetType().Name -eq "Byte[]") {
-            $psobj = $enc.GetString($response.Content) | ConvertFrom-Json
-        } else {
-            $psobj = $response.Content | ConvertFrom-Json
-        }
-        $hash = Convert-PSObjectToHashtable $psobj
-    } catch {
-        Write-Verbose "repo.json not found at: $RepoUrl"
-        Write-Host "ERROR: $_"
-        $hash = @{}
-    }
+$saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
+$response = Invoke-WebRequest "$ApiUrl/$Version/$saltFileName"
+$psobj = $response.ToString() | ConvertFrom-Json
+$saltFileUrl = $psobj.downloadUri
+$saltSha256  = $psobj.checksums.sha256
 
-    $searchVersion = $Version.ToLower()
-    if ( $hash.Contains($searchVersion)) {
-        Write-Verbose "Found $searchVersion in $RepoUrl/repo.json"
-        foreach ($item in $hash.($searchVersion).Keys) {
-            if ( $item.ToLower().EndsWith(".exe") ) {
-                if ( $item.ToLower().Contains($arch.ToLower()) ) {
-                    $saltFileName = $hash.($searchVersion).($item).name
-                    $saltVersion = $hash.($searchVersion).($item).version
-                    $saltSha512 = $hash.($searchVersion).($item).SHA512
-                }
-            }
-        }
-    } else {
-        try {
-            Write-Verbose "Searching for $searchVersion in $RepoUrl/minor/repo.json"
-            $response = Invoke-WebRequest -Uri "$RepoUrl/minor/repo.json" -UseBasicParsing
-            if ($response.Content.GetType().Name -eq "Byte[]") {
-                $psobj = $enc.GetString($response.Content) | ConvertFrom-Json
-            } else {
-                $psobj = $response.Content | ConvertFrom-Json
-            }
-            $hash = Convert-PSObjectToHashtable $psobj
-        } catch {
-            Write-Verbose "repo.json not found at: $RepoUrl/minor/repo.json"
-            Write-Verbose "ERROR: $_"
-            $hash = @{}
-        }
-        if ( $hash.Contains($searchVersion)) {
-            Write-Verbose "Found $searchVersion in $RepoUrl/minor/repo.json"
-            foreach ($item in $hash.($searchVersion).Keys) {
-                if ( $item.ToLower().EndsWith(".exe") ) {
-                    if ( $item.ToLower().Contains($arch.ToLower()) ) {
-                        $saltFileName = $hash.($searchVersion).($item).name
-                        $saltVersion = $hash.($searchVersion).($item).version
-                        $saltSha512 = $hash.($searchVersion).($item).SHA512
-                    }
-                }
-            }
-        } else {
-            Write-Verbose "Version not found in $RepoUrl/minor/repo.json"
-        }
-    }
-}
-
-if ( $saltFileName -and $saltVersion -and $saltSha512 ) {
+if ( $saltFileName -and $saltVersion -and $saltSha256) {
     Write-Verbose "Found Name, Version, and Sha"
 } else {
     # We will guess the name of the installer
-    Write-Verbose "Failed to get Name, Version, and Sha from repo.json"
+    Write-Verbose "Failed to get Name, Version, and Sha from Artifactory API"
     Write-Verbose "We'll try to find the file in standard paths"
     $saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
     $saltVersion = $Version
 }
-
-Write-Verbose "Creating list of urls using the following:"
-Write-Verbose "RepoUrl: $RepoUrl"
-Write-Verbose "Version: $saltVersion"
-Write-Verbose "File Name: $saltFileName"
-$urls = $(@($RepoUrl, $saltVersion, $saltFileName) -join "/"),
-        $(@($RepoUrl, "minor", $saltVersion, $saltFileName) -join "/"),
-        $(@($RepoUrl, $saltFileName) -join "/"),
-        $(@($oldRepoUrl, $saltFileName) -join "/")
-
-$saltFileUrl = $null
-
-foreach ($url in $urls) {
-    try {
-        Write-Verbose "Looking for installer at: $url"
-        $response = Invoke-WebRequest "$url" `
-                    -DisableKeepAlive `
-                    -UseBasicParsing `
-                    -Method Head
-        if ( $response.StatusCode -eq "200" ) {
-            Write-Verbose "Found installer"
-            # This URL contains a repo.json file, let's use it
-            $saltFileUrl = $url
-            break
-        } else {
-            Write-Verbose "Installer not found: $url"
-        }
-    } catch {
-        Write-Verbose "ERROR: $url"
-    }
-}
-
-if ( !$saltFileUrl ) {
-    Write-Host "Could not find an installer:"
-    Write-Verbose "Here are the urls searched:"
-    foreach ($url in $urls) {
-        Write-Verbose $url
-    }
-    exit 1
-}
-
 
 #===============================================================================
 # Download minion setup file
@@ -561,6 +461,7 @@ Write-Host " Bootstrapping Salt Minion" -ForegroundColor Green
 Write-Host " - version: $Version"
 Write-Host " - file name: $saltFileName"
 Write-Host " - file url: $saltFileUrl"
+Write-Host " - file hash: $saltSha256"
 Write-Host " - master: $Master"
 Write-Host " - minion id: $Minion"
 Write-Host " - start service: $RunService"
@@ -580,15 +481,16 @@ if ( Test-Path -Path $localFile ) {
     Write-Host "Success" -ForegroundColor Green
 } else {
     Write-Host "Failed" -ForegroundColor Red
+    exit 1
 }
 
-if ( $saltSha512 ) {
-    $localSha512 = (Get-FileHash -Path $localFile -Algorithm SHA512).Hash
+if ( $saltSha256 ) {
+    $localSha256 = (Get-FileHash -Path $localFile -Algorithm SHA256).Hash
     Write-Host "Comparing Hash: " -NoNewline
     Write-Verbose ""
-    Write-Verbose "Local Hash: $localSha512"
-    Write-Verbose "Remote Hash: $saltSha512"
-    if ( $localSha512 -eq $saltSha512 ) {
+    Write-Verbose "Local Hash: $localSha256"
+    Write-Verbose "Remote Hash: $saltSha256"
+    if ( $localSha256 -eq $saltSha256 ) {
         Write-Host "Success" -ForegroundColor Green
     } else {
         Write-Host "Failed" -ForegroundColor Red
@@ -626,7 +528,7 @@ $process | Wait-Process -Timeout 300 -ErrorAction SilentlyContinue
 $process.Refresh()
 
 if ( !$process.HasExited ) {
-    Write-Host "Timedout" -ForegroundColor Yellow
+    Write-Host "Installer Timeout" -ForegroundColor Yellow
     Write-Host "Killing hung installer: " -NoNewline
     $process | Stop-Process
     $process.Refresh()
@@ -636,8 +538,6 @@ if ( !$process.HasExited ) {
         Write-Host "Failed" -ForegroundColor Red
         exit 1
     }
-
-    Write-Host "Checking installed service: " -NoNewline
 }
 
 # Wait for salt-minion service to be registered to verify successful
@@ -658,7 +558,7 @@ while ( ! $service ) {
         # probably went wrong and user intervention is required - report
         # failure.
         Write-Host "Failed" -ForegroundColor Red
-        Write-Host "Timed out waiting for the salt-minion service to be installed"
+        Write-Host "Timeout waiting for the salt-minion service to be installed"
         exit 1
     }
 }
@@ -676,27 +576,31 @@ if( $RunService ) {
     # We'll try for 2 minutes, sometimes the minion takes that long to start as
     # it compiles python code for the first time
     $max_tries = 60
-    while ( $service.Status -ne "Running" ) {
-        if ( $service.Status -eq "Stopped" ) {
-            Start-Service -Name "salt-minion" -ErrorAction SilentlyContinue
-        }
-        Start-Sleep -Seconds 2
-        Write-Verbose "Checking the service status"
-        $service.Refresh()
-        if ( $service.Status -eq "Running" ) {
-            Write-Host "Success" -ForegroundColor Green
-        } else {
-            if ( $tries -le $max_tries ) {
-                $tries += 1
+    if ( $service.Status -ne "Running" ) {
+        while ( $service.Status -ne "Running" ) {
+            if ( $service.Status -eq "Stopped" ) {
+                Start-Service -Name "salt-minion" -ErrorAction SilentlyContinue
+            }
+            Start-Sleep -Seconds 2
+            Write-Verbose "Checking the service status"
+            $service.Refresh()
+            if ( $service.Status -eq "Running" ) {
+                Write-Host "Success" -ForegroundColor Green
             } else {
-                # If the salt-minion service is still not running, something
-                # probably went wrong and user intervention is required - report
-                # failure.
-                Write-Host "Failed" -ForegroundColor Red
-                Write-Host "Timed out waiting for the salt-minion service to start"
-                exit 1
+                if ( $tries -le $max_tries ) {
+                    $tries += 1
+                } else {
+                    # If the salt-minion service is still not running, something
+                    # probably went wrong and user intervention is required - report
+                    # failure.
+                    Write-Host "Failed" -ForegroundColor Red
+                    Write-Host "Timed out waiting for the salt-minion service to start"
+                    exit 1
+                }
             }
         }
+    } else {
+        Write-Host "Success" -ForegroundColor Green
     }
 } else {
     # Set the service to manual start
