@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.09.24"
+__ScriptVersion="2024.11.01"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -267,9 +267,10 @@ _CUSTOM_REPO_URL="null"
 _CUSTOM_MASTER_CONFIG="null"
 _CUSTOM_MINION_CONFIG="null"
 _QUIET_GIT_INSTALLATION=$BS_FALSE
-_REPO_URL="repo.saltproject.io"
-_ONEDIR_DIR="salt"
-_ONEDIR_NIGHTLY_DIR="salt-dev/${_ONEDIR_DIR}"
+## DGM _REPO_URL="repo.saltproject.io"
+## DGM _ONEDIR_DIR="salt"
+## DGM _ONEDIR_NIGHTLY_DIR="salt-dev/${_ONEDIR_DIR}"
+_REPO_URL="packages.broadcom.com/artifactory"
 _PY_EXE="python3"
 _MINIMUM_PIP_VERSION="9.0.1"
 _MINIMUM_SETUPTOOLS_VERSION="65.6.3"
@@ -296,9 +297,9 @@ __usage() {
     - stable               Install latest stable release. This is the default
                            install type
     - stable [branch]      Install latest version on a branch. Only supported
-                           for packages available at repo.saltproject.io
+                           for packages available at packages.broadcom.com
     - stable [version]     Install a specific version. Only supported for
-                           packages available at repo.saltproject.io
+                           packages available at packages.broadcom.com
                            To pin a 3xxx minor version, specify it as 3xxx.0
     - testing              RHEL-family specific: configure EPEL testing repo
     - git                  Install from the head of the master branch
@@ -306,11 +307,11 @@ __usage() {
                            commit)
     - onedir               Install latest onedir release.
     - onedir [version]     Install a specific version. Only supported for
-                           onedir packages available at repo.saltproject.io
+                           onedir packages available at packages.broadcom.com
 
     - onedir_rc            Install latest onedir RC release.
     - onedir_rc [version]  Install a specific version. Only supported for
-                           onedir RC packages available at repo.saltproject.io
+                           onedir RC packages available at packages.broadcom.com
 
   Examples:
     - ${__ScriptName}
@@ -393,8 +394,8 @@ __usage() {
         And automatically accept the minion key.
     -R  Specify a custom repository URL. Assumes the custom repository URL
         points to a repository that mirrors Salt packages located at
-        repo.saltproject.io. The option passed with -R replaces the
-        "repo.saltproject.io". If -R is passed, -r is also set. Currently only
+        packages.broadcom.com. The option passed with -R replaces the
+        "packages.broadcom.com". If -R is passed, -r is also set. Currently only
         works on CentOS/RHEL and Debian based distributions and macOS.
     -s  Sleep time used when waiting for daemons to start, restart and when
         checking for the services running. Default: ${__DEFAULT_SLEEP}
@@ -613,13 +614,14 @@ elif [ "$ITYPE" = "stable" ]; then
         _ONEDIR_REV="latest"
         ITYPE="onedir"
     else
-        if [ "$(echo "$1" | grep -E '^(nightly|latest|3006|3007)$')" != "" ]; then
+        if [ "$(echo "$1" | grep -E '^(latest|3006|3007)$')" != "" ]; then
             ONEDIR_REV="$1"
             _ONEDIR_REV="$1"
             ITYPE="onedir"
             shift
         elif [ "$(echo "$1" | grep -E '^([3-9][0-5]{2}[5-9](\.[0-9]*)?)')" != "" ]; then
-            ONEDIR_REV="minor/$1"
+            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+            ONEDIR_REV="$1"
             _ONEDIR_REV="$1"
             ITYPE="onedir"
             shift
@@ -633,46 +635,51 @@ elif [ "$ITYPE" = "onedir" ]; then
     if [ "$#" -eq 0 ];then
         ONEDIR_REV="latest"
     else
-        if [ "$(echo "$1" | grep -E '^(nightly|latest|3006|3007)$')" != "" ]; then
+        if [ "$(echo "$1" | grep -E '^(latest|3006|3007)$')" != "" ]; then
             ONEDIR_REV="$1"
             shift
         elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}(\.[0-9]*)?)')" != "" ]; then
-            ONEDIR_REV="minor/$1"
+            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+            ONEDIR_REV="$1"
             shift
         else
-            echo "Unknown onedir version: $1 (valid: 3006, 3007, latest, nightly.)"
+            echo "Unknown onedir version: $1 (valid: 3006, 3007, latest.)"
             exit 1
         fi
     fi
 
 elif [ "$ITYPE" = "onedir_rc" ]; then
-    # Change the _ONEDIR_DIR to be the location for the RC packages
-    _ONEDIR_DIR="salt_rc/salt"
+    echoerror "RC Releases are not supported at this time"
 
-    # Change ITYPE to onedir so we use the regular onedir functions
-    ITYPE="onedir"
-
-    if [ "$#" -eq 0 ];then
-        ONEDIR_REV="latest"
-    else
-        if [ "$(echo "$1" | grep -E '^(latest)$')" != "" ]; then
-            ONEDIR_REV="$1"
-            shift
-        elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}?rc[0-9]-[0-9]$)')" != "" ]; then
-            # Handle the 3xxx.0 version as 3xxx archive (pin to minor) and strip the fake ".0" suffix
-            #ONEDIR_REV=$(echo "$1" | sed -E 's/^([3-9][0-9]{3})\.0$/\1/')
-            ONEDIR_REV="minor/$1"
-            shift
-        elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}\.[0-9]?rc[0-9]$)')" != "" ]; then
-            # Handle the 3xxx.0 version as 3xxx archive (pin to minor) and strip the fake ".0" suffix
-            #ONEDIR_REV=$(echo "$1" | sed -E 's/^([3-9][0-9]{3})\.0$/\1/')
-            ONEDIR_REV="minor/$1"
-            shift
-        else
-            echo "Unknown onedir_rc version: $1 (valid: 3006-8, 3007-1, latest)"
-            exit 1
-        fi
-    fi
+##    # Change the _ONEDIR_DIR to be the location for the RC packages
+##    _ONEDIR_DIR="salt_rc/salt"
+##
+##    # Change ITYPE to onedir so we use the regular onedir functions
+##    ITYPE="onedir"
+##
+##    if [ "$#" -eq 0 ];then
+##        ONEDIR_REV="latest"
+##    else
+##        if [ "$(echo "$1" | grep -E '^(latest)$')" != "" ]; then
+##            ONEDIR_REV="$1"
+##            shift
+##        elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}?rc[0-9]-[0-9]$)')" != "" ]; then
+##            # Handle the 3xxx.0 version as 3xxx archive (pin to minor) and strip the fake ".0" suffix
+##            #ONEDIR_REV=$(echo "$1" | sed -E 's/^([3-9][0-9]{3})\.0$/\1/')
+##            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+##            ONEDIR_REV="$1"
+##            shift
+##        elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}\.[0-9]?rc[0-9]$)')" != "" ]; then
+##            # Handle the 3xxx.0 version as 3xxx archive (pin to minor) and strip the fake ".0" suffix
+##            #ONEDIR_REV=$(echo "$1" | sed -E 's/^([3-9][0-9]{3})\.0$/\1/')
+##            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+##            ONEDIR_REV="$1"
+##            shift
+##        else
+##            echo "Unknown onedir_rc version: $1 (valid: 3006-8, 3007-1, latest)"
+##            exit 1
+##        fi
+##    fi
 fi
 
 # Doing a quick start, so install master
@@ -760,7 +767,7 @@ fi
 PY_PKG_VER=3
 _PY_PKG_VER="python3"
 _PY_MAJOR_VERSION="3"
-__PY_VERSION_REPO="py3"
+## DGM __PY_VERSION_REPO="py3"
 
 # Check if we're installing via a different Python executable and set major version variables
 if [ -n "$_PY_EXE" ]; then
@@ -811,7 +818,7 @@ if [ "$ITYPE" != "git" ]; then
     fi
 fi
 
-# Set the _REPO_URL value based on if -R was passed or not. Defaults to repo.saltproject.io.
+# Set the _REPO_URL value based on if -R was passed or not. Defaults to packages.broadcom.com
 if [ "$_CUSTOM_REPO_URL" != "null" ]; then
     _REPO_URL="$_CUSTOM_REPO_URL"
 
@@ -1340,8 +1347,10 @@ __check_dpkg_architecture() {
         return 1
     fi
 
-    __REPO_ARCH="$DPKG_ARCHITECTURE"
-    __REPO_ARCH_DEB='deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg]'
+    ## DGM __REPO_ARCH="$DPKG_ARCHITECTURE"
+    ## DGM __REPO_ARCH_DEB='deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg]'
+    ## DGM TBD wonder what to do here given use of salt.sources ????, this value's use has been commented out
+    ## DGM for now __REPO_ARCH_DEB='deb [signed-by=/etc/apt/keyrings/salt-archive-keyring.gpg]'
     __return_code=0
 
     case $DPKG_ARCHITECTURE in
@@ -1356,8 +1365,10 @@ __check_dpkg_architecture() {
         "arm64")
             # Saltstack official repository has full arm64 support since 3006
             error_msg=""
-            __REPO_ARCH="arm64"
-            __REPO_ARCH_DEB="deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg arch=$__REPO_ARCH]"
+            ## DGM __REPO_ARCH="arm64"
+            ## __REPO_ARCH_DEB="deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg arch=$__REPO_ARCH]"
+            ## DGM TBD wonder what to do here given use of salt.sources ???, this value's use has been commented out?
+            ## DGM for now __REPO_ARCH_DEB="deb [signed-by=/etc/apt/keyrings/salt-archive-keyring.gpg arch=$__REPO_ARCH]"
             ;;
         "armhf")
             error_msg="$_REPO_URL doesn't have packages for your system architecture: $DPKG_ARCHITECTURE."
@@ -1968,9 +1979,11 @@ __apt_key_fetch() {
     url=$1
 
     tempfile="$(__temp_gpg_pub)"
-
+    ## DGM __fetch_url "$tempfile" "$url" || return 1
+    ## DGM cp -f "$tempfile" /usr/share/keyrings/salt-archive-keyring.gpg && chmod 644 /usr/share/keyrings/salt-archive-keyring.gpg || return 1
     __fetch_url "$tempfile" "$url" || return 1
-    cp -f "$tempfile" /usr/share/keyrings/salt-archive-keyring.gpg && chmod 644 /usr/share/keyrings/salt-archive-keyring.gpg || return 1
+    mkdir -p /etc/apt/keyrings
+    cp -f "$tempfile" /etc/apt/keyrings/salt-archive-keyring.gpg && chmod 644 /etc/apt/keyrings/salt-archive-keyring.pgp || return 1
     rm -f "$tempfile"
 
     return 0
@@ -2886,13 +2899,14 @@ __install_saltstack_ubuntu_repository() {
 
     if { [ "$DISTRO_MAJOR_VERSION" -eq 20 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
        { [ "$DISTRO_MAJOR_VERSION" -eq 22 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
-        [ "$DISTRO_MAJOR_VERSION" -eq 21 ] ||  [ "$DISTRO_MAJOR_VERSION" -eq 23 ]; then
+       { [ "$DISTRO_MAJOR_VERSION" -eq 24 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
+        [ "$DISTRO_MAJOR_VERSION" -eq 21 ] ||  [ "$DISTRO_MAJOR_VERSION" -eq 23 ] || [ "$DISTRO_MAJOR_VERSION" -eq 25 ]; then
         echowarn "Non-LTS Ubuntu detected, but stable packages requested. Trying packages for previous LTS release. You may experience problems."
-        UBUNTU_VERSION=24.04
-        UBUNTU_CODENAME="noble"
-    else
-        UBUNTU_VERSION=${DISTRO_VERSION}
-        UBUNTU_CODENAME=${DISTRO_CODENAME}
+        ## DGM UBUNTU_VERSION=24.04
+        ## DGM UBUNTU_CODENAME="noble"
+    ## DGM else
+        ## DGM UBUNTU_VERSION=${DISTRO_VERSION}
+        ## DGM UBUNTU_CODENAME=${DISTRO_CODENAME}
     fi
 
     # Install downloader backend for GPG keys fetching
@@ -2922,24 +2936,45 @@ __install_saltstack_ubuntu_repository() {
     fi
 
     # SaltStack's stable Ubuntu repository:
-    SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/${STABLE_REV}"
-    echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
-    __apt_key_fetch "$SALTSTACK_UBUNTU_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
+    ## DGM SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/${STABLE_REV}"
+    ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
+    ## DGM __apt_key_fetch "$SALTSTACK_UBUNTU_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
 
+    __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
+
+    if [ "$STABLE_REV" != "latest" ]; then
+        # latest is default
+        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        fi
+    fi
+
+    ## DGM _ONEDIR_TYPE="saltproject-deb"
+    ## DGM SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_TYPE}/pool/"
+
 }
 
 __install_saltstack_ubuntu_onedir_repository() {
+    echodebug "__install_saltstack_ubuntu_onedir_repository() entry"
     # Workaround for latest non-LTS Ubuntu
     if { [ "$DISTRO_MAJOR_VERSION" -eq 20 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
        { [ "$DISTRO_MAJOR_VERSION" -eq 22 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
-        [ "$DISTRO_MAJOR_VERSION" -eq 21 ] ||  [ "$DISTRO_MAJOR_VERSION" -eq 23 ]; then
+        [ "$DISTRO_MAJOR_VERSION" -eq 21 ] ||  [ "$DISTRO_MAJOR_VERSION" -eq 23 ] || [ "$DISTRO_MAJOR_VERSION" -eq 25 ]; then
         echowarn "Non-LTS Ubuntu detected, but stable packages requested. Trying packages for previous LTS release. You may experience problems."
-        UBUNTU_VERSION=24.04
-        UBUNTU_CODENAME="noble"
-    else
-        UBUNTU_VERSION=${DISTRO_VERSION}
-        UBUNTU_CODENAME=${DISTRO_CODENAME}
+        ## DGM UBUNTU_VERSION=24.04
+        ## DGM UBUNTU_CODENAME="noble"
+    ## DGM else
+        ## DGM UBUNTU_VERSION=${DISTRO_VERSION}
+        ## DGM UBUNTU_CODENAME=${DISTRO_CODENAME}
     fi
 
     # Install downloader backend for GPG keys fetching
@@ -2964,18 +2999,34 @@ __install_saltstack_ubuntu_onedir_repository() {
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
     # SaltStack's stable Ubuntu repository:
-    SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/${ONEDIR_REV}/"
-    if [ "${ONEDIR_REV}" = "nightly" ] ; then
-        SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/"
-    fi
-    echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
+    ## DGM TBD need deb location
+    ## DGM SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/${ONEDIR_REV}/"
+    ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
+    ## DGM     SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/"
+    ## DGM fi
+    ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
 
-    __apt_key_fetch "${SALTSTACK_UBUNTU_URL}SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
-
+    __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
+
+    if [ "$STABLE_REV" != "latest" ]; then
+        # latest is default
+        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        fi
+    fi
 }
 
 install_ubuntu_deps() {
+    echodebug "install_ubuntu_deps() entry"
     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ]; then
         # Install add-apt-repository
         if ! __check_command_exists add-apt-repository; then
@@ -3046,7 +3097,8 @@ install_ubuntu_stable_deps() {
     if [ "${_UPGRADE_SYS}" -eq $BS_TRUE ]; then
         if [ "${_INSECURE_DL}" -eq $BS_TRUE ]; then
             ## apt-key is deprecated
-            if [ "$DISTRO_MAJOR_VERSION" -ge 20 ] || [ "$DISTRO_MAJOR_VERSION" -ge 21 ] || [ "$DISTRO_MAJOR_VERSION" -ge 22 ] || [ "$DISTRO_MAJOR_VERSION" -ge 23 ] || [ "$DISTRO_MAJOR_VERSION" -ge 24 ]; then
+            ## DGM if [ "$DISTRO_MAJOR_VERSION" -ge 20 ] || [ "$DISTRO_MAJOR_VERSION" -ge 21 ] || [ "$DISTRO_MAJOR_VERSION" -ge 22 ] || [ "$DISTRO_MAJOR_VERSION" -ge 23 ] || [ "$DISTRO_MAJOR_VERSION" -ge 24 ]; then
+            if [ "$DISTRO_MAJOR_VERSION" -ge 20 ]; then
                 __apt_get_install_noinput --allow-unauthenticated debian-archive-keyring && apt-get update || return 1
             else
                 __apt_get_install_noinput --allow-unauthenticated debian-archive-keyring &&
@@ -3120,7 +3172,8 @@ install_ubuntu_onedir_deps() {
     if [ "${_UPGRADE_SYS}" -eq $BS_TRUE ]; then
         if [ "${_INSECURE_DL}" -eq $BS_TRUE ]; then
             ## apt-key is deprecated
-            if [ "$DISTRO_MAJOR_VERSION" -ge 20 ] || [ "$DISTRO_MAJOR_VERSION" -ge 21 ] || [ "$DISTRO_MAJOR_VERSION" -ge 22 ] || [ "$DISTRO_MAJOR_VERSION" -ge 23 ] || [ "$DISTRO_MAJOR_VERSION" -ge 24 ]; then
+            ## DGM if [ "$DISTRO_MAJOR_VERSION" -ge 20 ] || [ "$DISTRO_MAJOR_VERSION" -ge 21 ] || [ "$DISTRO_MAJOR_VERSION" -ge 22 ] || [ "$DISTRO_MAJOR_VERSION" -ge 23 ] || [ "$DISTRO_MAJOR_VERSION" -ge 24 ]; then
+            if [ "$DISTRO_MAJOR_VERSION" -ge 20 ]; then
                 __apt_get_install_noinput --allow-unauthenticated debian-archive-keyring && apt-get update || return 1
             else
                 __apt_get_install_noinput --allow-unauthenticated debian-archive-keyring &&
@@ -3391,8 +3444,8 @@ install_ubuntu_check_services() {
 __install_saltstack_debian_repository() {
     echodebug "__install_saltstack_debian_repository() entry"
 
-    DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
-    DEBIAN_CODENAME="$DISTRO_CODENAME"
+    ## DGM DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
+    ## DGM DEBIAN_CODENAME="$DISTRO_CODENAME"
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -3415,19 +3468,35 @@ __install_saltstack_debian_repository() {
     # shellcheck disable=SC2086,SC2090
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
-    SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}/${STABLE_REV}"
-    echo "$__REPO_ARCH_DEB $SALTSTACK_DEBIAN_URL $DEBIAN_CODENAME main" > "/etc/apt/sources.list.d/salt.list"
+    ## SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}/${STABLE_REV}"
+    ## echo "$__REPO_ARCH_DEB $SALTSTACK_DEBIAN_URL $DEBIAN_CODENAME main" > "/etc/apt/sources.list.d/salt.list"
+    ## __apt_key_fetch "$SALTSTACK_DEBIAN_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
+    ## __wait_for_apt apt-get update || return 1
 
-    __apt_key_fetch "$SALTSTACK_DEBIAN_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
-
+    __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
+
+    if [ "$STABLE_REV" != "latest" ]; then
+        # latest is default
+        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        fi
+    fi
 }
 
 __install_saltstack_debian_onedir_repository() {
     echodebug "__install_saltstack_debian_onedir_repository() entry"
 
-    DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
-    DEBIAN_CODENAME="$DISTRO_CODENAME"
+    ## DGM DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
+    ## DGM DEBIAN_CODENAME="$DISTRO_CODENAME"
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -3451,15 +3520,31 @@ __install_saltstack_debian_onedir_repository() {
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
     # amd64 is just a part of repository URI
-    SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}/${ONEDIR_REV}"
-    if [ "${ONEDIR_REV}" = "nightly" ] ; then
-        SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}"
-    fi
-    echo "$__REPO_ARCH_DEB $SALTSTACK_DEBIAN_URL $DEBIAN_CODENAME main" > "/etc/apt/sources.list.d/salt.list"
+    ## DGM SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}/${ONEDIR_REV}"
+    ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
+    ## DGM     SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}"
+    ## DGM fi
+    ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_DEBIAN_URL $DEBIAN_CODENAME main" > "/etc/apt/sources.list.d/salt.list"
+    ## DGM __apt_key_fetch "${SALTSTACK_DEBIAN_URL}/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
+    ## DGM __wait_for_apt apt-get update || return 1
 
-    __apt_key_fetch "${SALTSTACK_DEBIAN_URL}/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
-
+    __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
+
+    if [ "$STABLE_REV" != "latest" ]; then
+        # latest is default
+        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+            echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        fi
+    fi
 }
 
 install_debian_onedir_deps() {
@@ -3766,23 +3851,38 @@ __install_saltstack_fedora_onedir_repository() {
         return 1
     fi
 
-    __PY_VERSION_REPO="py3"
+    ## DGM __PY_VERSION_REPO="py3"
 
-    GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
+    ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
 
     REPO_FILE="/etc/yum.repos.d/salt.repo"
 
     if [ ! -s "$REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}"
-        if [ "${ONEDIR_REV}" = "nightly" ] ; then
-            FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
-        fi
+        ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}"
+        ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
+        ## DGM     FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
+        ## DGM fi
+        ## DGM __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
+        ## DGM yum clean metadata || return 1
 
+        FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        if [ "$REPO_REV" != "latest" ]; then
+            # 3006.x is default
+            REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+            if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                # Enable the Salt 3007 STS repo
+                dnf config-manager --set-disable salt-repo-*
+                dnf config-manager --set-enabled salt-repo-3007-sts
+            fi
+        else
+            # Enable the Salt LATEST repo
+            dnf config-manager --set-disable salt-repo-*
+            dnf config-manager --set-enabled salt-repo-latest
+        fi
+        dnf clean expire-cache || return 1
 
-        __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
-
-        yum clean metadata || return 1
     elif [ "$REPO_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
         echowarn "Use -F (forced overwrite) to install $REPO_REV."
@@ -4041,9 +4141,9 @@ install_fedora_onedir_post() {
 #
 __install_saltstack_rhel_onedir_repository() {
     if [ "$ITYPE" = "stable" ]; then
-        repo_rev="$ONEDIR_REV"
+        REPO_REV="$ONEDIR_REV"
     else
-        repo_rev="latest"
+        REPO_REV="latest"
     fi
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
@@ -4051,46 +4151,64 @@ __install_saltstack_rhel_onedir_repository() {
         return 1
     fi
 
-    # Avoid using '$releasever' variable for yum.
-    # Instead, this should work correctly on all RHEL variants.
-    base_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/\$basearch/${ONEDIR_REV}/"
-    if [ "${ONEDIR_REV}" = "nightly" ] ; then
-        base_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/\$basearch/"
-    fi
-
-    gpg_key="SALT-PROJECT-GPG-PUBKEY-2023.pub"
-
-    gpg_key_urls=""
-    for key in $gpg_key; do
-        gpg_key_urls=$(printf "${base_url}${key},%s" "$gpg_key_urls")
-    done
-
-    repo_file="/etc/yum.repos.d/salt.repo"
-
-    if [ ! -s "$repo_file" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        cat <<_eof > "$repo_file"
-[saltstack]
-name=SaltStack ${repo_rev} Release Channel for RHEL/CentOS \$releasever
-baseurl=${base_url}
-skip_if_unavailable=True
-gpgcheck=1
-gpgkey=${gpg_key_urls}
-enabled=1
-enabled_metadata=1
-_eof
-
-        fetch_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}/"
-        if [ "${ONEDIR_REV}" = "nightly" ] ; then
-            fetch_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
+## DGM     # Avoid using '$releasever' variable for yum.
+## DGM     # Instead, this should work correctly on all RHEL variants.
+## DGM     base_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/\$basearch/${ONEDIR_REV}/"
+## DGM     if [ "${ONEDIR_REV}" = "nightly" ] ; then
+## DGM         base_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/\$basearch/"
+## DGM     fi
+## DGM
+## DGM     ## gpg_key="SALT-PROJECT-GPG-PUBKEY-2023.pub"
+## DGM
+## DGM     gpg_key_urls=""
+## DGM     for key in $gpg_key; do
+## DGM         gpg_key_urls=$(printf "${base_url}${key},%s" "$gpg_key_urls")
+## DGM     done
+## DGM
+## DGM     repo_file="/etc/yum.repos.d/salt.repo"
+## DGM
+## DGM     if [ ! -s "$repo_file" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
+## DGM         cat <<_eof > "$repo_file"
+## DGM [saltstack]
+## DGM name=SaltStack ${repo_rev} Release Channel for RHEL/CentOS \$releasever
+## DGM baseurl=${base_url}
+## DGM skip_if_unavailable=True
+## DGM gpgcheck=1
+## DGM gpgkey=${gpg_key_urls}
+## DGM enabled=1
+## DGM enabled_metadata=1
+## DGM _eof
+## DGM
+## DGM         fetch_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}/"
+## DGM         if [ "${ONEDIR_REV}" = "nightly" ] ; then
+## DGM             fetch_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
+## DGM         fi
+## DGM         for key in $gpg_key; do
+## DGM             __rpm_import_gpg "${fetch_url}${key}" || return 1
+## DGM         done
+## DGM
+## DGM         yum clean metadata || return 1
+    if [ ! -s "$REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
+        REPO_FILE="/etc/yum.repos.d/salt.repo"
+        FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
+        __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        if [ "$REPO_REV" != "latest" ]; then
+            # 3006.x is default
+            REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+            if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                # Enable the Salt 3007 STS repo
+                dnf config-manager --set-disable salt-repo-*
+                dnf config-manager --set-enabled salt-repo-3007-sts
+            fi
+        else
+            # Enable the Salt LATEST repo
+            dnf config-manager --set-disable salt-repo-*
+            dnf config-manager --set-enabled salt-repo-latest
         fi
-        for key in $gpg_key; do
-            __rpm_import_gpg "${fetch_url}${key}" || return 1
-        done
-
-        yum clean metadata || return 1
-    elif [ "$repo_rev" != "latest" ]; then
+        dnf clean expire-cache || return 1
+    elif [ "$REPO_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
-        echowarn "Use -F (forced overwrite) to install $repo_rev."
+        echowarn "Use -F (forced overwrite) to install $REPO_REV."
     fi
 
     return 0
@@ -5376,9 +5494,9 @@ install_amazon_linux_ami_2_deps() {
     fi
 
     if [ "$ITYPE" = "stable" ]; then
-        repo_rev="$STABLE_REV"
+        REPO_REV="$STABLE_REV"
     else
-        repo_rev="latest"
+        REPO_REV="latest"
     fi
 
     # We need to install yum-utils before doing anything else when installing on
@@ -5390,31 +5508,51 @@ install_amazon_linux_ami_2_deps() {
         yum -y update || return 1
     fi
 
+## DGM     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
+## DGM         __REPO_FILENAME="salt.repo"
+## DGM         PY_PKG_VER=3
+## DGM         __PY_VERSION_REPO="py3"
+## DGM         repo_label="saltstack-py3-repo"
+## DGM         repo_name="SaltStack Python 3 repo for Amazon Linux 2"
+## DGM
+## DGM         base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/$repo_rev/"
+## DGM         gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.gpg"
+## DGM
+## DGM         # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
+## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
+## DGM         # amazon linux yum file.
+## DGM         if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
+## DGM           cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
+## DGM [$repo_label]
+## DGM name=$repo_name
+## DGM failovermethod=priority
+## DGM priority=10
+## DGM gpgcheck=1
+## DGM gpgkey=$gpg_key
+## DGM baseurl=$base_url
+## DGM _eof
+## DGM         fi
+
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        __REPO_FILENAME="salt.repo"
-        PY_PKG_VER=3
-        __PY_VERSION_REPO="py3"
-        repo_label="saltstack-py3-repo"
-        repo_name="SaltStack Python 3 repo for Amazon Linux 2"
-
-        base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/$repo_rev/"
-        gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.gpg"
-
-        # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
-        # With args passed in to do the right thing.  Reformatted to be more like the
-        # amazon linux yum file.
-        if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
-          cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
-[$repo_label]
-name=$repo_name
-failovermethod=priority
-priority=10
-gpgcheck=1
-gpgkey=$gpg_key
-baseurl=$base_url
-_eof
+        REPO_FILE="/etc/yum.repos.d/salt.repo"
+        if [ ! -s "${REPO_FILE}" ]; then
+            FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
+            __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+            if [ "$REPO_REV" != "latest" ]; then
+                # 3006.x is default
+                REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                    # Enable the Salt 3007 STS repo
+                    dnf config-manager --set-disable salt-repo-*
+                    dnf config-manager --set-enabled salt-repo-3007-sts
+                fi
+            else
+                # Enable the Salt LATEST repo
+                dnf config-manager --set-disable salt-repo-*
+                dnf config-manager --set-enabled salt-repo-latest
+            fi
+            dnf clean expire-cache || return 1
         fi
-
     fi
 
     if [ "${_EXTRA_PACKAGES}" != "" ]; then
@@ -5431,9 +5569,9 @@ install_amazon_linux_ami_2_onedir_deps() {
     fi
 
     if [ "$ITYPE" = "onedir" ]; then
-        repo_rev="$ONEDIR_REV"
+        REPO_REV="$ONEDIR_REV"
     else
-        repo_rev="latest"
+        REPO_REV="latest"
     fi
 
     # We need to install yum-utils before doing anything else when installing on
@@ -5445,34 +5583,56 @@ install_amazon_linux_ami_2_onedir_deps() {
         yum -y update || return 1
     fi
 
+## DGM     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
+## DGM         __REPO_FILENAME="salt.repo"
+## DGM         __PY_VERSION_REPO="py3"
+## DGM         PY_PKG_VER=3
+## DGM         repo_label="saltstack-py3-repo"
+## DGM         repo_name="SaltStack Python 3 repo for Amazon Linux 2"
+## DGM         fi
+## DGM
+## DGM         base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/$repo_rev/"
+## DGM         if [ "${ONEDIR_REV}" = "nightly" ] ; then
+## DGM             base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/"
+## DGM         fi
+## DGM
+## DGM         gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.pub"
+## DGM
+## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
+## DGM         # amazon linux yum file.
+## DGM         if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
+## DGM           cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
+## DGM [$repo_label]
+## DGM name=$repo_name
+## DGM failovermethod=priority
+## DGM priority=10
+## DGM gpgcheck=1
+## DGM gpgkey=$gpg_key
+## DGM baseurl=$base_url
+## DGM _eof
+## DGM         fi
+
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        __REPO_FILENAME="salt.repo"
-        __PY_VERSION_REPO="py3"
-        PY_PKG_VER=3
-        repo_label="saltstack-py3-repo"
-        repo_name="SaltStack Python 3 repo for Amazon Linux 2"
+        REPO_FILE="/etc/yum.repos.d/salt.repo"
+        if [ ! -s "${REPO_FILE}" ]; then
+            FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
+            __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+            if [ "$REPO_REV" != "latest" ]; then
+                # 3006.x is default
+                REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                    # Enable the Salt 3007 STS repo
+                    dnf config-manager --set-disable salt-repo-*
+                    dnf config-manager --set-enabled salt-repo-3007-sts
+                fi
+            else
+                # Enable the Salt LATEST repo
+                dnf config-manager --set-disable salt-repo-*
+                dnf config-manager --set-enabled salt-repo-latest
+            fi
+            dnf clean expire-cache || return 1
         fi
-
-        base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/$repo_rev/"
-        if [ "${ONEDIR_REV}" = "nightly" ] ; then
-            base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/"
-        fi
-
-        gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.pub"
-
-        # With args passed in to do the right thing.  Reformatted to be more like the
-        # amazon linux yum file.
-        if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
-          cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
-[$repo_label]
-name=$repo_name
-failovermethod=priority
-priority=10
-gpgcheck=1
-gpgkey=$gpg_key
-baseurl=$base_url
-_eof
-        fi
+    fi
 
     if [ "${_EXTRA_PACKAGES}" != "" ]; then
         echoinfo "Installing the following extra packages as requested: ${_EXTRA_PACKAGES}"
@@ -5571,9 +5731,9 @@ install_amazon_linux_ami_2023_git_deps() {
 
 install_amazon_linux_ami_2023_onedir_deps() {
     if [ "$ITYPE" = "onedir" ]; then
-        repo_rev="$ONEDIR_REV"
+        REPO_REV="$ONEDIR_REV"
     else
-        repo_rev="latest"
+        REPO_REV="latest"
     fi
 
     # We need to install yum-utils before doing anything else when installing on
@@ -5585,33 +5745,54 @@ install_amazon_linux_ami_2023_onedir_deps() {
         yum -y update || return 1
     fi
 
-    if [ "$_DISABLE_REPOS" -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        __REPO_FILENAME="salt.repo"
-        __PY_VERSION_REPO="py3"
-        PY_PKG_VER=3
-        repo_label="saltstack-py3-repo"
-        repo_name="SaltStack Python 3 repo for Amazon Linux 2023"
-
-        base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2023/\$basearch/$repo_rev/"
-        if [ "${ONEDIR_REV}" = "nightly" ] ; then
-            base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/amazon/2023/\$basearch/"
-        fi
-
-        gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.pub"
-
-        # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
-        # With args passed in to do the right thing.  Reformatted to be more like the
-        # amazon linux yum file.
-        if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
-          cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
-[$repo_label]
-name=$repo_name
-failovermethod=priority
-priority=10
-gpgcheck=1
-gpgkey=$gpg_key
-baseurl=$base_url
-_eof
+## DGM     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
+## DGM         __REPO_FILENAME="salt.repo"
+## DGM         __PY_VERSION_REPO="py3"
+## DGM         PY_PKG_VER=3
+## DGM         repo_label="saltstack-py3-repo"
+## DGM         repo_name="SaltStack Python 3 repo for Amazon Linux 2023"
+## DGM
+## DGM         base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2023/\$basearch/$repo_rev/"
+## DGM         if [ "${ONEDIR_REV}" = "nightly" ] ; then
+## DGM             base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/amazon/2023/\$basearch/"
+## DGM         fi
+## DGM
+## DGM         gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.pub"
+## DGM
+## DGM         # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
+## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
+## DGM         # amazon linux yum file.
+## DGM         if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
+## DGM           cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
+## DGM [$repo_label]
+## DGM name=$repo_name
+## DGM failovermethod=priority
+## DGM priority=10
+## DGM gpgcheck=1
+## DGM gpgkey=$gpg_key
+## DGM baseurl=$base_url
+## DGM _eof
+## DGM         fi
+## DGM     fi
+    if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
+        REPO_FILE="/etc/yum.repos.d/salt.repo"
+        if [ ! -s "${REPO_FILE}" ]; then
+            FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
+            __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+            if [ "$REPO_REV" != "latest" ]; then
+                # 3006.x is default
+                REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                    # Enable the Salt 3007 STS repo
+                    dnf config-manager --set-disable salt-repo-*
+                    dnf config-manager --set-enabled salt-repo-3007-sts
+                fi
+            else
+                # Enable the Salt LATEST repo
+                dnf config-manager --set-disable salt-repo-*
+                dnf config-manager --set-enabled salt-repo-latest
+            fi
+            dnf clean expire-cache || return 1
         fi
     fi
 
@@ -5942,22 +6123,34 @@ __install_saltstack_photon_onedir_repository() {
         REPO_REV="latest"
     fi
 
-    __PY_VERSION_REPO="py3"
+    ## DGM __PY_VERSION_REPO="py3"
     REPO_FILE="/etc/yum.repos.d/salt.repo"
 
     if [ ! -s "$REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        ## salt repo 4 & 5 have issues, need the Major version dot Zero, eg: 4.0, 5.0
-        FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/${ONEDIR_REV}"
-        if [ "${ONEDIR_REV}" = "nightly" ] ; then
-            FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/"
-        fi
+        ## DGM ## salt repo 4 & 5 have issues, need the Major version dot Zero, eg: 4.0, 5.0
+        ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/${ONEDIR_REV}"
+        ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
+        ## DGM     FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/"
+        ## DGM fi
+        ## DGM __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
+        ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
 
+        FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
-
-        GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
-
-        __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
-
+        if [ "$REPO_REV" != "latest" ]; then
+            # 3006.x is default
+            REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+            if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                # Enable the Salt 3007 STS repo
+                dnf config-manager --set-disable salt-repo-*
+                dnf config-manager --set-enabled salt-repo-3007-sts
+            fi
+        else
+            # Enable the Salt LATEST repo
+            dnf config-manager --set-disable salt-repo-*
+            dnf config-manager --set-enabled salt-repo-latest
+        fi
         tdnf makecache || return 1
     elif [ "$REPO_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
@@ -7132,21 +7325,42 @@ daemons_running_voidlinux() {
 #   OS X / Darwin Install Functions
 #
 
-__parse_repo_json_python() {
+## DGM __parse_repo_json_python() {
+## DGM
+## DGM   # Using latest, grab the right
+## DGM   # version from the repo.json
+## DGM   _JSON_VERSION=$(python - <<-EOF
+## DGM import json, urllib.request
+## DGM ## DGM url = "https://repo.saltproject.io/salt/py3/macos/repo.json"     ## DGM note the use of repo.json here TBD handling this
+## DGM url = "https://packages.broadcom.com/ui/repos/tree/General/saltproject-generic/macos"
+## DGM response = urllib.request.urlopen(url)
+## DGM
+## DGM ## DGM No json file to process here TBD handling it
+## DGM data = json.loads(response.read())
+## DGM version = data["${_ONEDIR_REV}"][list(data["${_ONEDIR_REV}"])[0]]['version']
+## DGM print(version)
+## DGM EOF
+## DGM )
+## DGM echo "${_JSON_VERSION}"
+## DGM }
 
-  # Using latest, grab the right
-  # version from the repo.json
-  _JSON_VERSION=$(python - <<-EOF
-import json, urllib.request
-url = "https://repo.saltproject.io/salt/py3/macos/repo.json"
-response = urllib.request.urlopen(url)
-data = json.loads(response.read())
-version = data["${_ONEDIR_REV}"][list(data["${_ONEDIR_REV}"])[0]]['version']
-print(version)
-EOF
-)
-echo "${_JSON_VERSION}"
+__macosx_get_packagesite_onedir_latest() {
+    echodebug "Find latest MacOS release from repository"
+
+    # get dir listing from url, sort and pick highest
+    macos_versions_tmpf=$(mktemp)
+    curr_pwd=$(pwd)
+    cd  ${macos_versions_tmpf} || return 1
+    wget -r -np -nH --exclude-directories=onedir,relenv,windows -x -l 1 "$SALT_MACOS_PKGDIR_URL/"
+    # shellcheck disable=SC2010
+    LATEST_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | tail -n 1)
+    cd ${curr_pwd} || return "${LATEST_VERSION}"
+    rm -fR ${macos_versions_tmpf}
+
+    echodebug "latest MacOS release from repository found ${LATEST_VERSION}"
+    return "${LATEST_VERSION}"
 }
+
 
 __macosx_get_packagesite_onedir() {
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
@@ -7156,16 +7370,35 @@ __macosx_get_packagesite_onedir() {
 
     DARWIN_ARCH=${CPU_ARCH_L}
 
+## DGM     if [ "$(echo "$_ONEDIR_REV" | grep -E '^(latest)$')" != "" ]; then
+## DGM       ## DGM TBD what to do here
+## DGM       _PKG_VERSION=$(__parse_repo_json_python)
+## DGM     elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*))')" != "" ]; then
+## DGM       _PKG_VERSION=$_ONEDIR_REV
+## DGM     else
+## DGM       ## DGM TBD what to do here
+## DGM       _PKG_VERSION=$(__parse_repo_json_python)
+## DGM     fi
+## DGM
+## DGM     ## DGM PKG="salt-${_PKG_VERSION}-${__PY_VERSION_REPO}-${DARWIN_ARCH}.pkg"
+## DGM     ## DGM SALTPKGCONFURL="https://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/macos/${ONEDIR_REV}/${PKG}"
+## DGM     _ONEDIR_TYPE="saltproject-generic"
+## DGM     PKG="salt-${ONEDIR_REV}-py3-${DARWIN_ARCH}.pkg"
+## DGM     SALTPKGCONFURL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos/${ONEDIR_REV}/${PKG}"
+
+    _ONEDIR_TYPE="saltproject-generic"
+    SALT_MACOS_PKGDIR_URL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos"
     if [ "$(echo "$_ONEDIR_REV" | grep -E '^(latest)$')" != "" ]; then
-      _PKG_VERSION=$(__parse_repo_json_python)
+      _PKG_VERSION=$(__macosx_get_packagesite_onedir_latest)
     elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*))')" != "" ]; then
       _PKG_VERSION=$_ONEDIR_REV
     else
-      _PKG_VERSION=$(__parse_repo_json_python)
+      _PKG_VERSION=$(__macosx_get_packagesite_onedir_latest)
     fi
 
-    PKG="salt-${_PKG_VERSION}-${__PY_VERSION_REPO}-${DARWIN_ARCH}.pkg"
-    SALTPKGCONFURL="https://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/macos/${ONEDIR_REV}/${PKG}"
+    PKG="salt-${_PKG_VERSION}-py3-${DARWIN_ARCH}.pkg"
+    SALTPKGCONFURL="${SALT_MACOS_PKGDIR_URL}/${ONEDIR_REV}/${PKG}"
+
 }
 
 __configure_macosx_pkg_details_onedir() {
