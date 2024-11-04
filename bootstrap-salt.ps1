@@ -398,7 +398,7 @@ if ([IntPtr]::Size -eq 4) {
 # Getting version information from the repo
 #===============================================================================
 Write-Verbose "Getting version information from Artifactory"
-$response = Invoke-WebRequest $ApiUrl
+$response = Invoke-WebRequest $ApiUrl -UseBasicParsing
 # Convert the output to a powershell object
 $psobj = $response.ToString() | ConvertFrom-Json
 
@@ -438,7 +438,7 @@ if ( $versions -notcontains $Version ) {
 # Get file name to download
 #===============================================================================
 $saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
-$response = Invoke-WebRequest "$ApiUrl/$Version/$saltFileName"
+$response = Invoke-WebRequest "$ApiUrl/$Version/$saltFileName" -UseBasicParsing
 $psobj = $response.ToString() | ConvertFrom-Json
 $saltFileUrl = $psobj.downloadUri
 $saltSha256  = $psobj.checksums.sha256
