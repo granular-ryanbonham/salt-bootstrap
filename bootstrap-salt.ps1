@@ -18,7 +18,7 @@
     Specifies a particular version of the installer.
 
 .EXAMPLE
-    ./bootstrap-salt.ps1 -RunService false
+    ./bootstrap-salt.ps1 -RunService $false
     Specifies the salt-minion service to stop and be set to manual. Useful for
     testing locally from the command line with the --local switch
 
@@ -28,7 +28,7 @@
     installer values of host name for the minion id and "salt" for the master.
 
 .EXAMPLE
-    ./bootstrap-salt.ps1 -Minion minion-box -Master master-box -Version 3006.7 -RunService false
+    ./bootstrap-salt.ps1 -Minion minion-box -Master master-box -Version 3006.7 -RunService $false
     Specifies all the optional parameters in no particular order.
 
 .NOTES
@@ -56,12 +56,11 @@ param(
     [String]$Version = "latest",
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
-    [ValidateSet("true","false")]
     [Alias("s")]
-    # Boolean flag to start or stop the minion service. True will start the
-    # minion service. False will stop the minion service and set it to "manual".
+    # Boolean flag to start or stop the minion service. $true will start the
+    # minion service. $false will stop the minion service and set it to "manual".
     # The installer starts it by default.
-    [String]$RunService = "true",
+    [Bool]$RunService = $true,
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
     [Alias("m")]
@@ -331,16 +330,12 @@ Write-Verbose "apiurl: $ApiUrl"
 Write-Verbose "ConfDir: $ConfDir"
 Write-Verbose "RootDir: $RootDir"
 
-if ($RunService.ToLower() -eq "true") {
+if ($RunService) {
     Write-Verbose "Windows service will be set to run"
     [bool]$RunService = $True
-} elseif ($RunService.ToLower() -eq "false") {
+} else {
     Write-Verbose "Windows service will be stopped and set to manual"
     [bool]$RunService = $False
-} else {
-    # Param passed in wasn't clear so defaulting to true.
-    Write-Verbose "Windows service defaulting to run automatically"
-    [bool]$RunService = $True
 }
 
 #===============================================================================
