@@ -63,12 +63,9 @@ jobs:
           Write-Output "Environment Variables"
           Get-ChildItem Env:
 
-      - name: Refresh Environment
+      - name: Add Salt to Path
         run: |
-          foreach ($level in "Machine", "User") {
-            $vars = [Environment]::GetEnvironmentVariables($level).GetEnumerator()
-            $vars | ForEach-Object { $_ } | Set-Content -Path { "Env:$( $_.Name )" }
-          }
+          $env:Path = "$env:Path;C:\Program Files\Salt Project\Salt"
 
       - name: Test Bootstrap
         run: |

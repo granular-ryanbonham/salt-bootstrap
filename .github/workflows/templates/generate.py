@@ -6,171 +6,46 @@ import pathlib
 
 os.chdir(os.path.abspath(os.path.dirname(__file__)))
 
-##    "amazon-2023",
-##    "opensuse-tumbleweed",
 LINUX_DISTROS = [
-    "almalinux-8",
-    "almalinux-9",
-    "amazon-2",
-    "arch",
-    "centos-stream9",
-    "debian-11",
-    "debian-12",
-    "fedora-39",
-    "fedora-40",
-    "gentoo",
-    "gentoo-systemd",
-    "opensuse-15",
-    "oraclelinux-8",
-    "oraclelinux-9",
-    "photon-4",
-    "photon-5",
-    "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 WINDOWS = [
     "windows-2022",
 ]
 
-OSX = [
-    "macos-12",
-    "macos-13",
-]
-
-
-##    "amazon-2023",
-##    "opensuse-tumbleweed",
 STABLE_DISTROS = [
-    "almalinux-8",
-    "almalinux-9",
-    "amazon-2",
-    "arch",
-    "centos-stream9",
-    "debian-11",
-    "debian-12",
-    "fedora-39",
-    "fedora-40",
-    "opensuse-15",
-    "oraclelinux-8",
-    "oraclelinux-9",
-    "photon-4",
-    "photon-5",
-    "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 
-##    "amazon-2023",
 ONEDIR_DISTROS = [
-    "almalinux-8",
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
-    "debian-11",
-    "debian-12",
-    "fedora-39",
-    "fedora-40",
-    "oraclelinux-8",
-    "oraclelinux-9",
-    "photon-4",
-    "photon-5",
-    "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 
 ONEDIR_RC_DISTROS = [
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
-    "debian-12",
-    "oraclelinux-9",
-    "photon-4",
-    "photon-5",
     "rockylinux-9",
     "ubuntu-2404",
 ]
 
-##    "opensuse-tumbleweed",
 BLACKLIST_3006 = [
-    "arch",
-    "debian-12",
-    "fedora-40",
-    "gentoo",
-    "gentoo-systemd",
-    "opensuse-15",
     "ubuntu-2404",
 ]
 
-##    "opensuse-tumbleweed",
-BLACKLIST_3007 = [
-    "arch",
-    "fedora-39",
-    "gentoo",
-    "gentoo-systemd",
-    "opensuse-15",
-    "photon-4",
-    "photon-5",
-]
+BLACKLIST_3007 = []
 
-##    "amazon-2023",
-##    "opensuse-tumbleweed",
 BLACKLIST_GIT_3006 = [
-    "almalinux-9",
-    "amazon-2",
-    "arch",
-    "centos-stream9",
-    "debian-11",
-    "debian-12",
-    "fedora-40",
-    "gentoo",
-    "gentoo-systemd",
-    "opensuse-15",
-    "oraclelinux-9",
-    "photon-4",
-    "photon-5",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 
-##    "amazon-2023",
-##    "opensuse-tumbleweed",
 BLACKLIST_GIT_3007 = [
-    "almalinux-9",
-    "amazon-2",
-    "arch",
-    "centos-stream9",
-    "debian-11",
-    "debian-12",
-    "fedora-39",
-    "fedora-40",
-    "gentoo",
-    "gentoo-systemd",
-    "opensuse-15",
-    "oraclelinux-9",
-    "photon-4",
-    "photon-5",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 
-BLACKLIST_GIT_MASTER = [
-    "amazon-2",
-    "fedora-39",
-    "photon-4",
-    "photon-5",
-]
+BLACKLIST_GIT_MASTER = []
 
 SALT_VERSIONS = [
     "3006",
@@ -225,57 +100,19 @@ GIT_VERSION_BLACKLIST = [
 #           SetuptoolsDeprecationWarning: setup.py install is deprecated.
 #           Use build and pip and other standards-based tools.
 #
-GIT_DISTRO_BLACKLIST = [
-    "almalinux-8",
-    "fedora-39",
-    "opensuse-15",
-    "oraclelinux-8",
-    "rockylinux-8",
-]
+GIT_DISTRO_BLACKLIST = []
 
-LATEST_PKG_BLACKLIST = [
-    "gentoo",
-    "gentoo-systemd",
-]
+LATEST_PKG_BLACKLIST = []
 
-##    "amazon-2023": "Amazon 2023",
-##    "opensuse-tumbleweed": "Opensuse Tumbleweed",
 DISTRO_DISPLAY_NAMES = {
-    "almalinux-8": "AlmaLinux 8",
-    "almalinux-9": "AlmaLinux 9",
-    "amazon-2": "Amazon 2",
-    "arch": "Arch",
-    "centos-stream9": "CentOS Stream 9",
-    "debian-11": "Debian 11",
-    "debian-12": "Debian 12",
-    "fedora-39": "Fedora 39",
-    "fedora-40": "Fedora 40",
-    "gentoo": "Gentoo",
-    "gentoo-systemd": "Gentoo (systemd)",
-    "opensuse-15": "Opensuse 15",
-    "oraclelinux-8": "Oracle Linux 8",
-    "oraclelinux-9": "Oracle Linux 9",
-    "photon-4": "Photon OS 4",
-    "photon-5": "Photon OS 5",
-    "rockylinux-8": "Rocky Linux 8",
     "rockylinux-9": "Rocky Linux 9",
-    "ubuntu-2004": "Ubuntu 20.04",
-    "ubuntu-2204": "Ubuntu 22.04",
     "ubuntu-2404": "Ubuntu 24.04",
-    "macos-12": "macOS 12",
-    "macos-13": "macOS 13",
     "windows-2022": "Windows 2022",
 }
 
 TIMEOUT_DEFAULT = 20
-TIMEOUT_OVERRIDES = {
-    "gentoo": 90,
-    "gentoo-systemd": 90,
-}
-VERSION_ONLY_OVERRIDES = [
-    "gentoo",
-    "gentoo-systemd",
-]
+TIMEOUT_OVERRIDES = {}
+VERSION_ONLY_OVERRIDES = []
 
 TEMPLATE = """
   {distro}:
@@ -295,50 +132,6 @@ TEMPLATE = """
 def generate_test_jobs():
     test_jobs = ""
     needs = ["lint", "generate-actions-workflow"]
-
-    test_jobs += "\n"
-    for distro in OSX:
-        test_jobs += "\n"
-        runs_on = distro
-        runs_on = f"\n      runs-on: {runs_on}"
-        ifcheck = "\n    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'"
-        uses = "./.github/workflows/test-macos.yml"
-        instances = []
-        timeout_minutes = (
-            TIMEOUT_OVERRIDES[distro]
-            if distro in TIMEOUT_OVERRIDES
-            else TIMEOUT_DEFAULT
-        )
-
-        for salt_version in SALT_VERSIONS:
-            if salt_version == "latest":
-                instances.append(salt_version)
-                continue
-
-            for bootstrap_type in ["stable"]:
-                if bootstrap_type == "stable":
-                    if salt_version in MAC_STABLE_VERSION_BLACKLIST:
-                        continue
-
-                test_target = f"{bootstrap_type}-{salt_version}"
-                instances.append(test_target)
-
-        for bootstrap_type in ["default"]:
-            if distro not in STABLE_DISTROS:
-                continue
-            instances.append(bootstrap_type)
-
-        if instances:
-            needs.append(distro)
-            test_jobs += TEMPLATE.format(
-                distro=distro,
-                runs_on=runs_on,
-                uses=uses,
-                ifcheck=ifcheck,
-                instances=json.dumps(instances),
-                display_name=DISTRO_DISPLAY_NAMES[distro],
-                timeout_minutes=timeout_minutes,
-            )
 
     test_jobs += "\n"
     for distro in WINDOWS:
