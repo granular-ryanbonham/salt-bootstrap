@@ -63,6 +63,13 @@ jobs:
           Write-Output "Environment Variables"
           Get-ChildItem Env:
 
+      - name: Refresh Environment
+        run: |
+          foreach ($level in "Machine", "User") {
+            $vars = [Environment]::GetEnvironmentVariables($level).GetEnumerator()
+            $vars | ForEach-Object { $_ } | Set-Content -Path { "Env:$( $_.Name )" }
+          }
+
       - name: Test Bootstrap
         run: |
           pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
