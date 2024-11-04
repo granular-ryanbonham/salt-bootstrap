@@ -13,18 +13,7 @@ def target_python_version():
 
 @pytest.fixture(scope="session")
 def target_salt_version():
-    bootstrap_types = ("git", "stable", "onedir", "onedir_rc")
-
-    # filter out any bootstrap types and then join
-    target_salt = ".".join(
-        [
-            item
-            for item in os.environ.get("KITCHEN_SUITE", "").split("-")
-            if item not in bootstrap_types
-        ]
-    )
-
-    # target_salt = os.environ["KITCHEN_SUITE"].split("-", 1)[-1].replace("-", ".")
+    target_salt = os.environ.get("SaltVersion", "")
 
     if target_salt.startswith("v"):
         target_salt = target_salt[1:]
