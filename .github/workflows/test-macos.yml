@@ -85,7 +85,7 @@ jobs:
 
       - name: Bootstrap Salt
         run: |
-          . ./bootstrap-salt.sh
+          sh -x ./bootstrap-salt.sh
 
       - name: Test Bootstrap
         run: |

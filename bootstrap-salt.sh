@@ -903,6 +903,10 @@ __fetch_url() {
 #  DESCRIPTION:  Retrieves a URL, verifies its content and writes it to standard output
 #----------------------------------------------------------------------------------------------------------------------
 __fetch_verify() {
+    # DGM debug
+    set -v
+    set -x
+
     fetch_verify_url="$1"
     fetch_verify_sum="$2"
     fetch_verify_size="$3"
@@ -924,6 +928,10 @@ __fetch_verify() {
 #  DESCRIPTION:  Checks if a URL exists
 #----------------------------------------------------------------------------------------------------------------------
 __check_url_exists() {
+    # DGM debug
+    set -v
+    set -x
+
   _URL="$1"
   if curl --output /dev/null --silent --fail "${_URL}"; then
     return 0
@@ -1936,6 +1944,10 @@ __wait_for_apt(){
 #    PARAMETERS:  packages
 #----------------------------------------------------------------------------------------------------------------------
 __apt_get_install_noinput() {
+    # DGM debug
+    set -v
+    set -x
+
     __wait_for_apt apt-get install -y -o DPkg::Options::=--force-confold "${@}"; return $?
 }   # ----------  end of function __apt_get_install_noinput  ----------
 
@@ -1945,6 +1957,10 @@ __apt_get_install_noinput() {
 #   DESCRIPTION:  (DRY) apt-get upgrade with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __apt_get_upgrade_noinput() {
+    # DGM debug
+    set -v
+    set -x
+
     __wait_for_apt apt-get upgrade -y -o DPkg::Options::=--force-confold; return $?
 }   # ----------  end of function __apt_get_upgrade_noinput  ----------
 
@@ -1975,6 +1991,10 @@ __temp_gpg_pub() {
 #    PARAMETERS:  url
 #----------------------------------------------------------------------------------------------------------------------
 __apt_key_fetch() {
+    # DGM debug
+    set -v
+    set -x
+
 
     url=$1
 
@@ -1996,6 +2016,10 @@ __apt_key_fetch() {
 #    PARAMETERS:  url
 #----------------------------------------------------------------------------------------------------------------------
 __rpm_import_gpg() {
+    # DGM debug
+    set -v
+    set -x
+
     url=$1
 
     tempfile="$(__temp_gpg_pub)"
@@ -2019,6 +2043,10 @@ __rpm_import_gpg() {
 #   DESCRIPTION:  (DRY) yum install with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __yum_install_noinput() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$DISTRO_NAME_L" = "oracle_linux" ]; then
         # We need to install one package at a time because --enablerepo=X disables ALL OTHER REPOS!!!!
         for package in "${@}"; do
@@ -2034,6 +2062,10 @@ __yum_install_noinput() {
 #   DESCRIPTION:  (DRY) dnf install with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __dnf_install_noinput() {
+    # DGM debug
+    set -v
+    set -x
+
     dnf -y install "${@}" || return $?
 }   # ----------  end of function __dnf_install_noinput  ----------
 
@@ -2042,6 +2074,10 @@ __dnf_install_noinput() {
 #   DESCRIPTION:  (DRY) tdnf install with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __tdnf_install_noinput() {
+    # DGM debug
+    set -v
+    set -x
+
     tdnf -y install "${@}" || return $?
 }   # ----------  end of function __tdnf_install_noinput  ----------
 
@@ -2051,6 +2087,10 @@ __tdnf_install_noinput() {
 #                 specific revision.
 #----------------------------------------------------------------------------------------------------------------------
 __git_clone_and_checkout() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "Installed git version: $(git --version | awk '{ print $3 }')"
     # Turn off SSL verification if -I flag was set for insecure downloads
     if [ "$_INSECURE_DL" -eq $BS_TRUE ]; then
@@ -2389,6 +2429,10 @@ __overwriteconfig() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_systemd() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
         exit 1
@@ -2415,6 +2459,10 @@ __check_services_systemd() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_upstart() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
         exit 1
@@ -2442,6 +2490,10 @@ __check_services_upstart() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_sysvinit() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
         exit 1
@@ -2468,6 +2520,10 @@ __check_services_sysvinit() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_debian() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
         exit 1
@@ -2495,6 +2551,10 @@ __check_services_debian() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_openrc() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
         exit 1
@@ -2521,6 +2581,10 @@ __check_services_openrc() {
 #   DESCRIPTION:  Return 0 or 1 depending on successful creation of virtualenv
 #----------------------------------------------------------------------------------------------------------------------
 __create_virtualenv() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ ! -d "$_VIRTUALENV_DIR" ]; then
         echoinfo "Creating virtualenv ${_VIRTUALENV_DIR}"
         if [ "$_PIP_ALL" -eq $BS_TRUE ]; then
@@ -2538,6 +2602,10 @@ __create_virtualenv() {
 #   DESCRIPTION:  Return 0 or 1 depending on successful activation of virtualenv
 #----------------------------------------------------------------------------------------------------------------------
 __activate_virtualenv() {
+    # DGM debug
+    set -v
+    set -x
+
     set +o nounset
     # Is virtualenv empty
     if [ -z "$_VIRTUALENV_DIR" ]; then
@@ -2635,6 +2703,10 @@ __install_pip_deps() {
 #    PARAMETERS:  py_exe
 #----------------------------------------------------------------------------------------------------------------------
 __install_salt_from_repo() {
+    # DGM debug
+    set -v
+    set -x
+
     _py_exe="$1"
 
     if [ "${_py_exe}" = "" ]; then
@@ -2881,6 +2953,10 @@ fi
 #   Ubuntu Install Functions
 #
 __enable_universe_repository() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$(grep -R universe /etc/apt/sources.list /etc/apt/sources.list.d/ | grep -v '#')" != "" ]; then
         # The universe repository is already enabled
         return 0
@@ -2964,6 +3040,10 @@ __install_saltstack_ubuntu_repository() {
 }
 
 __install_saltstack_ubuntu_onedir_repository() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "__install_saltstack_ubuntu_onedir_repository() entry"
     # Workaround for latest non-LTS Ubuntu
     if { [ "$DISTRO_MAJOR_VERSION" -eq 20 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
@@ -3026,6 +3106,10 @@ __install_saltstack_ubuntu_onedir_repository() {
 }
 
 install_ubuntu_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "install_ubuntu_deps() entry"
     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ]; then
         # Install add-apt-repository
@@ -3083,6 +3167,10 @@ install_ubuntu_deps() {
 }
 
 install_ubuntu_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "install_ubuntu_stable_deps() entry"
 
     if [ "$_START_DAEMONS" -eq $BS_FALSE ]; then
@@ -3118,6 +3206,10 @@ install_ubuntu_stable_deps() {
 }
 
 install_ubuntu_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "install_ubuntu_git_deps() entry"
 
     __wait_for_apt apt-get update || return 1
@@ -3160,6 +3252,10 @@ install_ubuntu_git_deps() {
 }
 
 install_ubuntu_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$_START_DAEMONS" -eq $BS_FALSE ]; then
         echowarn "Not starting daemons on Debian based distributions is not working mostly because starting them is the default behaviour."
     fi
@@ -3193,6 +3289,10 @@ install_ubuntu_onedir_deps() {
 }
 
 install_ubuntu_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -3219,6 +3319,10 @@ install_ubuntu_stable() {
 }
 
 install_ubuntu_git() {
+    # DGM debug
+    set -v
+    set -x
+
     # Activate virtualenv before install
     if [ "${_VIRTUALENV_DIR}" != "null" ]; then
         __activate_virtualenv || return 1
@@ -3248,6 +3352,10 @@ install_ubuntu_git() {
 }
 
 install_ubuntu_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -3274,6 +3382,10 @@ install_ubuntu_onedir() {
 }
 
 install_ubuntu_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
@@ -3300,6 +3412,10 @@ install_ubuntu_stable_post() {
 }
 
 install_ubuntu_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
         [ $fname = "api" ] && \
@@ -3359,6 +3475,10 @@ install_ubuntu_git_post() {
 }
 
 install_ubuntu_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
     # Ensure upstart configs / systemd units are loaded
@@ -3414,6 +3534,10 @@ install_ubuntu_restart_daemons() {
 }
 
 install_ubuntu_check_services() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
@@ -3442,6 +3566,10 @@ install_ubuntu_check_services() {
 #   Debian Install Functions
 #
 __install_saltstack_debian_repository() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "__install_saltstack_debian_repository() entry"
 
     ## DGM DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
@@ -3493,6 +3621,10 @@ __install_saltstack_debian_repository() {
 }
 
 __install_saltstack_debian_onedir_repository() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "__install_saltstack_debian_onedir_repository() entry"
 
     ## DGM DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
@@ -3548,6 +3680,10 @@ __install_saltstack_debian_onedir_repository() {
 }
 
 install_debian_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "install_debian_onedir_git_deps() entry"
 
     if [ "$_START_DAEMONS" -eq $BS_FALSE ]; then
@@ -3602,6 +3738,10 @@ install_debian_onedir_deps() {
 }
 
 install_debian_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "install_debian_git_deps() entry"
 
     __wait_for_apt apt-get update || return 1
@@ -3637,6 +3777,10 @@ install_debian_git_deps() {
 }
 
 install_debian_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -3663,18 +3807,30 @@ install_debian_stable() {
 }
 
 install_debian_11_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
 
     install_debian_git_deps || return 1
     return 0
 }
 
 install_debian_12_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
 
     install_debian_git_deps || return 1
     return 0
 }
 
 install_debian_git() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ -n "$_PY_EXE" ]; then
         _PYEXE=${_PY_EXE}
     else
@@ -3702,16 +3858,28 @@ install_debian_git() {
 }
 
 install_debian_11_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_debian_git || return 1
     return 0
 }
 
 install_debian_12_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_debian_git || return 1
     return 0
 }
 
 install_debian_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -3738,6 +3906,10 @@ install_debian_onedir() {
 }
 
 install_debian_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
         [ "$fname" = "api" ] && \
@@ -3777,6 +3949,10 @@ install_debian_git_post() {
 }
 
 install_debian_2021_post() {
+    # DGM debug
+    set -v
+    set -x
+
     # Kali 2021 (debian derivative) disables all network services by default
     # Using archlinux post function to enable salt systemd services
     install_arch_linux_post || return 1
@@ -3784,6 +3960,10 @@ install_debian_2021_post() {
 }
 
 install_debian_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return 0
 
     for fname in api master minion syndic; do
@@ -3812,6 +3992,10 @@ install_debian_restart_daemons() {
 }
 
 install_debian_check_services() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
@@ -3840,6 +4024,10 @@ install_debian_check_services() {
 #
 
 __install_saltstack_fedora_onedir_repository() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$ITYPE" = "stable" ]; then
         REPO_REV="$ONEDIR_REV"
     else
@@ -3892,6 +4080,10 @@ __install_saltstack_fedora_onedir_repository() {
 }
 
 install_fedora_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         dnf -y update || return 1
     fi
@@ -3922,6 +4114,10 @@ install_fedora_deps() {
 }
 
 install_fedora_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
         return 1
@@ -3961,6 +4157,10 @@ install_fedora_git_deps() {
 }
 
 install_fedora_git() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "${_PY_EXE}" != "" ]; then
         _PYEXE=${_PY_EXE}
         echoinfo "Using the following python version: ${_PY_EXE} to install salt"
@@ -3975,6 +4175,10 @@ install_fedora_git() {
 }
 
 install_fedora_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
         [ $fname = "api" ] && \
@@ -4006,6 +4210,10 @@ install_fedora_git_post() {
 }
 
 install_fedora_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     [ $_START_DAEMONS -eq $BS_FALSE ] && return
 
     for fname in api master minion syndic; do
@@ -4028,6 +4236,10 @@ install_fedora_restart_daemons() {
 }
 
 install_fedora_check_services() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
@@ -4044,6 +4256,10 @@ install_fedora_check_services() {
 }
 
 install_fedora_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         yum -y update || return 1
     fi
@@ -4082,6 +4298,10 @@ install_fedora_onedir_deps() {
 
 
 install_fedora_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     STABLE_REV=$ONEDIR_REV
     #install_fedora_stable || return 1
 
@@ -4111,6 +4331,10 @@ install_fedora_onedir() {
 }
 
 install_fedora_onedir_post() {
+    # DGM debug
+    set -v
+    set -x
+
     STABLE_REV=$ONEDIR_REV
 
     for fname in api master minion syndic; do
@@ -4140,6 +4364,10 @@ install_fedora_onedir_post() {
 #   CentOS Install Functions
 #
 __install_saltstack_rhel_onedir_repository() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$ITYPE" = "stable" ]; then
         REPO_REV="$ONEDIR_REV"
     else
@@ -4215,6 +4443,10 @@ __install_saltstack_rhel_onedir_repository() {
 }
 
 install_centos_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         yum -y update || return 1
     fi
@@ -4252,6 +4484,10 @@ install_centos_stable_deps() {
 }
 
 install_centos_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -4285,6 +4521,10 @@ install_centos_stable() {
 }
 
 install_centos_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     SYSTEMD_RELOAD=$BS_FALSE
 
     for fname in api master minion syndic; do
@@ -4316,6 +4556,10 @@ install_centos_stable_post() {
 }
 
 install_centos_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     # First try stable deps then fall back to onedir deps if that one fails
     # if we're installing on a Red Hat based host that doesn't have the classic
     # package repos available.
@@ -4361,6 +4605,10 @@ install_centos_git_deps() {
 }
 
 install_centos_git() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "${_PY_EXE}" != "" ]; then
         _PYEXE=${_PY_EXE}
         echoinfo "Using the following python version: ${_PY_EXE} to install salt"
@@ -4376,6 +4624,10 @@ install_centos_git() {
 }
 
 install_centos_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     SYSTEMD_RELOAD=$BS_FALSE
 
     for fname in api master minion syndic; do
@@ -4416,6 +4668,10 @@ install_centos_git_post() {
 }
 
 install_centos_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ "$_UPGRADE_SYS" -eq "$BS_TRUE" ]; then
         yum -y update || return 1
     fi
@@ -4452,6 +4708,10 @@ install_centos_onedir_deps() {
 }
 
 install_centos_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -4478,6 +4738,10 @@ install_centos_onedir() {
 }
 
 install_centos_onedir_post() {
+    # DGM debug
+    set -v
+    set -x
+
     SYSTEMD_RELOAD=$BS_FALSE
 
     for fname in api master minion syndic; do
@@ -4509,6 +4773,10 @@ install_centos_onedir_post() {
 }
 
 install_centos_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
     for fname in api master minion syndic; do
@@ -4553,21 +4821,37 @@ install_centos_restart_daemons() {
 }
 
 install_centos_testing_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_stable_deps || return 1
     return 0
 }
 
 install_centos_testing() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_stable || return 1
     return 0
 }
 
 install_centos_testing_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_stable_post || return 1
     return 0
 }
 
 install_centos_check_services() {
+    # DGM debug
+    set -v
+    set -x
+
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
@@ -4596,286 +4880,514 @@ install_centos_check_services() {
 #   RedHat Install Functions
 #
 install_red_hat_linux_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_stable_deps || return 1
     return 0
 }
 
 install_red_hat_linux_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_git_deps || return 1
     return 0
 }
 
 install_red_hat_linux_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_timat_deps || return 1
     return 0
 }
 
 install_red_hat_linux_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_stable || return 1
     return 0
 }
 
 install_red_hat_linux_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_git || return 1
     return 0
 }
 
 install_red_hat_linux_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_git() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_linux_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_stable_post || return 1
     return 0
 }
 
 install_red_hat_linux_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_linux_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_linux_testing_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_linux_testing() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_linux_testing_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_testing_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_testing() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_enterprise_testing_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_testing_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_testing() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_testing_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_testing_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_testing() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_testing_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_centos_testing_post || return 1
     return 0
 }
@@ -4889,6 +5401,10 @@ install_red_hat_enterprise_workstation_testing_post() {
 #   Oracle Linux Install Functions
 #
 install_oracle_linux_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     # Install Oracle's EPEL.
     if [ "${_EPEL_REPOS_INSTALLED}" -eq $BS_FALSE ]; then
         _EPEL_REPO=oracle-epel-release-el${DISTRO_MAJOR_VERSION}
@@ -7345,6 +7861,10 @@ daemons_running_voidlinux() {
 ## DGM }
 
 __macosx_get_packagesite_onedir_latest() {
+    # DGM debug
+    set -v
+    set -x
+
     echodebug "Find latest MacOS release from repository"
 
     # get dir listing from url, sort and pick highest
@@ -7363,6 +7883,10 @@ __macosx_get_packagesite_onedir_latest() {
 
 
 __macosx_get_packagesite_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
         return 1
@@ -7402,21 +7926,37 @@ __macosx_get_packagesite_onedir() {
 }
 
 __configure_macosx_pkg_details_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     __macosx_get_packagesite_onedir || return 1
     return 0
 }
 
 install_macosx_stable_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     __configure_macosx_pkg_details_onedir || return 1
     return 0
 }
 
 install_macosx_onedir_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     __configure_macosx_pkg_details_onedir || return 1
     return 0
 }
 
 install_macosx_git_deps() {
+    # DGM debug
+    set -v
+    set -x
+
     install_macosx_stable_deps || return 1
 
     if ! echo "$PATH" | grep -q /usr/local/bin; then
@@ -7442,6 +7982,10 @@ install_macosx_git_deps() {
 }
 
 install_macosx_stable() {
+    # DGM debug
+    set -v
+    set -x
+
     install_macosx_stable_deps || return 1
 
     __fetch_url "/tmp/${PKG}" "${SALTPKGCONFURL}" || return 1
@@ -7452,6 +7996,10 @@ install_macosx_stable() {
 }
 
 install_macosx_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     install_macosx_onedir_deps || return 1
 
     __fetch_url "/tmp/${PKG}" "${SALTPKGCONFURL}" || return 1
@@ -7462,6 +8010,10 @@ install_macosx_onedir() {
 }
 
 install_macosx_git() {
+    # DGM debug
+    set -v
+    set -x
+
 
     if [ -n "$_PY_EXE" ]; then
         _PYEXE="${_PY_EXE}"
@@ -7475,6 +8027,10 @@ install_macosx_git() {
 }
 
 install_macosx_stable_post() {
+    # DGM debug
+    set -v
+    set -x
+
     if [ ! -f /etc/paths.d/salt ]; then
         print "%s\n" "/opt/salt/bin" "/usr/local/sbin" > /etc/paths.d/salt
     fi
@@ -7490,16 +8046,28 @@ install_macosx_stable_post() {
 }
 
 install_macosx_onedir_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_macosx_stable_post || return 1
     return 0
 }
 
 install_macosx_git_post() {
+    # DGM debug
+    set -v
+    set -x
+
     install_macosx_stable_post || return 1
     return 0
 }
 
 install_macosx_restart_daemons() {
+    # DGM debug
+    set -v
+    set -x
+
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
     if [ "$_INSTALL_MINION" -eq $BS_TRUE ]; then
@@ -7525,6 +8093,10 @@ install_macosx_restart_daemons() {
 #   the -c options is passed.
 #
 config_salt() {
+    # DGM debug
+    set -v
+    set -x
+
     # If the configuration directory is not passed, return
     [ "$_TEMP_CONFIG_DIR" = "null" ] && return
 
@@ -7686,6 +8258,10 @@ config_salt() {
 #   as long as the -k option is passed.
 #
 preseed_master() {
+    # DGM debug
+    set -v
+    set -x
+
     # Create the PKI directory
 
     if [ "$(find "$_TEMP_KEYS_DIR" -maxdepth 1 -type f | wc -l)" -lt 1 ]; then
@@ -7720,6 +8296,10 @@ preseed_master() {
 #   This function checks if all of the installed daemons are running or not.
 #
 daemons_running_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return 0
 
     FAILED_DAEMONS=0
@@ -7757,6 +8337,10 @@ daemons_running_onedir() {
 #   This function checks if all of the installed daemons are running or not.
 #
 daemons_running() {
+    # DGM debug
+    set -v
+    set -x
+
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return 0
 
     FAILED_DAEMONS=0
