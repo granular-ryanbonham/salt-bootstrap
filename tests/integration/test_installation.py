@@ -4,7 +4,7 @@ import platform
 import subprocess
 
 import pytest
-from Demoa.winc32cred_demo import target
+from Demos.win32cred_demo import target
 
 log = logging.getLogger(__name__)
 
