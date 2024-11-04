@@ -32,7 +32,6 @@ LINUX_DISTROS = [
     "ubuntu-2404",
 ]
 WINDOWS = [
-    "windows-2019",
     "windows-2022",
 ]
 
@@ -265,7 +264,6 @@ DISTRO_DISPLAY_NAMES = {
     "ubuntu-2404": "Ubuntu 24.04",
     "macos-12": "macOS 12",
     "macos-13": "macOS 13",
-    "windows-2019": "Windows 2019",
     "windows-2022": "Windows 2022",
 }
 
