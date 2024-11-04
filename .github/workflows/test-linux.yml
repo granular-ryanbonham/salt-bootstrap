@@ -77,8 +77,7 @@ jobs:
 
       - name: Bootstrap Salt
         run: |
-          ls -alh
-          ## . ./bootstrap.sh
+          . ./bootstrap-salt.sh
 
       - name: Test Bootstrap
         run: |
