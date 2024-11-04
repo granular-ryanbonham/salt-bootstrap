@@ -2,6 +2,7 @@
 *.sw?
 *.un~
 .vagrant
+*__pycache__
 tools
 venv
 

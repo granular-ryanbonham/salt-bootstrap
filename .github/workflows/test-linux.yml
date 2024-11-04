@@ -37,22 +37,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.6.10
-          ## ruby-version: 3.3.4
-          bundler-cache: true
+      ## DGM - name: Setup Ruby
+      ## DGM   uses: ruby/setup-ruby@v1
+      ## DGM   with:
+      ## DGM     ruby-version: 2.6.10
+      ## DGM     ## ruby-version: 3.3.4
+      ## DGM     bundler-cache: true
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+      ## DGM - name: Set up Python 3.10
+      ## DGM   uses: actions/setup-python@v5
+      ## DGM   with:
+      ## DGM     python-version: "3.10"
 
-      - name: Install Python Dependencies
-        run: |
-          python3 -m pip install -U pip
-          python3 -m pip install -r tests/requirements.txt
+      ## DGM - name: Install Python Dependencies
+      ## DGM   run: |
+      ## DGM     python3 -m pip install -U pip
+      ## DGM     python3 -m pip install -r tests/requirements.txt
 
       ## DGM - name: Create Test Instance
       ## DGM   run: |
@@ -70,6 +70,18 @@ jobs:
       ## DGM   run: |
       ## DGM     bundle exec kitchen destroy ${{ matrix.instance }}-${{ inputs.distro-slug }}
       ## DGM     sleep 2
+
+      - name: Install Pytest
+        run: |
+          pip install -U pytest
+
+      - name: Bootstrap Salt
+        run: |
+          . ./bootstrap.sh
+
+      - name: Test Bootstrap
+        run: |
+          pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
 
       - name: Set Exit Status
         if: always()
