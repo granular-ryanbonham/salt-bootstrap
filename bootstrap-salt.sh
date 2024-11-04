@@ -3017,7 +3017,7 @@ __install_saltstack_ubuntu_repository() {
     ## DGM __apt_key_fetch "$SALTSTACK_UBUNTU_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
 
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
-    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
     if [ "$STABLE_REV" != "latest" ]; then
@@ -3087,7 +3087,7 @@ __install_saltstack_ubuntu_onedir_repository() {
     ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
 
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
-    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
     if [ "$STABLE_REV" != "latest" ]; then
@@ -3602,7 +3602,7 @@ __install_saltstack_debian_repository() {
     ## __wait_for_apt apt-get update || return 1
 
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
-    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
     if [ "$STABLE_REV" != "latest" ]; then
@@ -3661,7 +3661,7 @@ __install_saltstack_debian_onedir_repository() {
     ## DGM __wait_for_apt apt-get update || return 1
 
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
-    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}//api/security/keypair/SaltProjectKey/public" || return 1
+    __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
     if [ "$STABLE_REV" != "latest" ]; then
