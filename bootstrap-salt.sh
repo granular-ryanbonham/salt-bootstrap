@@ -586,6 +586,7 @@ echowarn "Running the unstable version of ${__ScriptName}"
 STABLE_REV="latest"
 ONEDIR_REV="latest"
 _ONEDIR_REV="latest"
+YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
 # Define installation type
 if [ "$#" -gt 0 ];then
@@ -4048,19 +4049,19 @@ __install_saltstack_fedora_onedir_repository() {
 
     ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
 
-    REPO_FILE="/etc/yum.repos.d/salt.repo"
+    YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
-    if [ ! -s "$REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
+    if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}"
         ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
         ## DGM     FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
         ## DGM fi
-        ## DGM __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        ## DGM __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
         ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
         ## DGM yum clean metadata || return 1
 
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
         if [ "$REPO_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -4421,10 +4422,11 @@ __install_saltstack_rhel_onedir_repository() {
 ## DGM         done
 ## DGM
 ## DGM         yum clean metadata || return 1
-    if [ ! -s "$REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        REPO_FILE="/etc/yum.repos.d/salt.repo"
+    YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+
+    if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
         if [ "$REPO_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6030,7 +6032,7 @@ install_amazon_linux_ami_2_deps() {
     fi
 
 ## DGM     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-## DGM         __REPO_FILENAME="salt.repo"
+## DGM         __YUM_REPO_FILENAME="salt.repo"
 ## DGM         PY_PKG_VER=3
 ## DGM         __PY_VERSION_REPO="py3"
 ## DGM         repo_label="saltstack-py3-repo"
@@ -6042,8 +6044,8 @@ install_amazon_linux_ami_2_deps() {
 ## DGM         # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
 ## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
 ## DGM         # amazon linux yum file.
-## DGM         if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
-## DGM           cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
+## DGM         if [ ! -s "/etc/yum.repos.d/${__YUM_REPO_FILENAME}" ]; then
+## DGM           cat <<_eof > "/etc/yum.repos.d/${__YUM_REPO_FILENAME}"
 ## DGM [$repo_label]
 ## DGM name=$repo_name
 ## DGM failovermethod=priority
@@ -6055,10 +6057,10 @@ install_amazon_linux_ami_2_deps() {
 ## DGM         fi
 
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        REPO_FILE="/etc/yum.repos.d/salt.repo"
-        if [ ! -s "${REPO_FILE}" ]; then
+        YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+        if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-            __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
             if [ "$REPO_REV" != "latest" ]; then
                 # 3006.x is default
                 REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6105,7 +6107,7 @@ install_amazon_linux_ami_2_onedir_deps() {
     fi
 
 ## DGM     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-## DGM         __REPO_FILENAME="salt.repo"
+## DGM         __YUM_REPO_FILENAME="salt.repo"
 ## DGM         __PY_VERSION_REPO="py3"
 ## DGM         PY_PKG_VER=3
 ## DGM         repo_label="saltstack-py3-repo"
@@ -6121,8 +6123,8 @@ install_amazon_linux_ami_2_onedir_deps() {
 ## DGM
 ## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
 ## DGM         # amazon linux yum file.
-## DGM         if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
-## DGM           cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
+## DGM         if [ ! -s "/etc/yum.repos.d/${__YUM_REPO_FILENAME}" ]; then
+## DGM           cat <<_eof > "/etc/yum.repos.d/${__YUM_REPO_FILENAME}"
 ## DGM [$repo_label]
 ## DGM name=$repo_name
 ## DGM failovermethod=priority
@@ -6134,10 +6136,10 @@ install_amazon_linux_ami_2_onedir_deps() {
 ## DGM         fi
 
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        REPO_FILE="/etc/yum.repos.d/salt.repo"
-        if [ ! -s "${REPO_FILE}" ]; then
+        YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+        if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-            __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
             if [ "$REPO_REV" != "latest" ]; then
                 # 3006.x is default
                 REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6267,7 +6269,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
     fi
 
 ## DGM     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-## DGM         __REPO_FILENAME="salt.repo"
+## DGM         __YUM_REPO_FILENAME="salt.repo"
 ## DGM         __PY_VERSION_REPO="py3"
 ## DGM         PY_PKG_VER=3
 ## DGM         repo_label="saltstack-py3-repo"
@@ -6283,8 +6285,8 @@ install_amazon_linux_ami_2023_onedir_deps() {
 ## DGM         # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
 ## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
 ## DGM         # amazon linux yum file.
-## DGM         if [ ! -s "/etc/yum.repos.d/${__REPO_FILENAME}" ]; then
-## DGM           cat <<_eof > "/etc/yum.repos.d/${__REPO_FILENAME}"
+## DGM         if [ ! -s "/etc/yum.repos.d/${__YUM_REPO_FILENAME}" ]; then
+## DGM           cat <<_eof > "/etc/yum.repos.d/${__YUM_REPO_FILENAME}"
 ## DGM [$repo_label]
 ## DGM name=$repo_name
 ## DGM failovermethod=priority
@@ -6296,10 +6298,10 @@ install_amazon_linux_ami_2023_onedir_deps() {
 ## DGM         fi
 ## DGM     fi
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        REPO_FILE="/etc/yum.repos.d/salt.repo"
-        if [ ! -s "${REPO_FILE}" ]; then
+        YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+        if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-            __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
             if [ "$REPO_REV" != "latest" ]; then
                 # 3006.x is default
                 REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6645,20 +6647,20 @@ __install_saltstack_photon_onedir_repository() {
     fi
 
     ## DGM __PY_VERSION_REPO="py3"
-    REPO_FILE="/etc/yum.repos.d/salt.repo"
+    YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
-    if [ ! -s "$REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
+    if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         ## DGM ## salt repo 4 & 5 have issues, need the Major version dot Zero, eg: 4.0, 5.0
         ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/${ONEDIR_REV}"
         ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
         ## DGM     FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/"
         ## DGM fi
-        ## DGM __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        ## DGM __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
         ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
         ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
 
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${REPO_FILE}" "${FETCH_URL}.repo"
+        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
         if [ "$REPO_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
