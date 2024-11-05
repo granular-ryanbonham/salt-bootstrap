@@ -401,32 +401,41 @@ $psobj = $response.ToString() | ConvertFrom-Json
 $filtered = $psobj.children | Where-Object -Property folder -EQ $true
 
 # Get each uri and add it to the list of versions
-$versions = [System.Collections.ArrayList]@()
+$available_versions = [System.Collections.ArrayList]@()
 $filtered | Select-Object -Property uri | ForEach-Object {
-    $versions.Add($_.uri.Trim("/")) | Out-Null
+    $available_versions.Add($_.uri.Trim("/")) | Out-Null
 }
 
-# last one in the list is the latest
-$latest = $versions | Select-Object -Last 1
+# Create a versions table, similar to repo.json
+# This will have the latest version available, the latest version available for
+# each major version, and every version available. This makes the version
+# lookup logic easier. You can view the contents of the versions table by
+# passing the -Verbose command
+$latest = $available_versions | Select-Object -Last 1
+$versions_table = [ordered]@{"latest"=$latest}
+
+$available_versions | ForEach-Object {
+    $versions_table[$(Get-MajorVersion $_)] = $_
+    $versions_table[$_.ToLower()] = $_.ToLower()
+}
 
 Write-Verbose "Available versions:"
-$versions | ForEach-Object {
-    Write-Verbose $_
+$available_versions | ForEach-Object {
+    Write-Verbose "- $_"
 }
-Write-Verbose "Latest version: $latest"
-
-if ( $Version -EQ "latest") {
-    $Version = $latest
-}
+Write-Verbose "Versions Table:"
+$versions_table | Sort-Object Name | Out-String | Write-Verbose
 
 #===============================================================================
 # Validate passed version
 #===============================================================================
-if ( $versions -notcontains $Version ) {
+if ( $versions_table -notcontains $Version.ToLower() ) {
     Write-Host "Version $Version is not available" -ForegroundColor Red
     Write-Host "Available versions are:" -ForegroundColor Yellow
-    $versions | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    $available_versions | ForEach-Object { Write-Host "- $_" -ForegroundColor Yellow }
     exit 1
+} else {
+    $Version = $versions_table[$Version.ToLower()]
 }
 
 #===============================================================================
