@@ -429,13 +429,13 @@ $versions_table | Sort-Object Name | Out-String | Write-Verbose
 #===============================================================================
 # Validate passed version
 #===============================================================================
-if ( $versions_table -notcontains $Version.ToLower() ) {
+if ( $versions_table.Contains($Version.ToLower()) ) {
+    $Version = $versions_table[$Version.ToLower()]
+} else {
     Write-Host "Version $Version is not available" -ForegroundColor Red
     Write-Host "Available versions are:" -ForegroundColor Yellow
     $available_versions | ForEach-Object { Write-Host "- $_" -ForegroundColor Yellow }
     exit 1
-} else {
-    $Version = $versions_table[$Version.ToLower()]
 }
 
 #===============================================================================
