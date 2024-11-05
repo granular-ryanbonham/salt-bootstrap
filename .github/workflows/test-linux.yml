@@ -81,7 +81,8 @@ jobs:
 
       - name: Bootstrap Salt
         run: |
-          sudo sh -x ./bootstrap-salt.sh
+          ## sudo sh -x ./bootstrap-salt.sh
+          sh -x ./bootstrap-salt.sh
 
       - name: Test Bootstrap
         run: |
