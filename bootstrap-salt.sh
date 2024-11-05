@@ -3408,8 +3408,11 @@ install_ubuntu_stable_post() {
                 /bin/systemctl enable salt-$fname.service > /dev/null 2>&1
             )
             sleep 1
-            /bin/systemctl daemon-reload
-        elif [ -f /etc/init.d/salt-$fname ]; then
+            /bin/systemctl daemon-reload && continue
+        fi
+
+        # if here, try using init.rc in case using container without systemd
+        if [ -f /etc/init.d/salt-$fname ]; then
             update-rc.d salt-$fname defaults
         fi
     done
@@ -3445,7 +3448,7 @@ install_ubuntu_git_post() {
 
             systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
             sleep 1
-            systemctl daemon-reload
+            systemctl daemon-reload && continue
         elif [ -f /sbin/initctl ]; then
             _upstart_conf="/etc/init/salt-$fname.conf"
             # We have upstart support
@@ -3461,8 +3464,10 @@ install_ubuntu_git_post() {
                 fi
                 /sbin/initctl reload-configuration || return 1
             fi
+        fi
         # No upstart support in Ubuntu!?
-        elif [ -f "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" ]; then
+        # if here, try using init.rc in case using container without systemd
+        if [ -f "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" ]; then
             echodebug "There's NO upstart support!?"
             echodebug "Copying ${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init to /etc/init.d/salt-$fname"
             __copyfile "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" "/etc/init.d/salt-$fname"
@@ -3989,7 +3994,9 @@ install_debian_restart_daemons() {
                 systemctl status salt-$fname.service
                 journalctl -xe
             fi
-        elif [ -f /etc/init.d/salt-$fname ]; then
+        fi
+        # if here, try using init.rc in case using container without systemd
+        if [ -f /etc/init.d/salt-$fname ]; then
             # Still in SysV init
             /etc/init.d/salt-$fname stop > /dev/null 2>&1
             /etc/init.d/salt-$fname start
@@ -4211,7 +4218,12 @@ install_fedora_git_post() {
 
         systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
         sleep 1
-        systemctl daemon-reload
+        systemctl daemon-reload && continue
+
+        # if here, try using init.rc in case using container without systemd
+        if [ -f /etc/init.d/salt-$fname ]; then
+            update-rc.d salt-$fname defaults
+        fi
     done
 }
 
@@ -4237,6 +4249,11 @@ install_fedora_restart_daemons() {
         if [ "$_ECHO_DEBUG" -eq $BS_TRUE ]; then
             systemctl status salt-$fname.service
             journalctl -xe
+        fi
+        # if here, try using init.rc in case using container without systemd
+        if [ -f /etc/init.d/salt-$fname ]; then
+            /etc/init.d/salt-$fname stop > /dev/null 2>&1
+            /etc/init.d/salt-$fname start && continue
         fi
     done
 }
@@ -4658,7 +4675,9 @@ install_centos_git_post() {
             fi
 
             SYSTEMD_RELOAD=$BS_TRUE
-        elif [ ! -f "/etc/init.d/salt-$fname" ] || \
+        fi
+        # ensure init.rc in case using container without systemd full support
+        if [ ! -f "/etc/init.d/salt-$fname" ] || \
             { [ -f "/etc/init.d/salt-$fname" ] && [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; }; then
             __copyfile "${_SALT_GIT_CHECKOUT_DIR}/pkg/rpm/salt-${fname}" /etc/init.d
             chmod +x /etc/init.d/salt-${fname}
