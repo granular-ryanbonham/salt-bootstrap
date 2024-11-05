@@ -28,7 +28,9 @@ jobs:
     name: ${{ matrix.instance }}
     ## DGM runs-on: ubuntu-20.04
     runs-on: ubuntu-latest
-    container: rockylinux-9
+    container:
+      image: ghcr.io/saltstack/salt-ci-containers/packaging:rockylinux-9
+
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
       max-parallel: 2
