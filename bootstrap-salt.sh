@@ -125,6 +125,31 @@ __check_command_exists() {
 }
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
+#          NAME:  __check_services_systemd_functional
+#   DESCRIPTION:  Set _SYSTEMD_FUNCTIONAL = BS_TRUE or BS_FALSE case where systemd is functional (for example: container may not have systemd)
+#----------------------------------------------------------------------------------------------------------------------
+__check_services_systemd_functional() {
+    # DGM debug
+    set -v
+    set -x
+
+    # check if systemd is functional, having systemctl present is insufficient
+
+    if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_FALSE ]; then
+        # already determined systemd is not functional, default is 1
+        return
+    fi
+
+    if __check_command_exists systemctl; then
+        # shellcheck disable=SC2034
+        _SYSTEMD_HELP="$(systemctl --help)"
+    else
+        echoerror "systemctl: command not found, assume systemd not implemented"
+        _SYSTEMD_FUNCTIONAL=$BS_FALSE
+    fi
+}   # ----------  end of function __check_services_systemd_functional  ----------
+
+#---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  __check_pip_allowed
 #   DESCRIPTION:  Simple function to let the users know that -P needs to be used.
 #----------------------------------------------------------------------------------------------------------------------
@@ -279,6 +304,7 @@ _PIP_INSTALL_ARGS="--prefix=/usr"
 _PIP_DOWNLOAD_ARGS=""
 _QUICK_START="$BS_FALSE"
 _AUTO_ACCEPT_MINION_KEYS="$BS_FALSE"
+_SYSTEMD_FUNCTIONAL=$BS_TRUE
 
 # Defaults for install arguments
 ITYPE="stable"
@@ -587,6 +613,9 @@ STABLE_REV="latest"
 ONEDIR_REV="latest"
 _ONEDIR_REV="latest"
 YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+
+# check if systemd is functional
+__check_services_systemd_functional
 
 # Define installation type
 if [ "$#" -gt 0 ];then
@@ -2446,6 +2475,20 @@ __check_services_systemd() {
         echoerror "You need to pass a service name to check as the single argument to the function"
     fi
 
+    # check if systemd is functional, having systemctl present is insufficient
+
+    if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_FALSE ]; then
+        # already determined systemd is not functional, default is 1
+        return 1
+    fi
+
+    _SYSTEMD_ACTIVE=$(/bin/systemctl daemon-reload 2>&1 | grep 'System has not been booted with systemd')
+    if [ "$_SYSTEMD_ACTIVE" != "" ]; then
+        echodebug "systemd is not functional, despite systemctl being present"
+        _SYSTEMD_FUNCTIONAL="$BS_FALSE"
+        return 1
+    fi
+
     servicename=$1
     echodebug "Checking if service ${servicename} is enabled"
 
@@ -2875,6 +2918,7 @@ if [ "x${_PY_MAJOR_VERSION}" = "x" ]; then
     # Default to python 3 for install
     _PY_MAJOR_VERSION=3
 fi
+
 
 #######################################################################################################################
 #
@@ -3401,18 +3445,16 @@ install_ubuntu_stable_post() {
         [ $fname = "master" ] && [ "$_INSTALL_MASTER" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ]; then
+        ## if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # Using systemd
             /bin/systemctl is-enabled salt-$fname.service > /dev/null 2>&1 || (
                 /bin/systemctl preset salt-$fname.service > /dev/null 2>&1 &&
                 /bin/systemctl enable salt-$fname.service > /dev/null 2>&1
             )
             sleep 1
-            /bin/systemctl daemon-reload && continue
-        fi
-
-        # if here, try using init.rc in case using container without systemd
-        if [ -f /etc/init.d/salt-$fname ]; then
+            /bin/systemctl daemon-reload
+        elif [ -f /etc/init.d/salt-$fname ]; then
             update-rc.d salt-$fname defaults
         fi
     done
@@ -3440,7 +3482,8 @@ install_ubuntu_git_post() {
           _SERVICE_DIR="${_SALT_GIT_CHECKOUT_DIR}/pkg"
         fi
 
-        if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+        ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
             __copyfile "${_SERVICE_DIR}/salt-${fname}.service" "/lib/systemd/system/salt-${fname}.service"
 
             # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -3448,26 +3491,24 @@ install_ubuntu_git_post() {
 
             systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
             sleep 1
-            systemctl daemon-reload && continue
-        elif [ -f /sbin/initctl ]; then
-            _upstart_conf="/etc/init/salt-$fname.conf"
-            # We have upstart support
-            echodebug "There's upstart support"
-            if [ ! -f $_upstart_conf ]; then
-                # upstart does not know about our service, let's copy the proper file
-                echowarn "Upstart does not appear to know about salt-$fname"
-                echodebug "Copying ${_SERVICE_DIR}/salt-$fname.upstart to $_upstart_conf"
-                __copyfile "${_SERVICE_DIR}/salt-${fname}.upstart" "$_upstart_conf"
-                # Set service to know about virtualenv
-                if [ "${_VIRTUALENV_DIR}" != "null" ]; then
-                    echo "SALT_USE_VIRTUALENV=${_VIRTUALENV_DIR}" > /etc/default/salt-${fname}
-                fi
-                /sbin/initctl reload-configuration || return 1
-            fi
-        fi
+            systemctl daemon-reload
+        ## DGM elif [ -f /sbin/initctl ]; then
+        ## DGM     _upstart_conf="/etc/init/salt-$fname.conf"
+        ## DGM     # We have upstart support
+        ## DGM     echodebug "There's upstart support"
+        ## DGM     if [ ! -f $_upstart_conf ]; then
+        ## DGM         # upstart does not know about our service, let's copy the proper file
+        ## DGM         echowarn "Upstart does not appear to know about salt-$fname"
+        ## DGM         echodebug "Copying ${_SERVICE_DIR}/salt-$fname.upstart to $_upstart_conf"
+        ## DGM         __copyfile "${_SERVICE_DIR}/salt-${fname}.upstart" "$_upstart_conf"
+        ## DGM         # Set service to know about virtualenv
+        ## DGM         if [ "${_VIRTUALENV_DIR}" != "null" ]; then
+        ## DGM             echo "SALT_USE_VIRTUALENV=${_VIRTUALENV_DIR}" > /etc/default/salt-${fname}
+        ## DGM         fi
+        ## DGM         /sbin/initctl reload-configuration || return 1
+        ## DGM     fi
         # No upstart support in Ubuntu!?
-        # if here, try using init.rc in case using container without systemd
-        if [ -f "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" ]; then
+        elif [ -f "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" ]; then
             echodebug "There's NO upstart support!?"
             echodebug "Copying ${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init to /etc/init.d/salt-$fname"
             __copyfile "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" "/etc/init.d/salt-$fname"
@@ -3478,7 +3519,8 @@ install_ubuntu_git_post() {
 
             update-rc.d salt-$fname defaults
         else
-            echoerror "Neither upstart nor init.d was setup for salt-$fname"
+            ## DGM echoerror "Neither upstart nor init.d was setup for salt-$fname"
+            echoerror "No init.d was setup for salt-$fname"
         fi
     done
 
@@ -3493,10 +3535,11 @@ install_ubuntu_restart_daemons() {
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
     # Ensure upstart configs / systemd units are loaded
-    if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+    ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+    if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
         systemctl daemon-reload
-    elif [ -f /sbin/initctl ]; then
-        /sbin/initctl reload-configuration
+    ## DGM elif [ -f /sbin/initctl ]; then
+    ## DGM     /sbin/initctl reload-configuration
     fi
 
     for fname in api master minion syndic; do
@@ -3508,7 +3551,8 @@ install_ubuntu_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+        ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
             echodebug "There's systemd support while checking salt-$fname"
             systemctl stop salt-$fname > /dev/null 2>&1
             systemctl start salt-$fname.service && continue
@@ -3520,17 +3564,17 @@ install_ubuntu_restart_daemons() {
             fi
         fi
 
-        if [ -f /sbin/initctl ]; then
-            echodebug "There's upstart support while checking salt-$fname"
+        ## DGM if [ -f /sbin/initctl ]; then
+        ## DGM     echodebug "There's upstart support while checking salt-$fname"
 
-            if status salt-$fname 2>/dev/null | grep -q running; then
-                stop salt-$fname || (echodebug "Failed to stop salt-$fname" && return 1)
-            fi
+        ## DGM     if status salt-$fname 2>/dev/null | grep -q running; then
+        ## DGM         stop salt-$fname || (echodebug "Failed to stop salt-$fname" && return 1)
+        ## DGM     fi
 
-            start salt-$fname && continue
-            # We failed to start the service, let's test the SysV code below
-            echodebug "Failed to start salt-$fname using Upstart"
-        fi
+        ## DGM     start salt-$fname && continue
+        ## DGM     # We failed to start the service, let's test the SysV code below
+        ## DGM     echodebug "Failed to start salt-$fname using Upstart"
+        ## DGM fi
 
         if [ ! -f /etc/init.d/salt-$fname ]; then
             echoerror "No init.d support for salt-$fname was found"
@@ -3558,7 +3602,8 @@ install_ubuntu_check_services() {
         [ $fname = "master" ] && [ "$_INSTALL_MASTER" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+        ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
             __check_services_systemd salt-$fname || return 1
         elif [ -f /etc/init.d/salt-$fname ]; then
             __check_services_debian salt-$fname || return 1
@@ -3937,7 +3982,8 @@ install_debian_git_post() {
         fi
 
         # Configure SystemD for Debian 8 "Jessie" and later
-        if [ -f /bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             if [ ! -f /lib/systemd/system/salt-${fname}.service ] || \
                 { [ -f /lib/systemd/system/salt-${fname}.service ] && [ $_FORCE_OVERWRITE -eq $BS_TRUE ]; }; then
                 if [ -f "${_SERVICE_DIR}/salt-${fname}.service" ]; then
@@ -3986,7 +4032,8 @@ install_debian_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # Debian 8 and above uses systemd
             /bin/systemctl stop salt-$fname > /dev/null 2>&1
             /bin/systemctl start salt-$fname.service && continue
@@ -3994,9 +4041,7 @@ install_debian_restart_daemons() {
                 systemctl status salt-$fname.service
                 journalctl -xe
             fi
-        fi
-        # if here, try using init.rc in case using container without systemd
-        if [ -f /etc/init.d/salt-$fname ]; then
+        elif [ -f /etc/init.d/salt-$fname ]; then
             # Still in SysV init
             /etc/init.d/salt-$fname stop > /dev/null 2>&1
             /etc/init.d/salt-$fname start
@@ -4018,7 +4063,8 @@ install_debian_check_services() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             __check_services_systemd salt-$fname || return 1
         elif [ -f /etc/init.d/salt-$fname ]; then
             __check_services_debian salt-$fname || return 1
@@ -4056,7 +4102,7 @@ __install_saltstack_fedora_onedir_repository() {
 
     ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
 
-    YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+    ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}"
@@ -4218,12 +4264,8 @@ install_fedora_git_post() {
 
         systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
         sleep 1
-        systemctl daemon-reload && continue
+        systemctl daemon-reload
 
-        # if here, try using init.rc in case using container without systemd
-        if [ -f /etc/init.d/salt-$fname ]; then
-            update-rc.d salt-$fname defaults
-        fi
     done
 }
 
@@ -4249,11 +4291,6 @@ install_fedora_restart_daemons() {
         if [ "$_ECHO_DEBUG" -eq $BS_TRUE ]; then
             systemctl status salt-$fname.service
             journalctl -xe
-        fi
-        # if here, try using init.rc in case using container without systemd
-        if [ -f /etc/init.d/salt-$fname ]; then
-            /etc/init.d/salt-$fname stop > /dev/null 2>&1
-            /etc/init.d/salt-$fname start && continue
         fi
     done
 }
@@ -4439,7 +4476,7 @@ __install_saltstack_rhel_onedir_repository() {
 ## DGM         done
 ## DGM
 ## DGM         yum clean metadata || return 1
-    YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+    ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
@@ -4560,7 +4597,8 @@ install_centos_stable_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             /bin/systemctl is-enabled salt-${fname}.service > /dev/null 2>&1 || (
                 /bin/systemctl preset salt-${fname}.service > /dev/null 2>&1 &&
                 /bin/systemctl enable salt-${fname}.service > /dev/null 2>&1
@@ -4668,16 +4706,16 @@ install_centos_git_post() {
         else
           _SERVICE_FILE="${_SALT_GIT_CHECKOUT_DIR}/pkg/rpm/salt-${fname}.service"
         fi
-        if [ -f /bin/systemctl ]; then
+
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             if [ ! -f "/usr/lib/systemd/system/salt-${fname}.service" ] || \
                 { [ -f "/usr/lib/systemd/system/salt-${fname}.service" ] && [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; }; then
                 __copyfile "${_SERVICE_FILE}" /usr/lib/systemd/system
             fi
 
             SYSTEMD_RELOAD=$BS_TRUE
-        fi
-        # ensure init.rc in case using container without systemd full support
-        if [ ! -f "/etc/init.d/salt-$fname" ] || \
+        elif [ ! -f "/etc/init.d/salt-$fname" ] || \
             { [ -f "/etc/init.d/salt-$fname" ] && [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; }; then
             __copyfile "${_SALT_GIT_CHECKOUT_DIR}/pkg/rpm/salt-${fname}" /etc/init.d
             chmod +x /etc/init.d/salt-${fname}
@@ -4779,7 +4817,8 @@ install_centos_onedir_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             /bin/systemctl is-enabled salt-${fname}.service > /dev/null 2>&1 || (
                 /bin/systemctl preset salt-${fname}.service > /dev/null 2>&1 &&
                 /bin/systemctl enable salt-${fname}.service > /dev/null 2>&1
@@ -4814,26 +4853,28 @@ install_centos_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /sbin/initctl ] && [ -f /etc/init/salt-${fname}.conf ]; then
-            # We have upstart support and upstart knows about our service
-            if ! /sbin/initctl status salt-$fname > /dev/null 2>&1; then
-                # Everything is in place and upstart gave us an error code? Fail!
-                return 1
-            fi
+        ## DGM if [ -f /sbin/initctl ] && [ -f /etc/init/salt-${fname}.conf ]; then
+        ## DGM     # We have upstart support and upstart knows about our service
+        ## DGM     if ! /sbin/initctl status salt-$fname > /dev/null 2>&1; then
+        ## DGM         # Everything is in place and upstart gave us an error code? Fail!
+        ## DGM         return 1
+        ## DGM     fi
 
-            # upstart knows about this service.
-            # Let's try to stop it, and then start it
-            /sbin/initctl stop salt-$fname > /dev/null 2>&1
-            # Restart service
-            if ! /sbin/initctl start salt-$fname > /dev/null 2>&1; then
-                # Failed the restart?!
-                return 1
-            fi
-        elif [ -f /etc/init.d/salt-$fname ]; then
+        ## DGM     # upstart knows about this service.
+        ## DGM     # Let's try to stop it, and then start it
+        ## DGM     /sbin/initctl stop salt-$fname > /dev/null 2>&1
+        ## DGM     # Restart service
+        ## DGM     if ! /sbin/initctl start salt-$fname > /dev/null 2>&1; then
+        ## DGM         # Failed the restart?!
+        ## DGM         return 1
+        ## DGM     fi
+        ## DGM elif [ -f /etc/init.d/salt-$fname ]; then
+        if [ -f /etc/init.d/salt-$fname ]; then
             # Disable stdin to fix shell session hang on killing tee pipe
             service salt-$fname stop < /dev/null > /dev/null 2>&1
             service salt-$fname start < /dev/null
-        elif [ -f /usr/bin/systemctl ]; then
+        ## DGM elif [ -f /usr/bin/systemctl ]; then
+        elif [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # CentOS 7 uses systemd
             /usr/bin/systemctl stop salt-$fname > /dev/null 2>&1
             /usr/bin/systemctl start salt-$fname.service && continue
@@ -4889,7 +4930,8 @@ install_centos_check_services() {
 
         if [ -f "/etc/init.d/salt-$fname" ]; then
             __check_services_sysvinit "salt-$fname" || return 1
-        elif [ -f /usr/bin/systemctl ]; then
+        ## DGM elif [ -f /usr/bin/systemctl ]; then
+        elif [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             __check_services_systemd "salt-$fname" || return 1
         fi
     done
@@ -6076,7 +6118,7 @@ install_amazon_linux_ami_2_deps() {
 ## DGM         fi
 
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+        ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
@@ -6155,7 +6197,7 @@ install_amazon_linux_ami_2_onedir_deps() {
 ## DGM         fi
 
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+        ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
@@ -6317,7 +6359,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
 ## DGM         fi
 ## DGM     fi
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+        ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
@@ -6530,7 +6572,8 @@ install_arch_linux_post() {
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
 
-        if [ -f /usr/bin/systemctl ]; then
+        ## DGM if [ -f /usr/bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # Using systemd
             /usr/bin/systemctl is-enabled salt-$fname.service > /dev/null 2>&1 || (
                 /usr/bin/systemctl preset salt-$fname.service > /dev/null 2>&1 &&
@@ -6561,7 +6604,8 @@ install_arch_linux_git_post() {
           _SERVICE_DIR="${_SALT_GIT_CHECKOUT_DIR}/pkg/rpm"
         fi
 
-        if [ -f /usr/bin/systemctl ]; then
+        ## DGM if [ -f /usr/bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             __copyfile "${_SERVICE_DIR}/salt-${fname}.service" "/lib/systemd/system/salt-${fname}.service"
 
             # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -6594,7 +6638,8 @@ install_arch_linux_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /usr/bin/systemctl ]; then
+        ## DGM if [ -f /usr/bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             /usr/bin/systemctl stop salt-$fname.service > /dev/null 2>&1
             /usr/bin/systemctl start salt-$fname.service && continue
             echodebug "Failed to start salt-$fname using systemd"
@@ -6610,7 +6655,8 @@ install_arch_linux_restart_daemons() {
 }
 
 install_arch_check_services() {
-    if [ ! -f /usr/bin/systemctl ]; then
+    ## DGM if [ ! -f /usr/bin/systemctl ]; then
+    if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
         # Not running systemd!? Don't check!
         return 0
     fi
@@ -6666,7 +6712,7 @@ __install_saltstack_photon_onedir_repository() {
     fi
 
     ## DGM __PY_VERSION_REPO="py3"
-    YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
+    ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         ## DGM ## salt repo 4 & 5 have issues, need the Major version dot Zero, eg: 4.0, 5.0
@@ -7190,7 +7236,8 @@ install_opensuse_stable_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ] || [ -f /usr/bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ] || [ -f /usr/bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
             sleep 1
             systemctl daemon-reload
@@ -7213,7 +7260,8 @@ install_opensuse_git_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if command -v systemctl; then
+        ## DGM if command -v systemctl; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             use_usr_lib=$BS_FALSE
 
             if [ "${DISTRO_MAJOR_VERSION}" -ge 15 ]; then
@@ -7265,7 +7313,8 @@ install_opensuse_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        if [ -f /bin/systemctl ]; then
+        ## DGM if [ -f /bin/systemctl ]; then
+        if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             systemctl stop salt-$fname > /dev/null 2>&1
             systemctl start salt-$fname.service && continue
             echodebug "Failed to start salt-$fname using systemd"
@@ -7281,7 +7330,8 @@ install_opensuse_restart_daemons() {
 }
 
 install_opensuse_check_services() {
-    if [ ! -f /bin/systemctl ]; then
+    ## DGM if [ ! -f /bin/systemctl ]; then
+    if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
         # Not running systemd!? Don't check!
         return 0
     fi
