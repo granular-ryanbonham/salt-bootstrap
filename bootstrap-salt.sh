@@ -2003,7 +2003,7 @@ __apt_key_fetch() {
     ## DGM cp -f "$tempfile" /usr/share/keyrings/salt-archive-keyring.gpg && chmod 644 /usr/share/keyrings/salt-archive-keyring.gpg || return 1
     __fetch_url "$tempfile" "$url" || return 1
     mkdir -p /etc/apt/keyrings
-    cp -f "$tempfile" /etc/apt/keyrings/salt-archive-keyring.gpg && chmod 644 /etc/apt/keyrings/salt-archive-keyring.pgp || return 1
+    cp -f "$tempfile" /etc/apt/keyrings/salt-archive-keyring.pgp && chmod 644 /etc/apt/keyrings/salt-archive-keyring.pgp || return 1
     rm -f "$tempfile"
 
     return 0
