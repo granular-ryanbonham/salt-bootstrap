@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.01"
+__ScriptVersion="2024.11.05"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -581,6 +581,11 @@ echoinfo "Running version: ${__ScriptVersion}"
 echoinfo "Executed by: ${CALLER}"
 echoinfo "Command line: '${__ScriptFullName} ${__ScriptArgs}'"
 echowarn "Running the unstable version of ${__ScriptName}"
+
+# Defaults
+STABLE_REV="latest"
+ONEDIR_REV="latest"
+_ONEDIR_REV="latest"
 
 # Define installation type
 if [ "$#" -gt 0 ];then
