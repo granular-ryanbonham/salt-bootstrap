@@ -26,7 +26,9 @@ on:
 jobs:
   Test:
     name: ${{ matrix.instance }}
-    runs-on: ubuntu-20.04
+    ## DGM runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: ubuntu-22.04
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
       max-parallel: 2
