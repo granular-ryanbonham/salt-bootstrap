@@ -26,6 +26,7 @@ def run_salt_call(cmd):
     """
     cmd.append("--out=json")
     result = subprocess.run(cmd, capture_output=True, text=True)
+    print(f"DGM run_salt_call, cmd '{cmd}', result '{result}'", flush=True)
     json_data = json.loads(result.stdout)
     return json_data["local"]
 
