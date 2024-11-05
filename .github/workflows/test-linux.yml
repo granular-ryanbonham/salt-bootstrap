@@ -29,7 +29,7 @@ jobs:
     ## DGM runs-on: ubuntu-20.04
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/saltstack/salt-ci-containers/packaging:rockylinux-9
+      image: ghcr.io/saltstack/salt-ci-containers/packaging:ubuntu-22.04
 
     timeout-minutes: ${{ inputs.timeout }}
     strategy:

@@ -4068,7 +4068,7 @@ __install_saltstack_fedora_onedir_repository() {
         ## DGM yum clean metadata || return 1
 
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
+        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$REPO_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -4443,7 +4443,7 @@ __install_saltstack_rhel_onedir_repository() {
 
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
+        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$REPO_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6079,7 +6079,7 @@ install_amazon_linux_ami_2_deps() {
         YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
+            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
             if [ "$REPO_REV" != "latest" ]; then
                 # 3006.x is default
                 REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6158,7 +6158,7 @@ install_amazon_linux_ami_2_onedir_deps() {
         YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
+            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
             if [ "$REPO_REV" != "latest" ]; then
                 # 3006.x is default
                 REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6320,7 +6320,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
         YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
+            __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
             if [ "$REPO_REV" != "latest" ]; then
                 # 3006.x is default
                 REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
@@ -6679,7 +6679,7 @@ __install_saltstack_photon_onedir_repository() {
         ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
 
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
+        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$REPO_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
