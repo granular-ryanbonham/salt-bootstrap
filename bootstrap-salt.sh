@@ -144,8 +144,8 @@ __check_services_systemd_functional() {
         # shellcheck disable=SC2034
         _SYSTEMD_HELP="$(systemctl --help)"
     else
-        echoerror "systemctl: command not found, assume systemd not implemented"
         _SYSTEMD_FUNCTIONAL=$BS_FALSE
+        echoerror "systemctl: command not found, assume systemd not implemented, _SYSTEMD_FUNCTIONAL $_SYSTEMD_FUNCTIONAL"
     fi
 }   # ----------  end of function __check_services_systemd_functional  ----------
 
@@ -2483,9 +2483,10 @@ __check_services_systemd() {
     fi
 
     _SYSTEMD_ACTIVE=$(/bin/systemctl daemon-reload 2>&1 | grep 'System has not been booted with systemd')
+    echodebug "__check_services_systemd _SYSTEMD_ACTIVE result ,$_SYSTEMD_ACTIVE,"
     if [ "$_SYSTEMD_ACTIVE" != "" ]; then
-        echodebug "systemd is not functional, despite systemctl being present"
-        _SYSTEMD_FUNCTIONAL="$BS_FALSE"
+        _SYSTEMD_FUNCTIONAL=$BS_FALSE
+        echodebug "systemd is not functional, despite systemctl being present, setting _SYSTEMD_FUNCTIONAL false, $_SYSTEMD_FUNCTIONAL"
         return 1
     fi
 
