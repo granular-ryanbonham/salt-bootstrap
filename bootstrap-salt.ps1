@@ -74,6 +74,15 @@ param(
     [String]$Master = "not-specified",
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
+    [Alias("r")]
+    # URL to the windows packages. Will look for a file named repo.json at the
+    # root of the URL. This file is used to determine the name and location of
+    # the installer in the repo. If repo.json is not found, it will look for the
+    # file under the minor directory.
+    # Default is "https://packages.broadcom.com/artifactory/saltproject-generic/windows/"
+    [String]$RepoUrl = "https://packages.broadcom.com/artifactory/saltproject-generic/windows/",
+
+    [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
     [Alias("c")]
     # Vagrant only
     # Vagrant files are placed in "C:\tmp". Copies Salt config files from
@@ -291,7 +300,7 @@ if (!(Get-IsAdministrator)) {
 }
 
 #===============================================================================
-# Change RepoUrl for older versions
+# Check for older versions
 #===============================================================================
 $majorVersion = Get-MajorVersion -Version $Version
 if ($majorVersion -lt "3006") {
@@ -306,6 +315,7 @@ if ($majorVersion -lt "3006") {
 $ConfDir = "$RootDir\conf"
 $PkiDir  = "$ConfDir\pki\minion"
 $RootDir = "$env:ProgramData\Salt Project\Salt"
+$DfltUrl = "https://packages.broadcom.com/artifactory/saltproject-generic/windows/"
 $ApiUrl  = "https://packages.broadcom.com/artifactory/api/storage/saltproject-generic/windows"
 
 # Check for existing installation where RootDir is stored in the registry
@@ -326,6 +336,7 @@ Write-Verbose "version: $Version"
 Write-Verbose "runservice: $RunService"
 Write-Verbose "master: $Master"
 Write-Verbose "minion: $Minion"
+Write-Verbose "repourl: $RepoUrl"
 Write-Verbose "apiurl: $ApiUrl"
 Write-Verbose "ConfDir: $ConfDir"
 Write-Verbose "RootDir: $RootDir"
@@ -392,69 +403,79 @@ if ([IntPtr]::Size -eq 4) {
 #===============================================================================
 # Getting version information from the repo
 #===============================================================================
-Write-Verbose "Getting version information from Artifactory"
-$response = Invoke-WebRequest $ApiUrl -UseBasicParsing
-# Convert the output to a powershell object
-$psobj = $response.ToString() | ConvertFrom-Json
+if ( $RepoUrl -eq $DfltUrl ) {
+    Write-Verbose "Getting version information from Artifactory"
+    $response = Invoke-WebRequest $ApiUrl -UseBasicParsing
+    # Convert the output to a powershell object
+    $psobj = $response.ToString() | ConvertFrom-Json
 
-# Filter the object for folders
-$filtered = $psobj.children | Where-Object -Property folder -EQ $true
+    # Filter the object for folders
+    $filtered = $psobj.children | Where-Object -Property folder -EQ $true
 
-# Get each uri and add it to the list of versions
-$available_versions = [System.Collections.ArrayList]@()
-$filtered | Select-Object -Property uri | ForEach-Object {
-    $available_versions.Add($_.uri.Trim("/")) | Out-Null
-}
+    # Get each uri and add it to the list of versions
+    $available_versions = [System.Collections.ArrayList]@()
+    $filtered | Select-Object -Property uri | ForEach-Object {
+        $available_versions.Add($_.uri.Trim("/")) | Out-Null
+    }
 
-# Create a versions table, similar to repo.json
-# This will have the latest version available, the latest version available for
-# each major version, and every version available. This makes the version
-# lookup logic easier. You can view the contents of the versions table by
-# passing the -Verbose command
-$latest = $available_versions | Select-Object -Last 1
-$versions_table = [ordered]@{"latest"=$latest}
+    # Create a versions table, similar to repo.json
+    # This will have the latest version available, the latest version available for
+    # each major version, and every version available. This makes the version
+    # lookup logic easier. You can view the contents of the versions table by
+    # passing the -Verbose command
+    $latest = $available_versions | Select-Object -Last 1
+    $versions_table = [ordered]@{"latest"=$latest}
 
-$available_versions | ForEach-Object {
-    $versions_table[$(Get-MajorVersion $_)] = $_
-    $versions_table[$_.ToLower()] = $_.ToLower()
-}
+    $available_versions | ForEach-Object {
+        $versions_table[$(Get-MajorVersion $_)] = $_
+        $versions_table[$_.ToLower()] = $_.ToLower()
+    }
 
-Write-Verbose "Available versions:"
-$available_versions | ForEach-Object {
-    Write-Verbose "- $_"
-}
-Write-Verbose "Versions Table:"
-$versions_table | Sort-Object Name | Out-String | Write-Verbose
+    Write-Verbose "Available versions:"
+    $available_versions | ForEach-Object {
+        Write-Verbose "- $_"
+    }
+    Write-Verbose "Versions Table:"
+    $versions_table | Sort-Object Name | Out-String | Write-Verbose
 
-#===============================================================================
-# Validate passed version
-#===============================================================================
-if ( $versions_table.Contains($Version.ToLower()) ) {
-    $Version = $versions_table[$Version.ToLower()]
-} else {
-    Write-Host "Version $Version is not available" -ForegroundColor Red
-    Write-Host "Available versions are:" -ForegroundColor Yellow
-    $available_versions | ForEach-Object { Write-Host "- $_" -ForegroundColor Yellow }
-    exit 1
-}
+    #===============================================================================
+    # Validate passed version
+    #===============================================================================
+    if ( $versions_table.Contains($Version.ToLower()) ) {
+        $Version = $versions_table[$Version.ToLower()]
+    } else {
+        Write-Host "Version $Version is not available" -ForegroundColor Red
+        Write-Host "Available versions are:" -ForegroundColor Yellow
+        $available_versions | ForEach-Object { Write-Host "- $_" -ForegroundColor Yellow }
+        exit 1
+    }
 
-#===============================================================================
-# Get file name to download
-#===============================================================================
-$saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
-$response = Invoke-WebRequest "$ApiUrl/$Version/$saltFileName" -UseBasicParsing
-$psobj = $response.ToString() | ConvertFrom-Json
-$saltFileUrl = $psobj.downloadUri
-$saltSha256  = $psobj.checksums.sha256
-
-if ( $saltFileName -and $saltVersion -and $saltSha256) {
-    Write-Verbose "Found Name, Version, and Sha"
-} else {
-    # We will guess the name of the installer
-    Write-Verbose "Failed to get Name, Version, and Sha from Artifactory API"
-    Write-Verbose "We'll try to find the file in standard paths"
+    #===============================================================================
+    # Get file url and sha256
+    #===============================================================================
     $saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
+    $response = Invoke-WebRequest "$ApiUrl/$Version/$saltFileName" -UseBasicParsing
+    $psobj = $response.ToString() | ConvertFrom-Json
+    $saltFileUrl = $psobj.downloadUri
+    $saltSha256  = $psobj.checksums.sha256
+
+    if ( $saltFileName -and $saltVersion -and $saltSha256) {
+        Write-Verbose "Found Name, Version, and Sha"
+    } else {
+        # We will guess the name of the installer
+        Write-Verbose "Failed to get Name, Version, and Sha from Artifactory API"
+        Write-Verbose "We'll try to find the file in standard paths"
+        $saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
+        $saltVersion = $Version
+    }
+} else {
+    # If we're using a custom RepoUrl, we're going to assum that the binary is
+    # in the reoot of the RepoUrl/Version. We will not check the sha on custom
+    # repos
+    $saltFileName = "Salt-Minion-$Version-Py3-$arch-Setup.exe"
+    $saltFileUrl = "$RepoUrl/$Version/$saltFileName"
     $saltVersion = $Version
+    $saltSha256 = ""
 }
 
 #===============================================================================
@@ -478,8 +499,8 @@ Write-Verbose ""
 Write-Verbose "Salt File URL: $saltFileUrl"
 Write-Verbose "Local File: $localFile"
 
-$webclient = New-Object System.Net.WebClient
-$webclient.DownloadFile($saltFileUrl, $localFile)
+if ( Test-Path -Path $localFile ) {Remove-Item -Path $localFile -Force}
+Invoke-WebRequest -Uri $saltFileUrl -OutFile $localFile
 
 if ( Test-Path -Path $localFile ) {
     Write-Host "Success" -ForegroundColor Green
