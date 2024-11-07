@@ -657,7 +657,7 @@ elif [ "$ITYPE" = "stable" ]; then
             ITYPE="onedir"
             shift
         else
-            echo "Unknown stable version: $1 (valid: 3006, 3007, latest)"
+            echo "Unknown stable version: $1 (valid: 3006, 3007, latest), versions older than 3006 are not available"
             exit 1
         fi
     fi
@@ -676,7 +676,7 @@ elif [ "$ITYPE" = "onedir" ]; then
             STABLE_REV="$1"
             shift
         else
-            echo "Unknown onedir version: $1 (valid: 3006, 3007, latest.)"
+            echo "Unknown onedir version: $1 (valid: 3006, 3007, latest), versions older than 3006 are not available"
             exit 1
         fi
     fi
