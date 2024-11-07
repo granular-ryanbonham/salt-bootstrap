@@ -6034,20 +6034,53 @@ __install_saltstack_photon_onedir_repository() {
     fi
 
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
-        __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
+        ## Photon tdnf doesn't support config-manager
+        ## FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
+        ## __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
+        # shellcheck disable=SC2129
         if [ "$ONEDIR_REV" != "latest" ]; then
             # 3006.x is default
             REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
             if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                 # Enable the Salt 3007 STS repo
-                dnf config-manager --set-disable salt-repo-*
-                dnf config-manager --set-enabled salt-repo-3007-sts
+                ## tdnf config-manager --set-disable salt-repo-*
+                ## tdnf config-manager --set-enabled salt-repo-3007-sts
+                echo "[salt-repo-3007-sts]" > "${YUM_REPO_FILE}"
+                echo "name=Salt Repo for Salt v3007 STS" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://packages.broadcom.com/artifactory/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+                echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                echo "priority=10" >> "${YUM_REPO_FILE}"
+                echo "enabled=1" >> "${YUM_REPO_FILE}"
+                echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                echo "exclude=*3006* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
+                echo "gpgkey=https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
+            else
+                # Salt 3006 repo
+                echo "[salt-repo-3006-lts]" > "${YUM_REPO_FILE}"
+                echo "name=Salt Repo for Salt v3006 LTS" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://packages.broadcom.com/artifactory/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+                echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                echo "priority=10" >> "${YUM_REPO_FILE}"
+                echo "enabled=1" >> "${YUM_REPO_FILE}"
+                echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                echo "exclude=*3007* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
+                echo "gpgkey=https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
             fi
         else
             # Enable the Salt LATEST repo
-            dnf config-manager --set-disable salt-repo-*
-            dnf config-manager --set-enabled salt-repo-latest
+            ## tdnf config-manager --set-disable salt-repo-*
+            ## tdnf config-manager --set-enabled salt-repo-latest
+            echo "[salt-repo-latest]" > "${YUM_REPO_FILE}"
+            echo "name=Salt Repo for Salt LATEST release" >> "${YUM_REPO_FILE}"
+            echo "baseurl=https://packages.broadcom.com/artifactory/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+            echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+            echo "priority=10" >> "${YUM_REPO_FILE}"
+            echo "enabled=1" >> "${YUM_REPO_FILE}"
+            echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+            echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+            echo "gpgkey=https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
         fi
         tdnf makecache || return 1
     elif [ "$ONEDIR_REV" != "latest" ]; then
@@ -7228,9 +7261,6 @@ daemons_running_voidlinux() {
 #   DESCRIPTION:  Set _PKG_VERSION to the latest for MacOS
 #----------------------------------------------------------------------------------------------------------------------
 __macosx_get_packagesite_onedir_latest() {
-    ## DGM debug
-    set -v
-    set -x
 
     echodebug "Find latest MacOS release from repository"
 
@@ -7250,9 +7280,6 @@ __macosx_get_packagesite_onedir_latest() {
 
 
 __macosx_get_packagesite_onedir() {
-    ## DGM debug
-    set -v
-    set -x
 
     echodebug "Get package site for onedir from repository"
 
