@@ -46,11 +46,11 @@ jobs:
         run: |
           pip install -U pytest
 
-      ## TBD Disabled until CI/CD is functional
-      ## - name: Bootstrap Salt
-      ##   run: |
-      ##     sudo sh -x ./bootstrap-salt.sh
+      - name: Bootstrap Salt
+        run: |
+          sudo sh -x ./bootstrap-salt.sh
 
+      ## TBD Disabled until CI/CD is functional
       ## - name: Test Bootstrap
       ##   run: |
       ##     pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/

@@ -7246,6 +7246,11 @@ __macosx_get_packagesite_onedir_latest() {
 
 
 __macosx_get_packagesite_onedir() {
+    ## DGM debug
+    set -v
+    set -x
+
+    echodebug "Get package site for onedir from repository"
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
