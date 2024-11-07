@@ -26,10 +26,9 @@ on:
 jobs:
   Test:
     name: ${{ matrix.instance }}
-    ## runs-on: ubuntu-20.04
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/saltstack/salt-ci-containers/packaging:ubuntu-22.04
+      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.distro-slug }}
 
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
@@ -48,8 +47,9 @@ jobs:
       - name: Bootstrap Salt
         run: |
           echo "matrix instance ,${{ matrix.instance }},"
-          echo "inputs.distro-slug ,${{ inputs.distro-slug }},"
-          sh -x ./bootstrap-salt.sh
+          $bt_parms = echo "${{ matrix.instance }}" | sed 's/-/ /'
+          echo "bt parms ,$bt_parms,"
+          sh -x ./bootstrap-salt.sh $bt_parms
 
       - name: Test Bootstrap
         run: |
