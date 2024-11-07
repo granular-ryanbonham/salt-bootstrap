@@ -7223,6 +7223,10 @@ daemons_running_voidlinux() {
 #   OS X / Darwin Install Functions
 #
 
+#---  FUNCTION  -------------------------------------------------------------------------------------------------------
+#          NAME:  __macosx_get_packagesite_onedir_latest
+#   DESCRIPTION:  Set _PKG_VERSION to the latest for MacOS
+#----------------------------------------------------------------------------------------------------------------------
 __macosx_get_packagesite_onedir_latest() {
     ## DGM debug
     set -v
@@ -7236,14 +7240,12 @@ __macosx_get_packagesite_onedir_latest() {
     cd  ${macos_versions_tmpdir} || return 1
     wget -r -np -nH --exclude-directories=onedir,relenv,windows -x -l 1 "$SALT_MACOS_PKGDIR_URL/"
     # shellcheck disable=SC2010
-    LATEST_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | tail -n 1)
-    cd ${curr_pwd} || return "${LATEST_VERSION}"
+    _PKG_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | tail -n 1)
+    cd ${curr_pwd} || return "${_PKG_VERSION}"
     rm -fR ${macos_versions_tmpdir}
 
-    echodebug "latest MacOS release from repository found ${LATEST_VERSION}"
-    # shellcheck disable=SC2116
-    LATEST_VERSION_RET=$(echo "${LATEST_VERSION_RET}")
-    return "${LATEST_VERSION_RET}"
+    echodebug "latest MacOS release from repository found ${_PKG_VERSION}"
+
 }
 
 
@@ -7260,11 +7262,12 @@ __macosx_get_packagesite_onedir() {
     fi
 
     DARWIN_ARCH=${CPU_ARCH_L}
+    _PKG_VERSION=""
 
     _ONEDIR_TYPE="saltproject-generic"
     SALT_MACOS_PKGDIR_URL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos"
     if [ "$(echo "$_ONEDIR_REV" | grep -E '^(latest)$')" != "" ]; then
-      _PKG_VERSION=$(__macosx_get_packagesite_onedir_latest)
+      __macosx_get_packagesite_onedir_latest
     elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*))')" != "" ]; then
       _PKG_VERSION=$_ONEDIR_REV
     else
