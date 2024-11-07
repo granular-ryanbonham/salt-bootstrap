@@ -231,7 +231,8 @@ jobs:
 
       - name: Tag The ${{ needs.update-develop.outputs.release-version }} Release
         run: |
-          git tag -m "Release ${{ needs.update-develop.outputs.release-version }}" -as ${{ needs.update-develop.outputs.release-version }}
+          cat ~/.gitconfig
+          git tag --no-sign -m "Release ${{ needs.update-develop.outputs.release-version }}" -as ${{ needs.update-develop.outputs.release-version }}
 
       - name: Update bootstrap-salt.sh sha256sum's
         run: |
