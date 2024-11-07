@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.05"
+__ScriptVersion="2024.11.06"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -645,17 +645,20 @@ if [ "$ITYPE" = "git" ]; then
 # If doing stable install, check if version specified
 elif [ "$ITYPE" = "stable" ]; then
     if [ "$#" -eq 0 ];then
+        STABLE_REV="latest"
         ONEDIR_REV="latest"
         _ONEDIR_REV="latest"
         ITYPE="onedir"
     else
         if [ "$(echo "$1" | grep -E '^(latest|3006|3007)$')" != "" ]; then
+            STABLE_REV="$1"
             ONEDIR_REV="$1"
             _ONEDIR_REV="$1"
             ITYPE="onedir"
             shift
         elif [ "$(echo "$1" | grep -E '^([3-9][0-5]{2}[5-9](\.[0-9]*)?)')" != "" ]; then
             ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+            STABLE_REV="$1"
             ONEDIR_REV="$1"
             _ONEDIR_REV="$1"
             ITYPE="onedir"
@@ -669,13 +672,16 @@ elif [ "$ITYPE" = "stable" ]; then
 elif [ "$ITYPE" = "onedir" ]; then
     if [ "$#" -eq 0 ];then
         ONEDIR_REV="latest"
+        STABLE_REV="latest"
     else
         if [ "$(echo "$1" | grep -E '^(latest|3006|3007)$')" != "" ]; then
             ONEDIR_REV="$1"
+            STABLE_REV="$1"
             shift
         elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}(\.[0-9]*)?)')" != "" ]; then
             ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
             ONEDIR_REV="$1"
+            STABLE_REV="$1"
             shift
         else
             echo "Unknown onedir version: $1 (valid: 3006, 3007, latest.)"
@@ -3141,14 +3147,14 @@ __install_saltstack_ubuntu_onedir_repository() {
     __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
-    if [ "$STABLE_REV" != "latest" ]; then
+    if [ "$ONEDIR_REV" != "latest" ]; then
         # latest is default
-        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+        ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+        if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+        elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
@@ -3721,14 +3727,14 @@ __install_saltstack_debian_onedir_repository() {
     __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
-    if [ "$STABLE_REV" != "latest" ]; then
+    if [ "$ONEDIR_REV" != "latest" ]; then
         # latest is default
-        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+        ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+        if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+        elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
@@ -4088,11 +4094,11 @@ __install_saltstack_fedora_onedir_repository() {
     set -v
     set -x
 
-    if [ "$ITYPE" = "stable" ]; then
-        REPO_REV="$ONEDIR_REV"
-    else
-        REPO_REV="latest"
-    fi
+    ## DGM if [ "$ITYPE" = "stable" ]; then
+    ## DGM     REPO_REV="$ONEDIR_REV"
+    ## DGM else
+    ## DGM     REPO_REV="latest"
+    ## DGM fi
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -4116,9 +4122,9 @@ __install_saltstack_fedora_onedir_repository() {
 
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
-        if [ "$REPO_REV" != "latest" ]; then
+        if [ "$ONEDIR_REV" != "latest" ]; then
             # 3006.x is default
-            REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+            REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
             if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                 # Enable the Salt 3007 STS repo
                 dnf config-manager --set-disable salt-repo-*
@@ -4131,9 +4137,9 @@ __install_saltstack_fedora_onedir_repository() {
         fi
         dnf clean expire-cache || return 1
 
-    elif [ "$REPO_REV" != "latest" ]; then
+    elif [ "$ONEDIR_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
-        echowarn "Use -F (forced overwrite) to install $REPO_REV."
+        echowarn "Use -F (forced overwrite) to install $ONEDIR_REV."
     fi
 
     return 0
@@ -4429,11 +4435,11 @@ __install_saltstack_rhel_onedir_repository() {
     set -v
     set -x
 
-    if [ "$ITYPE" = "stable" ]; then
-        REPO_REV="$ONEDIR_REV"
-    else
-        REPO_REV="latest"
-    fi
+    ## DGM if [ "$ITYPE" = "stable" ]; then
+    ## DGM     REPO_REV="$ONEDIR_REV"
+    ## DGM else
+    ## DGM     REPO_REV="latest"
+    ## DGM fi
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -4482,9 +4488,9 @@ __install_saltstack_rhel_onedir_repository() {
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
-        if [ "$REPO_REV" != "latest" ]; then
+        if [ "$ONEDIR_REV" != "latest" ]; then
             # 3006.x is default
-            REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+            REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
             if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                 # Enable the Salt 3007 STS repo
                 dnf config-manager --set-disable salt-repo-*
@@ -4496,9 +4502,9 @@ __install_saltstack_rhel_onedir_repository() {
             dnf config-manager --set-enabled salt-repo-latest
         fi
         dnf clean expire-cache || return 1
-    elif [ "$REPO_REV" != "latest" ]; then
+    elif [ "$ONEDIR_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
-        echowarn "Use -F (forced overwrite) to install $REPO_REV."
+        echowarn "Use -F (forced overwrite) to install $ONEDIR_REV."
     fi
 
     return 0
@@ -6078,11 +6084,11 @@ install_amazon_linux_ami_2_deps() {
         return 1
     fi
 
-    if [ "$ITYPE" = "stable" ]; then
-        REPO_REV="$STABLE_REV"
-    else
-        REPO_REV="latest"
-    fi
+    ## DGM if [ "$ITYPE" = "stable" ]; then
+    ## DGM     REPO_REV="$STABLE_REV"
+    ## DGM else
+    ## DGM     REPO_REV="latest"
+    ## DGM fi
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
@@ -6123,9 +6129,9 @@ install_amazon_linux_ami_2_deps() {
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
-            if [ "$REPO_REV" != "latest" ]; then
+            if [ "$STABLE_REV" != "latest" ]; then
                 # 3006.x is default
-                REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+                REPO_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
                 if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                     # Enable the Salt 3007 STS repo
                     dnf config-manager --set-disable salt-repo-*
@@ -6153,11 +6159,11 @@ install_amazon_linux_ami_2_onedir_deps() {
         return 1
     fi
 
-    if [ "$ITYPE" = "onedir" ]; then
-        REPO_REV="$ONEDIR_REV"
-    else
-        REPO_REV="latest"
-    fi
+    ## DGM if [ "$ITYPE" = "onedir" ]; then
+    ## DGM     REPO_REV="$ONEDIR_REV"
+    ## DGM else
+    ## DGM     REPO_REV="latest"
+    ## DGM fi
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
@@ -6202,9 +6208,9 @@ install_amazon_linux_ami_2_onedir_deps() {
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
-            if [ "$REPO_REV" != "latest" ]; then
+            if [ "$ONEDIR_REV" != "latest" ]; then
                 # 3006.x is default
-                REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
                 if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                     # Enable the Salt 3007 STS repo
                     dnf config-manager --set-disable salt-repo-*
@@ -6315,11 +6321,11 @@ install_amazon_linux_ami_2023_git_deps() {
 }
 
 install_amazon_linux_ami_2023_onedir_deps() {
-    if [ "$ITYPE" = "onedir" ]; then
-        REPO_REV="$ONEDIR_REV"
-    else
-        REPO_REV="latest"
-    fi
+    ## DGM if [ "$ITYPE" = "onedir" ]; then
+    ## DGM     REPO_REV="$ONEDIR_REV"
+    ## DGM else
+    ## DGM     REPO_REV="latest"
+    ## DGM fi
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
@@ -6364,9 +6370,9 @@ install_amazon_linux_ami_2023_onedir_deps() {
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
-            if [ "$REPO_REV" != "latest" ]; then
+            if [ "$ONEDIR_REV" != "latest" ]; then
                 # 3006.x is default
-                REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
                 if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                     # Enable the Salt 3007 STS repo
                     dnf config-manager --set-disable salt-repo-*
@@ -6706,11 +6712,11 @@ __install_saltstack_photon_onedir_repository() {
         return 1
     fi
 
-    if [ "$ITYPE" = "stable" ]; then
-        REPO_REV="$ONEDIR_REV"
-    else
-        REPO_REV="latest"
-    fi
+    ## DGM if [ "$ITYPE" = "stable" ]; then
+    ## DGM     REPO_REV="$ONEDIR_REV"
+    ## DGM else
+    ## DGM     REPO_REV="latest"
+    ## DGM fi
 
     ## DGM __PY_VERSION_REPO="py3"
     ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
@@ -6727,9 +6733,9 @@ __install_saltstack_photon_onedir_repository() {
 
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
-        if [ "$REPO_REV" != "latest" ]; then
+        if [ "$ONEDIR_REV" != "latest" ]; then
             # 3006.x is default
-            REPO_REV_MAJOR=$(echo "$REPO_REV" | cut -d '.' -f 1)
+            REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
             if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                 # Enable the Salt 3007 STS repo
                 dnf config-manager --set-disable salt-repo-*
@@ -6741,9 +6747,9 @@ __install_saltstack_photon_onedir_repository() {
             dnf config-manager --set-enabled salt-repo-latest
         fi
         tdnf makecache || return 1
-    elif [ "$REPO_REV" != "latest" ]; then
+    elif [ "$ONEDIR_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
-        echowarn "Use -F (forced overwrite) to install $REPO_REV."
+        echowarn "Use -F (forced overwrite) to install $ONEDIR_REV."
     fi
 
     return 0
