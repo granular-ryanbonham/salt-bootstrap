@@ -1,7 +1,1 @@
-## DGM pytest-testinfra
-## DGM paramiko
-## DGM requests-ntlm==1.1.0; sys.platform == 'win32'
-## DGM pywinrm; sys.platform == 'win32'
-## DGM six>=1.10.0
-
 pytest

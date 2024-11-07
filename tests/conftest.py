@@ -19,7 +19,6 @@ def target_salt_version():
     target_salt = ".".join(
         [
             item
-            ## DGM for item in os.environ["KITCHEN_SUITE"].split("-")
             for item in os.environ.get("KITCHEN_SUITE", "").split("-")
             if item not in bootstrap_types
         ]

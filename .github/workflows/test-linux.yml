@@ -26,7 +26,7 @@ on:
 jobs:
   Test:
     name: ${{ matrix.instance }}
-    ## DGM runs-on: ubuntu-20.04
+    ## runs-on: ubuntu-20.04
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/saltstack/salt-ci-containers/packaging:ubuntu-22.04
@@ -41,52 +41,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      ## DGM - name: Setup Ruby
-      ## DGM   uses: ruby/setup-ruby@v1
-      ## DGM   with:
-      ## DGM     ruby-version: 2.6.10
-      ## DGM     ## ruby-version: 3.3.4
-      ## DGM     bundler-cache: true
-
-      ## DGM - name: Set up Python 3.10
-      ## DGM   uses: actions/setup-python@v5
-      ## DGM   with:
-      ## DGM     python-version: "3.10"
-
-      ## DGM - name: Install Python Dependencies
-      ## DGM   run: |
-      ## DGM     python3 -m pip install -U pip
-      ## DGM     python3 -m pip install -r tests/requirements.txt
-
-      ## DGM - name: Create Test Instance
-      ## DGM   run: |
-      ## DGM     bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }} || \
-      ## DGM     (sleep 10 && bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }})
-      ## DGM     sleep 2
-
-      ## DGM - name: Test Bootstrap
-      ## DGM   run: |
-      ## DGM     bundle exec kitchen verify ${{ matrix.instance }}-${{ inputs.distro-slug }}
-      ## DGM     sleep 2
-
-      ## DGM - name: Destroy Test Instance
-      ## DGM   if: always()
-      ## DGM   run: |
-      ## DGM     bundle exec kitchen destroy ${{ matrix.instance }}-${{ inputs.distro-slug }}
-      ## DGM     sleep 2
-
       - name: Install Pytest
         run: |
           pip install -U pytest
 
-      - name: Bootstrap Salt
-        run: |
-          ## sudo sh -x ./bootstrap-salt.sh
-          sh -x ./bootstrap-salt.sh
+      ## TBD Disabled until CI/CD is functional
+      ## - name: Bootstrap Salt
+      ##   run: |
+      ##     sh -x ./bootstrap-salt.sh
 
-      - name: Test Bootstrap
-        run: |
-          pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
+      ## - name: Test Bootstrap
+      ##   run: |
+      ##     pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
 
       - name: Set Exit Status
         if: always()

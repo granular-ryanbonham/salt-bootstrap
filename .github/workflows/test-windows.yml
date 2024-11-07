@@ -28,16 +28,9 @@ on:
         default: 20
         description: The timeout(in minutes) for the workflow
 
-## DGM env:
-## DGM   machine_user: kitchen
-## DGM   machine_pass: Password1
-## DGM   machine_port: 5985
-## DGM   KITCHEN_LOCAL_YAML: 'kitchen.windows.yml'
-
 jobs:
   Test:
     name: ${{ matrix.instance }}
-    ## DGM runs-on: ${{ inputs.runs-on }}
     runs-on: windows-latest
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
@@ -48,67 +41,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      ## DGM - name: Setup Ruby
-      ## DGM   uses: ruby/setup-ruby@v1
-      ## DGM   with:
-      ## DGM     ruby-version: 2.6.10
-      ## DGM     ## ruby-version: 3.3.4
-      ## DGM     bundler-cache: true
-
-      ## DGM - name: Install Chef
-      ## DGM   uses: actionshub/chef-install@1.1.0
-      ## DGM   with:
-      ## DGM     project: chef
-      ## DGM     version: 16.10.8
-
-      ## DGM - name: Add Chef bindir to PATH
-      ## DGM   uses: myci-actions/export-env-var-powershell@1
-      ## DGM   with:
-      ## DGM     name: PATH
-      ## DGM     value: "C:\\opscode\\chef\\bin;C:\\opscode\\chef\\embedded\\bin;$env:PATH"
-
-      ## DGM - name: Setup test user
-      ## DGM   run: |
-      ## DGM     $password = ConvertTo-SecureString $env:machine_pass -AsPlainText -Force
-      ## DGM     New-LocalUser $env:machine_user -Password $password
-      ## DGM     Add-LocalGroupMember -Group "Administrators" -Member $env:machine_user
-      ## DGM     Get-LocalUser
-      ## DGM     Get-LocalGroupMember -Group "Administrators"
-
-      ## DGM - name: Set up WinRM
-      ## DGM   run: |
-      ## DGM     Set-WSManQuickConfig -Force
-      ## DGM     winrm set winrm/config/service '@{AllowUnencrypted="True"}'
-      ## DGM     env
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      ## DGM - name: Install Python Dependencies
       - name: Install Pytest
         run: |
-          ## DGM pip install -U pip
-          ## DGM pip install -r tests/requirements.txt
           pip install -U pytest
-
-      ## DGM - name: Create Test Instance
-      ## DGM   run: |
-      ## DGM     bundle exec kitchen create ${{ matrix.instance }}-${{ inputs.distro-slug }}
-      ## DGM     sleep 2
-
-      ## DGM - name: Test Bootstrap
-      ## DGM   run: |
-      ## DGM     env
-      ## DGM     bundle exec kitchen verify ${{ matrix.instance }}-${{ inputs.distro-slug }}
-      ## DGM     sleep 2
-
-      ## DGM - name: Destroy Test Instance
-      ## DGM   if: always()
-      ## DGM   run: |
-      ## DGM     bundle exec kitchen destroy ${{ matrix.instance }}-${{ inputs.distro-slug }}
-      ## DGM     sleep 2
 
       - name: Bootstrap Salt
         run: |

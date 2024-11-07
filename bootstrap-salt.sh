@@ -129,9 +129,6 @@ __check_command_exists() {
 #   DESCRIPTION:  Set _SYSTEMD_FUNCTIONAL = BS_TRUE or BS_FALSE case where systemd is functional (for example: container may not have systemd)
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_systemd_functional() {
-    # DGM debug
-    set -v
-    set -x
 
     # check if systemd is functional, having systemctl present is insufficient
 
@@ -292,9 +289,6 @@ _CUSTOM_REPO_URL="null"
 _CUSTOM_MASTER_CONFIG="null"
 _CUSTOM_MINION_CONFIG="null"
 _QUIET_GIT_INSTALLATION=$BS_FALSE
-## DGM _REPO_URL="repo.saltproject.io"
-## DGM _ONEDIR_DIR="salt"
-## DGM _ONEDIR_NIGHTLY_DIR="salt-dev/${_ONEDIR_DIR}"
 _REPO_URL="packages.broadcom.com/artifactory"
 _PY_EXE="python3"
 _MINIMUM_PIP_VERSION="9.0.1"
@@ -657,7 +651,6 @@ elif [ "$ITYPE" = "stable" ]; then
             ITYPE="onedir"
             shift
         elif [ "$(echo "$1" | grep -E '^([3-9][0-5]{2}[5-9](\.[0-9]*)?)')" != "" ]; then
-            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
             STABLE_REV="$1"
             ONEDIR_REV="$1"
             _ONEDIR_REV="$1"
@@ -679,7 +672,6 @@ elif [ "$ITYPE" = "onedir" ]; then
             STABLE_REV="$1"
             shift
         elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}(\.[0-9]*)?)')" != "" ]; then
-            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
             ONEDIR_REV="$1"
             STABLE_REV="$1"
             shift
@@ -707,13 +699,13 @@ elif [ "$ITYPE" = "onedir_rc" ]; then
 ##        elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}?rc[0-9]-[0-9]$)')" != "" ]; then
 ##            # Handle the 3xxx.0 version as 3xxx archive (pin to minor) and strip the fake ".0" suffix
 ##            #ONEDIR_REV=$(echo "$1" | sed -E 's/^([3-9][0-9]{3})\.0$/\1/')
-##            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+##            ## ONEDIR_REV="minor/$1" don't have minor directory anymore
 ##            ONEDIR_REV="$1"
 ##            shift
 ##        elif [ "$(echo "$1" | grep -E '^([3-9][0-9]{3}\.[0-9]?rc[0-9]$)')" != "" ]; then
 ##            # Handle the 3xxx.0 version as 3xxx archive (pin to minor) and strip the fake ".0" suffix
 ##            #ONEDIR_REV=$(echo "$1" | sed -E 's/^([3-9][0-9]{3})\.0$/\1/')
-##            ## DGM ONEDIR_REV="minor/$1" don't have minor directory anymore
+##            ## ONEDIR_REV="minor/$1" don't have minor directory anymore
 ##            ONEDIR_REV="$1"
 ##            shift
 ##        else
@@ -808,7 +800,6 @@ fi
 PY_PKG_VER=3
 _PY_PKG_VER="python3"
 _PY_MAJOR_VERSION="3"
-## DGM __PY_VERSION_REPO="py3"
 
 # Check if we're installing via a different Python executable and set major version variables
 if [ -n "$_PY_EXE" ]; then
@@ -944,9 +935,6 @@ __fetch_url() {
 #  DESCRIPTION:  Retrieves a URL, verifies its content and writes it to standard output
 #----------------------------------------------------------------------------------------------------------------------
 __fetch_verify() {
-    # DGM debug
-    set -v
-    set -x
 
     fetch_verify_url="$1"
     fetch_verify_sum="$2"
@@ -969,9 +957,6 @@ __fetch_verify() {
 #  DESCRIPTION:  Checks if a URL exists
 #----------------------------------------------------------------------------------------------------------------------
 __check_url_exists() {
-    # DGM debug
-    set -v
-    set -x
 
   _URL="$1"
   if curl --output /dev/null --silent --fail "${_URL}"; then
@@ -1396,10 +1381,6 @@ __check_dpkg_architecture() {
         return 1
     fi
 
-    ## DGM __REPO_ARCH="$DPKG_ARCHITECTURE"
-    ## DGM __REPO_ARCH_DEB='deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg]'
-    ## DGM TBD wonder what to do here given use of salt.sources ????, this value's use has been commented out
-    ## DGM for now __REPO_ARCH_DEB='deb [signed-by=/etc/apt/keyrings/salt-archive-keyring.gpg]'
     __return_code=0
 
     case $DPKG_ARCHITECTURE in
@@ -1414,10 +1395,6 @@ __check_dpkg_architecture() {
         "arm64")
             # Saltstack official repository has full arm64 support since 3006
             error_msg=""
-            ## DGM __REPO_ARCH="arm64"
-            ## __REPO_ARCH_DEB="deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg arch=$__REPO_ARCH]"
-            ## DGM TBD wonder what to do here given use of salt.sources ???, this value's use has been commented out?
-            ## DGM for now __REPO_ARCH_DEB="deb [signed-by=/etc/apt/keyrings/salt-archive-keyring.gpg arch=$__REPO_ARCH]"
             ;;
         "armhf")
             error_msg="$_REPO_URL doesn't have packages for your system architecture: $DPKG_ARCHITECTURE."
@@ -1985,9 +1962,6 @@ __wait_for_apt(){
 #    PARAMETERS:  packages
 #----------------------------------------------------------------------------------------------------------------------
 __apt_get_install_noinput() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get install -y -o DPkg::Options::=--force-confold "${@}"; return $?
 }   # ----------  end of function __apt_get_install_noinput  ----------
@@ -1998,9 +1972,6 @@ __apt_get_install_noinput() {
 #   DESCRIPTION:  (DRY) apt-get upgrade with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __apt_get_upgrade_noinput() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get upgrade -y -o DPkg::Options::=--force-confold; return $?
 }   # ----------  end of function __apt_get_upgrade_noinput  ----------
@@ -2032,16 +2003,11 @@ __temp_gpg_pub() {
 #    PARAMETERS:  url
 #----------------------------------------------------------------------------------------------------------------------
 __apt_key_fetch() {
-    # DGM debug
-    set -v
-    set -x
 
 
     url=$1
 
     tempfile="$(__temp_gpg_pub)"
-    ## DGM __fetch_url "$tempfile" "$url" || return 1
-    ## DGM cp -f "$tempfile" /usr/share/keyrings/salt-archive-keyring.gpg && chmod 644 /usr/share/keyrings/salt-archive-keyring.gpg || return 1
     __fetch_url "$tempfile" "$url" || return 1
     mkdir -p /etc/apt/keyrings
     cp -f "$tempfile" /etc/apt/keyrings/salt-archive-keyring.pgp && chmod 644 /etc/apt/keyrings/salt-archive-keyring.pgp || return 1
@@ -2057,9 +2023,6 @@ __apt_key_fetch() {
 #    PARAMETERS:  url
 #----------------------------------------------------------------------------------------------------------------------
 __rpm_import_gpg() {
-    # DGM debug
-    set -v
-    set -x
 
     url=$1
 
@@ -2084,9 +2047,6 @@ __rpm_import_gpg() {
 #   DESCRIPTION:  (DRY) yum install with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __yum_install_noinput() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$DISTRO_NAME_L" = "oracle_linux" ]; then
         # We need to install one package at a time because --enablerepo=X disables ALL OTHER REPOS!!!!
@@ -2103,9 +2063,6 @@ __yum_install_noinput() {
 #   DESCRIPTION:  (DRY) dnf install with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __dnf_install_noinput() {
-    # DGM debug
-    set -v
-    set -x
 
     dnf -y install "${@}" || return $?
 }   # ----------  end of function __dnf_install_noinput  ----------
@@ -2115,9 +2072,6 @@ __dnf_install_noinput() {
 #   DESCRIPTION:  (DRY) tdnf install with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __tdnf_install_noinput() {
-    # DGM debug
-    set -v
-    set -x
 
     tdnf -y install "${@}" || return $?
 }   # ----------  end of function __tdnf_install_noinput  ----------
@@ -2128,9 +2082,6 @@ __tdnf_install_noinput() {
 #                 specific revision.
 #----------------------------------------------------------------------------------------------------------------------
 __git_clone_and_checkout() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "Installed git version: $(git --version | awk '{ print $3 }')"
     # Turn off SSL verification if -I flag was set for insecure downloads
@@ -2470,9 +2421,6 @@ __overwriteconfig() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_systemd() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
@@ -2515,9 +2463,6 @@ __check_services_systemd() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_upstart() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
@@ -2546,9 +2491,6 @@ __check_services_upstart() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_sysvinit() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
@@ -2576,9 +2518,6 @@ __check_services_sysvinit() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_debian() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
@@ -2607,9 +2546,6 @@ __check_services_debian() {
 #    PARAMETERS:  servicename
 #----------------------------------------------------------------------------------------------------------------------
 __check_services_openrc() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ $# -eq 0 ]; then
         echoerror "You need to pass a service name to check!"
@@ -2637,9 +2573,6 @@ __check_services_openrc() {
 #   DESCRIPTION:  Return 0 or 1 depending on successful creation of virtualenv
 #----------------------------------------------------------------------------------------------------------------------
 __create_virtualenv() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ ! -d "$_VIRTUALENV_DIR" ]; then
         echoinfo "Creating virtualenv ${_VIRTUALENV_DIR}"
@@ -2658,9 +2591,6 @@ __create_virtualenv() {
 #   DESCRIPTION:  Return 0 or 1 depending on successful activation of virtualenv
 #----------------------------------------------------------------------------------------------------------------------
 __activate_virtualenv() {
-    # DGM debug
-    set -v
-    set -x
 
     set +o nounset
     # Is virtualenv empty
@@ -2759,9 +2689,6 @@ __install_pip_deps() {
 #    PARAMETERS:  py_exe
 #----------------------------------------------------------------------------------------------------------------------
 __install_salt_from_repo() {
-    # DGM debug
-    set -v
-    set -x
 
     _py_exe="$1"
 
@@ -3010,9 +2937,6 @@ fi
 #   Ubuntu Install Functions
 #
 __enable_universe_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$(grep -R universe /etc/apt/sources.list /etc/apt/sources.list.d/ | grep -v '#')" != "" ]; then
         # The universe repository is already enabled
@@ -3035,11 +2959,6 @@ __install_saltstack_ubuntu_repository() {
        { [ "$DISTRO_MAJOR_VERSION" -eq 24 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
         [ "$DISTRO_MAJOR_VERSION" -eq 21 ] ||  [ "$DISTRO_MAJOR_VERSION" -eq 23 ] || [ "$DISTRO_MAJOR_VERSION" -eq 25 ]; then
         echowarn "Non-LTS Ubuntu detected, but stable packages requested. Trying packages for previous LTS release. You may experience problems."
-        ## DGM UBUNTU_VERSION=24.04
-        ## DGM UBUNTU_CODENAME="noble"
-    ## DGM else
-        ## DGM UBUNTU_VERSION=${DISTRO_VERSION}
-        ## DGM UBUNTU_CODENAME=${DISTRO_CODENAME}
     fi
 
     # Install downloader backend for GPG keys fetching
@@ -3069,10 +2988,6 @@ __install_saltstack_ubuntu_repository() {
     fi
 
     # SaltStack's stable Ubuntu repository:
-    ## DGM SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/${STABLE_REV}"
-    ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
-    ## DGM __apt_key_fetch "$SALTSTACK_UBUNTU_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
-
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
     __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
@@ -3091,15 +3006,9 @@ __install_saltstack_ubuntu_repository() {
         fi
     fi
 
-    ## DGM _ONEDIR_TYPE="saltproject-deb"
-    ## DGM SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_TYPE}/pool/"
-
 }
 
 __install_saltstack_ubuntu_onedir_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "__install_saltstack_ubuntu_onedir_repository() entry"
     # Workaround for latest non-LTS Ubuntu
@@ -3107,11 +3016,6 @@ __install_saltstack_ubuntu_onedir_repository() {
        { [ "$DISTRO_MAJOR_VERSION" -eq 22 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
         [ "$DISTRO_MAJOR_VERSION" -eq 21 ] ||  [ "$DISTRO_MAJOR_VERSION" -eq 23 ] || [ "$DISTRO_MAJOR_VERSION" -eq 25 ]; then
         echowarn "Non-LTS Ubuntu detected, but stable packages requested. Trying packages for previous LTS release. You may experience problems."
-        ## DGM UBUNTU_VERSION=24.04
-        ## DGM UBUNTU_CODENAME="noble"
-    ## DGM else
-        ## DGM UBUNTU_VERSION=${DISTRO_VERSION}
-        ## DGM UBUNTU_CODENAME=${DISTRO_CODENAME}
     fi
 
     # Install downloader backend for GPG keys fetching
@@ -3136,13 +3040,6 @@ __install_saltstack_ubuntu_onedir_repository() {
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
     # SaltStack's stable Ubuntu repository:
-    ## DGM TBD need deb location
-    ## DGM SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/${ONEDIR_REV}/"
-    ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
-    ## DGM     SALTSTACK_UBUNTU_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/ubuntu/${UBUNTU_VERSION}/${__REPO_ARCH}/"
-    ## DGM fi
-    ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_UBUNTU_URL $UBUNTU_CODENAME main" > /etc/apt/sources.list.d/salt.list
-
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
     __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
@@ -3163,9 +3060,6 @@ __install_saltstack_ubuntu_onedir_repository() {
 }
 
 install_ubuntu_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_ubuntu_deps() entry"
     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ]; then
@@ -3224,9 +3118,6 @@ install_ubuntu_deps() {
 }
 
 install_ubuntu_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_ubuntu_stable_deps() entry"
 
@@ -3242,7 +3133,6 @@ install_ubuntu_stable_deps() {
     if [ "${_UPGRADE_SYS}" -eq $BS_TRUE ]; then
         if [ "${_INSECURE_DL}" -eq $BS_TRUE ]; then
             ## apt-key is deprecated
-            ## DGM if [ "$DISTRO_MAJOR_VERSION" -ge 20 ] || [ "$DISTRO_MAJOR_VERSION" -ge 21 ] || [ "$DISTRO_MAJOR_VERSION" -ge 22 ] || [ "$DISTRO_MAJOR_VERSION" -ge 23 ] || [ "$DISTRO_MAJOR_VERSION" -ge 24 ]; then
             if [ "$DISTRO_MAJOR_VERSION" -ge 20 ]; then
                 __apt_get_install_noinput --allow-unauthenticated debian-archive-keyring && apt-get update || return 1
             else
@@ -3263,9 +3153,6 @@ install_ubuntu_stable_deps() {
 }
 
 install_ubuntu_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_ubuntu_git_deps() entry"
 
@@ -3309,9 +3196,6 @@ install_ubuntu_git_deps() {
 }
 
 install_ubuntu_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_START_DAEMONS" -eq $BS_FALSE ]; then
         echowarn "Not starting daemons on Debian based distributions is not working mostly because starting them is the default behaviour."
@@ -3325,7 +3209,6 @@ install_ubuntu_onedir_deps() {
     if [ "${_UPGRADE_SYS}" -eq $BS_TRUE ]; then
         if [ "${_INSECURE_DL}" -eq $BS_TRUE ]; then
             ## apt-key is deprecated
-            ## DGM if [ "$DISTRO_MAJOR_VERSION" -ge 20 ] || [ "$DISTRO_MAJOR_VERSION" -ge 21 ] || [ "$DISTRO_MAJOR_VERSION" -ge 22 ] || [ "$DISTRO_MAJOR_VERSION" -ge 23 ] || [ "$DISTRO_MAJOR_VERSION" -ge 24 ]; then
             if [ "$DISTRO_MAJOR_VERSION" -ge 20 ]; then
                 __apt_get_install_noinput --allow-unauthenticated debian-archive-keyring && apt-get update || return 1
             else
@@ -3346,9 +3229,6 @@ install_ubuntu_onedir_deps() {
 }
 
 install_ubuntu_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     __PACKAGES=""
 
@@ -3376,9 +3256,6 @@ install_ubuntu_stable() {
 }
 
 install_ubuntu_git() {
-    # DGM debug
-    set -v
-    set -x
 
     # Activate virtualenv before install
     if [ "${_VIRTUALENV_DIR}" != "null" ]; then
@@ -3409,9 +3286,6 @@ install_ubuntu_git() {
 }
 
 install_ubuntu_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     __PACKAGES=""
 
@@ -3439,9 +3313,6 @@ install_ubuntu_onedir() {
 }
 
 install_ubuntu_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -3470,9 +3341,6 @@ install_ubuntu_stable_post() {
 }
 
 install_ubuntu_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
@@ -3489,7 +3357,6 @@ install_ubuntu_git_post() {
           _SERVICE_DIR="${_SALT_GIT_CHECKOUT_DIR}/pkg"
         fi
 
-        ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
             __copyfile "${_SERVICE_DIR}/salt-${fname}.service" "/lib/systemd/system/salt-${fname}.service"
 
@@ -3499,21 +3366,6 @@ install_ubuntu_git_post() {
             systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
             sleep 1
             systemctl daemon-reload
-        ## DGM elif [ -f /sbin/initctl ]; then
-        ## DGM     _upstart_conf="/etc/init/salt-$fname.conf"
-        ## DGM     # We have upstart support
-        ## DGM     echodebug "There's upstart support"
-        ## DGM     if [ ! -f $_upstart_conf ]; then
-        ## DGM         # upstart does not know about our service, let's copy the proper file
-        ## DGM         echowarn "Upstart does not appear to know about salt-$fname"
-        ## DGM         echodebug "Copying ${_SERVICE_DIR}/salt-$fname.upstart to $_upstart_conf"
-        ## DGM         __copyfile "${_SERVICE_DIR}/salt-${fname}.upstart" "$_upstart_conf"
-        ## DGM         # Set service to know about virtualenv
-        ## DGM         if [ "${_VIRTUALENV_DIR}" != "null" ]; then
-        ## DGM             echo "SALT_USE_VIRTUALENV=${_VIRTUALENV_DIR}" > /etc/default/salt-${fname}
-        ## DGM         fi
-        ## DGM         /sbin/initctl reload-configuration || return 1
-        ## DGM     fi
         # No upstart support in Ubuntu!?
         elif [ -f "${_SALT_GIT_CHECKOUT_DIR}/pkg/salt-${fname}.init" ]; then
             echodebug "There's NO upstart support!?"
@@ -3526,7 +3378,6 @@ install_ubuntu_git_post() {
 
             update-rc.d salt-$fname defaults
         else
-            ## DGM echoerror "Neither upstart nor init.d was setup for salt-$fname"
             echoerror "No init.d was setup for salt-$fname"
         fi
     done
@@ -3535,18 +3386,12 @@ install_ubuntu_git_post() {
 }
 
 install_ubuntu_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
-    # Ensure upstart configs / systemd units are loaded
-    ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
+    # Ensure systemd units are loaded
     if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
         systemctl daemon-reload
-    ## DGM elif [ -f /sbin/initctl ]; then
-    ## DGM     /sbin/initctl reload-configuration
     fi
 
     for fname in api master minion syndic; do
@@ -3558,7 +3403,6 @@ install_ubuntu_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
             echodebug "There's systemd support while checking salt-$fname"
             systemctl stop salt-$fname > /dev/null 2>&1
@@ -3570,18 +3414,6 @@ install_ubuntu_restart_daemons() {
                 journalctl -xe
             fi
         fi
-
-        ## DGM if [ -f /sbin/initctl ]; then
-        ## DGM     echodebug "There's upstart support while checking salt-$fname"
-
-        ## DGM     if status salt-$fname 2>/dev/null | grep -q running; then
-        ## DGM         stop salt-$fname || (echodebug "Failed to stop salt-$fname" && return 1)
-        ## DGM     fi
-
-        ## DGM     start salt-$fname && continue
-        ## DGM     # We failed to start the service, let's test the SysV code below
-        ## DGM     echodebug "Failed to start salt-$fname using Upstart"
-        ## DGM fi
 
         if [ ! -f /etc/init.d/salt-$fname ]; then
             echoerror "No init.d support for salt-$fname was found"
@@ -3596,9 +3428,6 @@ install_ubuntu_restart_daemons() {
 }
 
 install_ubuntu_check_services() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -3609,7 +3438,6 @@ install_ubuntu_check_services() {
         [ $fname = "master" ] && [ "$_INSTALL_MASTER" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ] && [ "$DISTRO_MAJOR_VERSION" -ge 16 ]; then
             __check_services_systemd salt-$fname || return 1
         elif [ -f /etc/init.d/salt-$fname ]; then
@@ -3629,14 +3457,8 @@ install_ubuntu_check_services() {
 #   Debian Install Functions
 #
 __install_saltstack_debian_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "__install_saltstack_debian_repository() entry"
-
-    ## DGM DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
-    ## DGM DEBIAN_CODENAME="$DISTRO_CODENAME"
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -3684,14 +3506,8 @@ __install_saltstack_debian_repository() {
 }
 
 __install_saltstack_debian_onedir_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "__install_saltstack_debian_onedir_repository() entry"
-
-    ## DGM DEBIAN_RELEASE="$DISTRO_MAJOR_VERSION"
-    ## DGM DEBIAN_CODENAME="$DISTRO_CODENAME"
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -3714,15 +3530,6 @@ __install_saltstack_debian_onedir_repository() {
     # shellcheck disable=SC2086,SC2090
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
-    # amd64 is just a part of repository URI
-    ## DGM SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}/${ONEDIR_REV}"
-    ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
-    ## DGM     SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}"
-    ## DGM fi
-    ## DGM echo "$__REPO_ARCH_DEB $SALTSTACK_DEBIAN_URL $DEBIAN_CODENAME main" > "/etc/apt/sources.list.d/salt.list"
-    ## DGM __apt_key_fetch "${SALTSTACK_DEBIAN_URL}/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
-    ## DGM __wait_for_apt apt-get update || return 1
-
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
     __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
@@ -3743,9 +3550,6 @@ __install_saltstack_debian_onedir_repository() {
 }
 
 install_debian_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_debian_onedir_git_deps() entry"
 
@@ -3801,9 +3605,6 @@ install_debian_onedir_deps() {
 }
 
 install_debian_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_debian_git_deps() entry"
 
@@ -3840,9 +3641,6 @@ install_debian_git_deps() {
 }
 
 install_debian_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     __PACKAGES=""
 
@@ -3870,29 +3668,18 @@ install_debian_stable() {
 }
 
 install_debian_11_git_deps() {
-    # DGM debug
-    set -v
-    set -x
-
 
     install_debian_git_deps || return 1
     return 0
 }
 
 install_debian_12_git_deps() {
-    # DGM debug
-    set -v
-    set -x
-
 
     install_debian_git_deps || return 1
     return 0
 }
 
 install_debian_git() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ -n "$_PY_EXE" ]; then
         _PYEXE=${_PY_EXE}
@@ -3921,27 +3708,18 @@ install_debian_git() {
 }
 
 install_debian_11_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_debian_git || return 1
     return 0
 }
 
 install_debian_12_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_debian_git || return 1
     return 0
 }
 
 install_debian_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     __PACKAGES=""
 
@@ -3969,9 +3747,6 @@ install_debian_onedir() {
 }
 
 install_debian_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
@@ -3989,7 +3764,6 @@ install_debian_git_post() {
         fi
 
         # Configure SystemD for Debian 8 "Jessie" and later
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             if [ ! -f /lib/systemd/system/salt-${fname}.service ] || \
                 { [ -f /lib/systemd/system/salt-${fname}.service ] && [ $_FORCE_OVERWRITE -eq $BS_TRUE ]; }; then
@@ -4013,9 +3787,6 @@ install_debian_git_post() {
 }
 
 install_debian_2021_post() {
-    # DGM debug
-    set -v
-    set -x
 
     # Kali 2021 (debian derivative) disables all network services by default
     # Using archlinux post function to enable salt systemd services
@@ -4024,9 +3795,6 @@ install_debian_2021_post() {
 }
 
 install_debian_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return 0
 
@@ -4039,7 +3807,6 @@ install_debian_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # Debian 8 and above uses systemd
             /bin/systemctl stop salt-$fname > /dev/null 2>&1
@@ -4057,9 +3824,6 @@ install_debian_restart_daemons() {
 }
 
 install_debian_check_services() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -4070,7 +3834,6 @@ install_debian_check_services() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             __check_services_systemd salt-$fname || return 1
         elif [ -f /etc/init.d/salt-$fname ]; then
@@ -4090,36 +3853,13 @@ install_debian_check_services() {
 #
 
 __install_saltstack_fedora_onedir_repository() {
-    # DGM debug
-    set -v
-    set -x
-
-    ## DGM if [ "$ITYPE" = "stable" ]; then
-    ## DGM     REPO_REV="$ONEDIR_REV"
-    ## DGM else
-    ## DGM     REPO_REV="latest"
-    ## DGM fi
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
         return 1
     fi
 
-    ## DGM __PY_VERSION_REPO="py3"
-
-    ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
-
-    ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
-
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}"
-        ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
-        ## DGM     FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/fedora/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
-        ## DGM fi
-        ## DGM __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
-        ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
-        ## DGM yum clean metadata || return 1
-
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$ONEDIR_REV" != "latest" ]; then
@@ -4146,9 +3886,6 @@ __install_saltstack_fedora_onedir_repository() {
 }
 
 install_fedora_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         dnf -y update || return 1
@@ -4180,9 +3917,6 @@ install_fedora_deps() {
 }
 
 install_fedora_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -4223,9 +3957,6 @@ install_fedora_git_deps() {
 }
 
 install_fedora_git() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "${_PY_EXE}" != "" ]; then
         _PYEXE=${_PY_EXE}
@@ -4241,9 +3972,6 @@ install_fedora_git() {
 }
 
 install_fedora_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
@@ -4277,9 +4005,6 @@ install_fedora_git_post() {
 }
 
 install_fedora_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ $_START_DAEMONS -eq $BS_FALSE ] && return
 
@@ -4303,9 +4028,6 @@ install_fedora_restart_daemons() {
 }
 
 install_fedora_check_services() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -4323,9 +4045,6 @@ install_fedora_check_services() {
 }
 
 install_fedora_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         yum -y update || return 1
@@ -4365,9 +4084,6 @@ install_fedora_onedir_deps() {
 
 
 install_fedora_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     STABLE_REV=$ONEDIR_REV
     #install_fedora_stable || return 1
@@ -4398,9 +4114,6 @@ install_fedora_onedir() {
 }
 
 install_fedora_onedir_post() {
-    # DGM debug
-    set -v
-    set -x
 
     STABLE_REV=$ONEDIR_REV
 
@@ -4431,59 +4144,11 @@ install_fedora_onedir_post() {
 #   CentOS Install Functions
 #
 __install_saltstack_rhel_onedir_repository() {
-    # DGM debug
-    set -v
-    set -x
-
-    ## DGM if [ "$ITYPE" = "stable" ]; then
-    ## DGM     REPO_REV="$ONEDIR_REV"
-    ## DGM else
-    ## DGM     REPO_REV="latest"
-    ## DGM fi
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
         return 1
     fi
-
-## DGM     # Avoid using '$releasever' variable for yum.
-## DGM     # Instead, this should work correctly on all RHEL variants.
-## DGM     base_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/\$basearch/${ONEDIR_REV}/"
-## DGM     if [ "${ONEDIR_REV}" = "nightly" ] ; then
-## DGM         base_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/\$basearch/"
-## DGM     fi
-## DGM
-## DGM     ## gpg_key="SALT-PROJECT-GPG-PUBKEY-2023.pub"
-## DGM
-## DGM     gpg_key_urls=""
-## DGM     for key in $gpg_key; do
-## DGM         gpg_key_urls=$(printf "${base_url}${key},%s" "$gpg_key_urls")
-## DGM     done
-## DGM
-## DGM     repo_file="/etc/yum.repos.d/salt.repo"
-## DGM
-## DGM     if [ ! -s "$repo_file" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-## DGM         cat <<_eof > "$repo_file"
-## DGM [saltstack]
-## DGM name=SaltStack ${repo_rev} Release Channel for RHEL/CentOS \$releasever
-## DGM baseurl=${base_url}
-## DGM skip_if_unavailable=True
-## DGM gpgcheck=1
-## DGM gpgkey=${gpg_key_urls}
-## DGM enabled=1
-## DGM enabled_metadata=1
-## DGM _eof
-## DGM
-## DGM         fetch_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/${ONEDIR_REV}/"
-## DGM         if [ "${ONEDIR_REV}" = "nightly" ] ; then
-## DGM             fetch_url="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/redhat/${DISTRO_MAJOR_VERSION}/${CPU_ARCH_L}/"
-## DGM         fi
-## DGM         for key in $gpg_key; do
-## DGM             __rpm_import_gpg "${fetch_url}${key}" || return 1
-## DGM         done
-## DGM
-## DGM         yum clean metadata || return 1
-    ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
 
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
@@ -4511,9 +4176,6 @@ __install_saltstack_rhel_onedir_repository() {
 }
 
 install_centos_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         yum -y update || return 1
@@ -4552,9 +4214,6 @@ install_centos_stable_deps() {
 }
 
 install_centos_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     __PACKAGES=""
 
@@ -4589,9 +4248,6 @@ install_centos_stable() {
 }
 
 install_centos_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     SYSTEMD_RELOAD=$BS_FALSE
 
@@ -4604,7 +4260,6 @@ install_centos_stable_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             /bin/systemctl is-enabled salt-${fname}.service > /dev/null 2>&1 || (
                 /bin/systemctl preset salt-${fname}.service > /dev/null 2>&1 &&
@@ -4625,9 +4280,6 @@ install_centos_stable_post() {
 }
 
 install_centos_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     # First try stable deps then fall back to onedir deps if that one fails
     # if we're installing on a Red Hat based host that doesn't have the classic
@@ -4674,9 +4326,6 @@ install_centos_git_deps() {
 }
 
 install_centos_git() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "${_PY_EXE}" != "" ]; then
         _PYEXE=${_PY_EXE}
@@ -4693,9 +4342,6 @@ install_centos_git() {
 }
 
 install_centos_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     SYSTEMD_RELOAD=$BS_FALSE
 
@@ -4714,7 +4360,6 @@ install_centos_git_post() {
           _SERVICE_FILE="${_SALT_GIT_CHECKOUT_DIR}/pkg/rpm/salt-${fname}.service"
         fi
 
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             if [ ! -f "/usr/lib/systemd/system/salt-${fname}.service" ] || \
                 { [ -f "/usr/lib/systemd/system/salt-${fname}.service" ] && [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; }; then
@@ -4739,9 +4384,6 @@ install_centos_git_post() {
 }
 
 install_centos_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_UPGRADE_SYS" -eq "$BS_TRUE" ]; then
         yum -y update || return 1
@@ -4779,9 +4421,6 @@ install_centos_onedir_deps() {
 }
 
 install_centos_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     __PACKAGES=""
 
@@ -4809,9 +4448,6 @@ install_centos_onedir() {
 }
 
 install_centos_onedir_post() {
-    # DGM debug
-    set -v
-    set -x
 
     SYSTEMD_RELOAD=$BS_FALSE
 
@@ -4824,7 +4460,6 @@ install_centos_onedir_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             /bin/systemctl is-enabled salt-${fname}.service > /dev/null 2>&1 || (
                 /bin/systemctl preset salt-${fname}.service > /dev/null 2>&1 &&
@@ -4845,9 +4480,6 @@ install_centos_onedir_post() {
 }
 
 install_centos_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
@@ -4860,27 +4492,10 @@ install_centos_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /sbin/initctl ] && [ -f /etc/init/salt-${fname}.conf ]; then
-        ## DGM     # We have upstart support and upstart knows about our service
-        ## DGM     if ! /sbin/initctl status salt-$fname > /dev/null 2>&1; then
-        ## DGM         # Everything is in place and upstart gave us an error code? Fail!
-        ## DGM         return 1
-        ## DGM     fi
-
-        ## DGM     # upstart knows about this service.
-        ## DGM     # Let's try to stop it, and then start it
-        ## DGM     /sbin/initctl stop salt-$fname > /dev/null 2>&1
-        ## DGM     # Restart service
-        ## DGM     if ! /sbin/initctl start salt-$fname > /dev/null 2>&1; then
-        ## DGM         # Failed the restart?!
-        ## DGM         return 1
-        ## DGM     fi
-        ## DGM elif [ -f /etc/init.d/salt-$fname ]; then
         if [ -f /etc/init.d/salt-$fname ]; then
             # Disable stdin to fix shell session hang on killing tee pipe
             service salt-$fname stop < /dev/null > /dev/null 2>&1
             service salt-$fname start < /dev/null
-        ## DGM elif [ -f /usr/bin/systemctl ]; then
         elif [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # CentOS 7 uses systemd
             /usr/bin/systemctl stop salt-$fname > /dev/null 2>&1
@@ -4895,36 +4510,24 @@ install_centos_restart_daemons() {
 }
 
 install_centos_testing_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable_deps || return 1
     return 0
 }
 
 install_centos_testing() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable || return 1
     return 0
 }
 
 install_centos_testing_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable_post || return 1
     return 0
 }
 
 install_centos_check_services() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -4937,7 +4540,6 @@ install_centos_check_services() {
 
         if [ -f "/etc/init.d/salt-$fname" ]; then
             __check_services_sysvinit "salt-$fname" || return 1
-        ## DGM elif [ -f /usr/bin/systemctl ]; then
         elif [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             __check_services_systemd "salt-$fname" || return 1
         fi
@@ -4955,513 +4557,342 @@ install_centos_check_services() {
 #   RedHat Install Functions
 #
 install_red_hat_linux_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable_deps || return 1
     return 0
 }
 
 install_red_hat_linux_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_git_deps || return 1
     return 0
 }
 
 install_red_hat_linux_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_timat_deps || return 1
     return 0
 }
 
 install_red_hat_linux_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable || return 1
     return 0
 }
 
 install_red_hat_linux_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_git || return 1
     return 0
 }
 
 install_red_hat_linux_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_git() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_onedir || return 1
     return 0
 }
 
 install_red_hat_linux_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable_post || return 1
     return 0
 }
 
 install_red_hat_linux_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_linux_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_linux_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_stable_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_restart_daemons || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_red_hat_linux_git_post || return 1
     return 0
 }
 
 install_red_hat_linux_testing_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_linux_testing() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_linux_testing_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_testing_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_testing() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_enterprise_testing_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_testing_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_testing() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_enterprise_server_testing_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_post || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_testing_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_deps || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_testing() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing || return 1
     return 0
 }
 
 install_red_hat_enterprise_workstation_testing_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_testing_post || return 1
     return 0
@@ -5476,9 +4907,6 @@ install_red_hat_enterprise_workstation_testing_post() {
 #   Oracle Linux Install Functions
 #
 install_oracle_linux_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     # Install Oracle's EPEL.
     if [ "${_EPEL_REPOS_INSTALLED}" -eq $BS_FALSE ]; then
@@ -6084,12 +5512,6 @@ install_amazon_linux_ami_2_deps() {
         return 1
     fi
 
-    ## DGM if [ "$ITYPE" = "stable" ]; then
-    ## DGM     REPO_REV="$STABLE_REV"
-    ## DGM else
-    ## DGM     REPO_REV="latest"
-    ## DGM fi
-
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
     __yum_install_noinput yum-utils
@@ -6099,33 +5521,7 @@ install_amazon_linux_ami_2_deps() {
         yum -y update || return 1
     fi
 
-## DGM     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-## DGM         __YUM_REPO_FILENAME="salt.repo"
-## DGM         PY_PKG_VER=3
-## DGM         __PY_VERSION_REPO="py3"
-## DGM         repo_label="saltstack-py3-repo"
-## DGM         repo_name="SaltStack Python 3 repo for Amazon Linux 2"
-## DGM
-## DGM         base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/$repo_rev/"
-## DGM         gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.gpg"
-## DGM
-## DGM         # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
-## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
-## DGM         # amazon linux yum file.
-## DGM         if [ ! -s "/etc/yum.repos.d/${__YUM_REPO_FILENAME}" ]; then
-## DGM           cat <<_eof > "/etc/yum.repos.d/${__YUM_REPO_FILENAME}"
-## DGM [$repo_label]
-## DGM name=$repo_name
-## DGM failovermethod=priority
-## DGM priority=10
-## DGM gpgcheck=1
-## DGM gpgkey=$gpg_key
-## DGM baseurl=$base_url
-## DGM _eof
-## DGM         fi
-
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
@@ -6159,12 +5555,6 @@ install_amazon_linux_ami_2_onedir_deps() {
         return 1
     fi
 
-    ## DGM if [ "$ITYPE" = "onedir" ]; then
-    ## DGM     REPO_REV="$ONEDIR_REV"
-    ## DGM else
-    ## DGM     REPO_REV="latest"
-    ## DGM fi
-
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
     __yum_install_noinput yum-utils
@@ -6174,37 +5564,7 @@ install_amazon_linux_ami_2_onedir_deps() {
         yum -y update || return 1
     fi
 
-## DGM     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-## DGM         __YUM_REPO_FILENAME="salt.repo"
-## DGM         __PY_VERSION_REPO="py3"
-## DGM         PY_PKG_VER=3
-## DGM         repo_label="saltstack-py3-repo"
-## DGM         repo_name="SaltStack Python 3 repo for Amazon Linux 2"
-## DGM         fi
-## DGM
-## DGM         base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/$repo_rev/"
-## DGM         if [ "${ONEDIR_REV}" = "nightly" ] ; then
-## DGM             base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/amazon/2/\$basearch/"
-## DGM         fi
-## DGM
-## DGM         gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.pub"
-## DGM
-## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
-## DGM         # amazon linux yum file.
-## DGM         if [ ! -s "/etc/yum.repos.d/${__YUM_REPO_FILENAME}" ]; then
-## DGM           cat <<_eof > "/etc/yum.repos.d/${__YUM_REPO_FILENAME}"
-## DGM [$repo_label]
-## DGM name=$repo_name
-## DGM failovermethod=priority
-## DGM priority=10
-## DGM gpgcheck=1
-## DGM gpgkey=$gpg_key
-## DGM baseurl=$base_url
-## DGM _eof
-## DGM         fi
-
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
@@ -6321,11 +5681,6 @@ install_amazon_linux_ami_2023_git_deps() {
 }
 
 install_amazon_linux_ami_2023_onedir_deps() {
-    ## DGM if [ "$ITYPE" = "onedir" ]; then
-    ## DGM     REPO_REV="$ONEDIR_REV"
-    ## DGM else
-    ## DGM     REPO_REV="latest"
-    ## DGM fi
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
@@ -6336,37 +5691,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
         yum -y update || return 1
     fi
 
-## DGM     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-## DGM         __YUM_REPO_FILENAME="salt.repo"
-## DGM         __PY_VERSION_REPO="py3"
-## DGM         PY_PKG_VER=3
-## DGM         repo_label="saltstack-py3-repo"
-## DGM         repo_name="SaltStack Python 3 repo for Amazon Linux 2023"
-## DGM
-## DGM         base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/amazon/2023/\$basearch/$repo_rev/"
-## DGM         if [ "${ONEDIR_REV}" = "nightly" ] ; then
-## DGM             base_url="$HTTP_VAL://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/amazon/2023/\$basearch/"
-## DGM         fi
-## DGM
-## DGM         gpg_key="${base_url}SALT-PROJECT-GPG-PUBKEY-2023.pub"
-## DGM
-## DGM         # This should prob be refactored to use __install_saltstack_rhel_onedir_repository()
-## DGM         # With args passed in to do the right thing.  Reformatted to be more like the
-## DGM         # amazon linux yum file.
-## DGM         if [ ! -s "/etc/yum.repos.d/${__YUM_REPO_FILENAME}" ]; then
-## DGM           cat <<_eof > "/etc/yum.repos.d/${__YUM_REPO_FILENAME}"
-## DGM [$repo_label]
-## DGM name=$repo_name
-## DGM failovermethod=priority
-## DGM priority=10
-## DGM gpgcheck=1
-## DGM gpgkey=$gpg_key
-## DGM baseurl=$base_url
-## DGM _eof
-## DGM         fi
-## DGM     fi
     if [ $_DISABLE_REPOS -eq $BS_FALSE ] || [ "$_CUSTOM_REPO_URL" != "null" ]; then
-        ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
         if [ ! -s "${YUM_REPO_FILE}" ]; then
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
@@ -6579,7 +5904,6 @@ install_arch_linux_post() {
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
         [ $fname = "api" ] && continue
 
-        ## DGM if [ -f /usr/bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # Using systemd
             /usr/bin/systemctl is-enabled salt-$fname.service > /dev/null 2>&1 || (
@@ -6611,7 +5935,6 @@ install_arch_linux_git_post() {
           _SERVICE_DIR="${_SALT_GIT_CHECKOUT_DIR}/pkg/rpm"
         fi
 
-        ## DGM if [ -f /usr/bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             __copyfile "${_SERVICE_DIR}/salt-${fname}.service" "/lib/systemd/system/salt-${fname}.service"
 
@@ -6645,7 +5968,6 @@ install_arch_linux_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /usr/bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             /usr/bin/systemctl stop salt-$fname.service > /dev/null 2>&1
             /usr/bin/systemctl start salt-$fname.service && continue
@@ -6662,7 +5984,6 @@ install_arch_linux_restart_daemons() {
 }
 
 install_arch_check_services() {
-    ## DGM if [ ! -f /usr/bin/systemctl ]; then
     if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
         # Not running systemd!? Don't check!
         return 0
@@ -6712,25 +6033,7 @@ __install_saltstack_photon_onedir_repository() {
         return 1
     fi
 
-    ## DGM if [ "$ITYPE" = "stable" ]; then
-    ## DGM     REPO_REV="$ONEDIR_REV"
-    ## DGM else
-    ## DGM     REPO_REV="latest"
-    ## DGM fi
-
-    ## DGM __PY_VERSION_REPO="py3"
-    ## DGM YUM_REPO_FILE="/etc/yum.repos.d/salt.repo"
-
     if [ ! -s "$YUM_REPO_FILE" ] || [ "$_FORCE_OVERWRITE" -eq $BS_TRUE ]; then
-        ## DGM ## salt repo 4 & 5 have issues, need the Major version dot Zero, eg: 4.0, 5.0
-        ## DGM FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/${ONEDIR_REV}"
-        ## DGM if [ "${ONEDIR_REV}" = "nightly" ] ; then
-        ## DGM     FETCH_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_NIGHTLY_DIR}/${__PY_VERSION_REPO}/photon/${DISTRO_MAJOR_VERSION}.0/${CPU_ARCH_L}/"
-        ## DGM fi
-        ## DGM __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}.repo"
-        ## DGM GPG_KEY="SALT-PROJECT-GPG-PUBKEY-2023.pub"
-        ## DGM __rpm_import_gpg "${FETCH_URL}/${GPG_KEY}" || return 1
-
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$ONEDIR_REV" != "latest" ]; then
@@ -7243,7 +6546,6 @@ install_opensuse_stable_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ] || [ -f /usr/bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             systemctl is-enabled salt-$fname.service || (systemctl preset salt-$fname.service && systemctl enable salt-$fname.service)
             sleep 1
@@ -7267,7 +6569,6 @@ install_opensuse_git_post() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if command -v systemctl; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             use_usr_lib=$BS_FALSE
 
@@ -7320,7 +6621,6 @@ install_opensuse_restart_daemons() {
         [ $fname = "minion" ] && [ "$_INSTALL_MINION" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## DGM if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             systemctl stop salt-$fname > /dev/null 2>&1
             systemctl start salt-$fname.service && continue
@@ -7337,7 +6637,6 @@ install_opensuse_restart_daemons() {
 }
 
 install_opensuse_check_services() {
-    ## DGM if [ ! -f /bin/systemctl ]; then
     if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
         # Not running systemd!? Don't check!
         return 0
@@ -7924,41 +7223,22 @@ daemons_running_voidlinux() {
 #   OS X / Darwin Install Functions
 #
 
-## DGM __parse_repo_json_python() {
-## DGM
-## DGM   # Using latest, grab the right
-## DGM   # version from the repo.json
-## DGM   _JSON_VERSION=$(python - <<-EOF
-## DGM import json, urllib.request
-## DGM ## DGM url = "https://repo.saltproject.io/salt/py3/macos/repo.json"     ## DGM note the use of repo.json here TBD handling this
-## DGM url = "https://packages.broadcom.com/ui/repos/tree/General/saltproject-generic/macos"
-## DGM response = urllib.request.urlopen(url)
-## DGM
-## DGM ## DGM No json file to process here TBD handling it
-## DGM data = json.loads(response.read())
-## DGM version = data["${_ONEDIR_REV}"][list(data["${_ONEDIR_REV}"])[0]]['version']
-## DGM print(version)
-## DGM EOF
-## DGM )
-## DGM echo "${_JSON_VERSION}"
-## DGM }
-
 __macosx_get_packagesite_onedir_latest() {
-    # DGM debug
+    ## DGM debug
     set -v
     set -x
 
     echodebug "Find latest MacOS release from repository"
 
     # get dir listing from url, sort and pick highest
-    macos_versions_tmpf=$(mktemp)
+    macos_versions_tmpdir=$(mktemp -d)
     curr_pwd=$(pwd)
-    cd  ${macos_versions_tmpf} || return 1
+    cd  ${macos_versions_tmpdir} || return 1
     wget -r -np -nH --exclude-directories=onedir,relenv,windows -x -l 1 "$SALT_MACOS_PKGDIR_URL/"
     # shellcheck disable=SC2010
     LATEST_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | tail -n 1)
     cd ${curr_pwd} || return "${LATEST_VERSION}"
-    rm -fR ${macos_versions_tmpf}
+    rm -fR ${macos_versions_tmpdir}
 
     echodebug "latest MacOS release from repository found ${LATEST_VERSION}"
     return "${LATEST_VERSION}"
@@ -7966,9 +7246,6 @@ __macosx_get_packagesite_onedir_latest() {
 
 
 __macosx_get_packagesite_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -7976,22 +7253,6 @@ __macosx_get_packagesite_onedir() {
     fi
 
     DARWIN_ARCH=${CPU_ARCH_L}
-
-## DGM     if [ "$(echo "$_ONEDIR_REV" | grep -E '^(latest)$')" != "" ]; then
-## DGM       ## DGM TBD what to do here
-## DGM       _PKG_VERSION=$(__parse_repo_json_python)
-## DGM     elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*))')" != "" ]; then
-## DGM       _PKG_VERSION=$_ONEDIR_REV
-## DGM     else
-## DGM       ## DGM TBD what to do here
-## DGM       _PKG_VERSION=$(__parse_repo_json_python)
-## DGM     fi
-## DGM
-## DGM     ## DGM PKG="salt-${_PKG_VERSION}-${__PY_VERSION_REPO}-${DARWIN_ARCH}.pkg"
-## DGM     ## DGM SALTPKGCONFURL="https://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/macos/${ONEDIR_REV}/${PKG}"
-## DGM     _ONEDIR_TYPE="saltproject-generic"
-## DGM     PKG="salt-${ONEDIR_REV}-py3-${DARWIN_ARCH}.pkg"
-## DGM     SALTPKGCONFURL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos/${ONEDIR_REV}/${PKG}"
 
     _ONEDIR_TYPE="saltproject-generic"
     SALT_MACOS_PKGDIR_URL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos"
@@ -8009,36 +7270,24 @@ __macosx_get_packagesite_onedir() {
 }
 
 __configure_macosx_pkg_details_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     __macosx_get_packagesite_onedir || return 1
     return 0
 }
 
 install_macosx_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     __configure_macosx_pkg_details_onedir || return 1
     return 0
 }
 
 install_macosx_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     __configure_macosx_pkg_details_onedir || return 1
     return 0
 }
 
 install_macosx_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_macosx_stable_deps || return 1
 
@@ -8065,9 +7314,6 @@ install_macosx_git_deps() {
 }
 
 install_macosx_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     install_macosx_stable_deps || return 1
 
@@ -8079,9 +7325,6 @@ install_macosx_stable() {
 }
 
 install_macosx_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     install_macosx_onedir_deps || return 1
 
@@ -8093,9 +7336,6 @@ install_macosx_onedir() {
 }
 
 install_macosx_git() {
-    # DGM debug
-    set -v
-    set -x
 
 
     if [ -n "$_PY_EXE" ]; then
@@ -8110,9 +7350,6 @@ install_macosx_git() {
 }
 
 install_macosx_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ ! -f /etc/paths.d/salt ]; then
         print "%s\n" "/opt/salt/bin" "/usr/local/sbin" > /etc/paths.d/salt
@@ -8129,27 +7366,18 @@ install_macosx_stable_post() {
 }
 
 install_macosx_onedir_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_macosx_stable_post || return 1
     return 0
 }
 
 install_macosx_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     install_macosx_stable_post || return 1
     return 0
 }
 
 install_macosx_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
@@ -8176,9 +7404,6 @@ install_macosx_restart_daemons() {
 #   the -c options is passed.
 #
 config_salt() {
-    # DGM debug
-    set -v
-    set -x
 
     # If the configuration directory is not passed, return
     [ "$_TEMP_CONFIG_DIR" = "null" ] && return
@@ -8341,9 +7566,6 @@ config_salt() {
 #   as long as the -k option is passed.
 #
 preseed_master() {
-    # DGM debug
-    set -v
-    set -x
 
     # Create the PKI directory
 
@@ -8379,9 +7601,6 @@ preseed_master() {
 #   This function checks if all of the installed daemons are running or not.
 #
 daemons_running_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return 0
 
@@ -8420,9 +7639,6 @@ daemons_running_onedir() {
 #   This function checks if all of the installed daemons are running or not.
 #
 daemons_running() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return 0
 

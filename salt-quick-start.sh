@@ -1,7 +1,6 @@
 #!/bin/sh
 
 __ScriptName="salt-quick-start.sh"
-## DGM SALT_REPO_URL="https://repo.saltproject.io/salt/py3/onedir"
 SALT_REPO_URL="https://packages.broadcom.com/artifactory/salt-project-generic/onedir"
 _COLORS=${QS_COLORS:-$(tput colors 2>/dev/null || echo 0)}
 
@@ -90,9 +89,6 @@ if [[ "$_LOCAL" == "1" && "$_FULL" == "1" ]]; then
 fi
 
 __parse_repo_json_jq() {
-  ## DGM TBD how to handle no repo.json
-  ## DGM _JSON_FILE="${SALT_REPO_URL}/repo.json"
-  ## DGM _JSON_VERSION=$(curl -s ${_JSON_FILE} | jq -sr ".[].latest[] | select(.os == \"$1\") | select(.arch == \"$2\").version")
 
     # $1 is OS_NAME
     # $2 is ARCH
@@ -162,7 +158,6 @@ fi
 __parse_repo_json_jq ${OS_NAME} ${CPU_ARCH_L}
 
 FILE="salt-${_JSON_VERSION}-onedir-${OS_NAME_L}-${CPU_ARCH_L}.tar.xz"
-## DGM URL="${SALT_REPO_URL}/latest/${FILE}"
 URL="${SALT_REPO_URL}/${_JSON_VERSION}/${FILE}"
 
 if [[ ! -f ${FILE} ]]; then
