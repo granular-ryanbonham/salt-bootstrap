@@ -75,10 +75,9 @@ param(
 
     [Parameter(Mandatory=$false, ValueFromPipeline=$True)]
     [Alias("r")]
-    # URL to the windows packages. Will look for a file named repo.json at the
-    # root of the URL. This file is used to determine the name and location of
-    # the installer in the repo. If repo.json is not found, it will look for the
-    # file under the minor directory.
+    # URL to the windows packages. Will look for the installer at the root of
+    # the URL/Version. Place a folder for each version of Salt in this directory
+    # and place the installer binary for each version in its folder.
     # Default is "https://packages.broadcom.com/artifactory/saltproject-generic/windows/"
     [String]$RepoUrl = "https://packages.broadcom.com/artifactory/saltproject-generic/windows/",
 
