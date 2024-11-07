@@ -7271,11 +7271,12 @@ __macosx_get_packagesite_onedir() {
     elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*))')" != "" ]; then
       _PKG_VERSION=$_ONEDIR_REV
     else
-      _PKG_VERSION=$(__macosx_get_packagesite_onedir_latest)
+      __macosx_get_packagesite_onedir_latest
     fi
 
     PKG="salt-${_PKG_VERSION}-py3-${DARWIN_ARCH}.pkg"
-    SALTPKGCONFURL="${SALT_MACOS_PKGDIR_URL}/${ONEDIR_REV}/${PKG}"
+    SALTPKGCONFURL="${SALT_MACOS_PKGDIR_URL}/${_PKG_VERSION}/${PKG}"
+
 
 }
 
