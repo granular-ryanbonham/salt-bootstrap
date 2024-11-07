@@ -45,14 +45,15 @@ jobs:
         run: |
           pip install -U pytest
 
-      ## TBD Disabled until CI/CD is functional
-      ## - name: Bootstrap Salt
-      ##   run: |
-      ##     sh -x ./bootstrap-salt.sh
+      - name: Bootstrap Salt
+        run: |
+          echo "matrix instance ,${{ matrix.instance }},"
+          echo "inputs.distro-slug ,${{ inputs.distro-slug }},"
+          sh -x ./bootstrap-salt.sh
 
-      ## - name: Test Bootstrap
-      ##   run: |
-      ##     pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
+      - name: Test Bootstrap
+        run: |
+          pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
 
       - name: Set Exit Status
         if: always()

@@ -245,20 +245,6 @@ jobs:
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  fedora-39:
-    name: Fedora 39
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: fedora-39
-      display-name: Fedora 39
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "latest", "default"]'
-
-
   fedora-40:
     name: Fedora 40
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
@@ -430,7 +416,6 @@ jobs:
       - centos-stream9
       - debian-11
       - debian-12
-      - fedora-39
       - fedora-40
       - opensuse-15
       - oraclelinux-8

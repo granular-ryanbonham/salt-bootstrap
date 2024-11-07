@@ -13,7 +13,6 @@ LINUX_DISTROS = [
     "centos-stream9",
     "debian-11",
     "debian-12",
-    "fedora-39",
     "fedora-40",
     "opensuse-15",
     "oraclelinux-8",
@@ -43,7 +42,6 @@ STABLE_DISTROS = [
     "centos-stream9",
     "debian-11",
     "debian-12",
-    "fedora-39",
     "fedora-40",
     "opensuse-15",
     "oraclelinux-8",
@@ -64,7 +62,6 @@ ONEDIR_DISTROS = [
     "centos-stream9",
     "debian-11",
     "debian-12",
-    "fedora-39",
     "fedora-40",
     "oraclelinux-8",
     "oraclelinux-9",
@@ -97,7 +94,6 @@ BLACKLIST_3006 = [
 ]
 
 BLACKLIST_3007 = [
-    "fedora-39",
     "opensuse-15",
     "photon-4",
     "photon-5",
@@ -126,7 +122,6 @@ BLACKLIST_GIT_3007 = [
     "centos-stream9",
     "debian-11",
     "debian-12",
-    "fedora-39",
     "fedora-40",
     "opensuse-15",
     "oraclelinux-9",
@@ -140,7 +135,6 @@ BLACKLIST_GIT_3007 = [
 
 BLACKLIST_GIT_MASTER = [
     "amazon-2",
-    "fedora-39",
     "photon-4",
     "photon-5",
 ]
@@ -200,7 +194,6 @@ GIT_VERSION_BLACKLIST = [
 #
 GIT_DISTRO_BLACKLIST = [
     "almalinux-8",
-    "fedora-39",
     "opensuse-15",
     "oraclelinux-8",
     "rockylinux-8",
@@ -215,7 +208,6 @@ DISTRO_DISPLAY_NAMES = {
     "centos-stream9": "CentOS Stream 9",
     "debian-11": "Debian 11",
     "debian-12": "Debian 12",
-    "fedora-39": "Fedora 39",
     "fedora-40": "Fedora 40",
     "opensuse-15": "Opensuse 15",
     "oraclelinux-8": "Oracle Linux 8",
