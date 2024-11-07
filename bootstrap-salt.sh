@@ -7241,7 +7241,9 @@ __macosx_get_packagesite_onedir_latest() {
     rm -fR ${macos_versions_tmpdir}
 
     echodebug "latest MacOS release from repository found ${LATEST_VERSION}"
-    return "${LATEST_VERSION}"
+    # shellcheck disable=SC2116
+    LATEST_VERSION_RET=$(echo "${LATEST_VERSION_RET}")
+    return "${LATEST_VERSION_RET}"
 }
 
 
