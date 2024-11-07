@@ -1,3 +1,11 @@
+# v2024.11.07
+
+## What's Changed
+
+- Changed release runners and shell script date by @dmurphy18 in https://github.com/saltstack/salt-bootstrap/pull/2035
+
+**Full Changelog**: https://github.com/saltstack/salt-bootstrap/compare/v2024.11.06...v2024.11.07
+
 # v2024.09.24
 
 ## What's Changed
