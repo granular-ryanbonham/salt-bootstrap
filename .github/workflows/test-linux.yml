@@ -47,13 +47,13 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          python3 -m pip install -U pip
-          python3 -m pip install -r tests/requirements.txt
+          python3 -m pip install --break-system-packages -U pip
+          python3 -m pip install --break-system-packages -r tests/requirements.txt
 
       - name: Bootstrap Salt
         run: |
           echo "matrix instance ,${{ matrix.instance }},"
-          $bt_parms = echo "${{ matrix.instance }}" | sed 's/-/ /'
+          bt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /')
           echo "bt parms ,$bt_parms,"
           sh -x ./bootstrap-salt.sh $bt_parms
 
