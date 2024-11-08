@@ -28,9 +28,7 @@ jobs:
     name: ${{ matrix.instance }}
     runs-on: ubuntu-latest
     container:
-      $trgt_version = echo "${{ inputs.display-name }}" | awk -F ' ' '{print $2}'
-      $trgt_slug = echo "${{ inputs.distro-slug}}" | awk -F '-' '{print $1}'
-      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ trgt_slug }}-${{ trgt_version }}
+      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.distro-slug}}
 
     timeout-minutes: ${{ inputs.timeout }}
     strategy:

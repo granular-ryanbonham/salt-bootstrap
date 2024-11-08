@@ -161,35 +161,7 @@ jobs:
 
 
 
-  almalinux-8:
-    name: AlmaLinux 8
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: almalinux-8
-      display-name: AlmaLinux 8
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
-
-
-  almalinux-9:
-    name: AlmaLinux 9
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: almalinux-9
-      display-name: AlmaLinux 9
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
-
-
-  amazon-2:
+  amazonlinux-2:
     name: Amazon 2
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -197,24 +169,24 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: amazon-2
+      distro-slug: amazonlinux-2
       display-name: Amazon 2
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
 
-  centos-stream9:
-    name: CentOS Stream 9
+  amazonlinux-2023:
+    name: Amazon 2023
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
     needs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: centos-stream9
-      display-name: CentOS Stream 9
+      distro-slug: amazonlinux-2023
+      display-name: Amazon 2023
       timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
+      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
 
   debian-11:
@@ -245,6 +217,20 @@ jobs:
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
+  debian-13:
+    name: Debian 13
+    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
+    uses: ./.github/workflows/test-linux.yml
+    needs:
+      - lint
+      - generate-actions-workflow
+    with:
+      distro-slug: debian-13
+      display-name: Debian 13
+      timeout: 20
+      instances: '["stable-3006", "git-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
+
+
   fedora-40:
     name: Fedora 40
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
@@ -257,48 +243,6 @@ jobs:
       display-name: Fedora 40
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
-
-
-  opensuse-15:
-    name: Opensuse 15
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: opensuse-15
-      display-name: Opensuse 15
-      timeout: 20
-      instances: '["latest", "default"]'
-
-
-  oraclelinux-8:
-    name: Oracle Linux 8
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: oraclelinux-8
-      display-name: Oracle Linux 8
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
-
-
-  oraclelinux-9:
-    name: Oracle Linux 9
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: oraclelinux-9
-      display-name: Oracle Linux 9
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
   photon-4:
@@ -357,7 +301,7 @@ jobs:
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  ubuntu-2004:
+  ubuntu-20.04:
     name: Ubuntu 20.04
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -365,13 +309,13 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: ubuntu-2004
+      distro-slug: ubuntu-20.04
       display-name: Ubuntu 20.04
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  ubuntu-2204:
+  ubuntu-22.04:
     name: Ubuntu 22.04
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -379,13 +323,13 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: ubuntu-2204
+      distro-slug: ubuntu-22.04
       display-name: Ubuntu 22.04
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  ubuntu-2404:
+  ubuntu-24.04:
     name: Ubuntu 24.04
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -393,7 +337,7 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: ubuntu-2404
+      distro-slug: ubuntu-24.04
       display-name: Ubuntu 24.04
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
@@ -410,23 +354,19 @@ jobs:
       - macos-12
       - macos-13
       - windows-2022
-      - almalinux-8
-      - almalinux-9
-      - amazon-2
-      - centos-stream9
+      - amazonlinux-2
+      - amazonlinux-2023
       - debian-11
       - debian-12
+      - debian-13
       - fedora-40
-      - opensuse-15
-      - oraclelinux-8
-      - oraclelinux-9
       - photon-4
       - photon-5
       - rockylinux-8
       - rockylinux-9
-      - ubuntu-2004
-      - ubuntu-2204
-      - ubuntu-2404
+      - ubuntu-20.04
+      - ubuntu-22.04
+      - ubuntu-24.04
     if: always()
     steps:
 

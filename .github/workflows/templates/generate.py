@@ -7,23 +7,19 @@ import pathlib
 os.chdir(os.path.abspath(os.path.dirname(__file__)))
 
 LINUX_DISTROS = [
-    "almalinux-8",
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "debian-11",
     "debian-12",
+    "debian-13",
     "fedora-40",
-    "opensuse-15",
-    "oraclelinux-8",
-    "oraclelinux-9",
     "photon-4",
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
-    "ubuntu-2404",
+    "ubuntu-20.04",
+    "ubuntu-22.04",
+    "ubuntu-24.04",
 ]
 
 WINDOWS = [
@@ -36,32 +32,28 @@ OSX = [
 ]
 
 STABLE_DISTROS = [
-    "almalinux-8",
-    "almalinux-9",
-    "amazon-2",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "centos-stream9",
     "debian-11",
     "debian-12",
+    "debian-13",
     "fedora-40",
-    "opensuse-15",
-    "oraclelinux-8",
-    "oraclelinux-9",
     "photon-4",
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
-    "ubuntu-2404",
+    "ubuntu-20.04",
+    "ubuntu-22.04",
+    "ubuntu-24.04",
 ]
 
 ONEDIR_DISTROS = [
-    "almalinux-8",
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "debian-11",
     "debian-12",
+    "debian-13",
     "fedora-40",
     "oraclelinux-8",
     "oraclelinux-9",
@@ -69,72 +61,64 @@ ONEDIR_DISTROS = [
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
-    "ubuntu-2404",
+    "ubuntu-20.04",
+    "ubuntu-22.04",
+    "ubuntu-24.04",
 ]
 
 ONEDIR_RC_DISTROS = [
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "debian-12",
-    "oraclelinux-9",
     "photon-4",
     "photon-5",
     "rockylinux-9",
-    "ubuntu-2404",
+    "ubuntu-24.04",
 ]
 
 BLACKLIST_3006 = [
     "debian-12",
     "fedora-40",
-    "opensuse-15",
-    "ubuntu-2404",
+    "ubuntu-24.04",
 ]
 
 BLACKLIST_3007 = [
-    "opensuse-15",
     "photon-4",
     "photon-5",
 ]
 
 BLACKLIST_GIT_3006 = [
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "debian-11",
     "debian-12",
     "fedora-40",
-    "opensuse-15",
-    "oraclelinux-9",
     "photon-4",
     "photon-5",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
-    "ubuntu-2404",
+    "ubuntu-20.04",
+    "ubuntu-22.04",
+    "ubuntu-24.04",
 ]
 
 BLACKLIST_GIT_3007 = [
-    "almalinux-9",
-    "amazon-2",
-    "centos-stream9",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "debian-11",
     "debian-12",
+    "debian-13",
     "fedora-40",
-    "opensuse-15",
-    "oraclelinux-9",
     "photon-4",
     "photon-5",
     "rockylinux-9",
-    "ubuntu-2004",
-    "ubuntu-2204",
-    "ubuntu-2404",
+    "ubuntu-20.04",
+    "ubuntu-22.04",
+    "ubuntu-24.04",
 ]
 
 BLACKLIST_GIT_MASTER = [
-    "amazon-2",
+    "amazonlinux-2",
+    "amazonlinux-2023",
     "photon-4",
     "photon-5",
 ]
@@ -193,32 +177,25 @@ GIT_VERSION_BLACKLIST = [
 #           Use build and pip and other standards-based tools.
 #
 GIT_DISTRO_BLACKLIST = [
-    "almalinux-8",
-    "opensuse-15",
-    "oraclelinux-8",
     "rockylinux-8",
 ]
 
 LATEST_PKG_BLACKLIST = []
 
 DISTRO_DISPLAY_NAMES = {
-    "almalinux-8": "AlmaLinux 8",
-    "almalinux-9": "AlmaLinux 9",
-    "amazon-2": "Amazon 2",
-    "centos-stream9": "CentOS Stream 9",
+    "amazonlinux-2": "Amazon 2",
+    "amazonlinux-2023": "Amazon 2023",
     "debian-11": "Debian 11",
     "debian-12": "Debian 12",
+    "debian-13": "Debian 13",
     "fedora-40": "Fedora 40",
-    "opensuse-15": "Opensuse 15",
-    "oraclelinux-8": "Oracle Linux 8",
-    "oraclelinux-9": "Oracle Linux 9",
     "photon-4": "Photon OS 4",
     "photon-5": "Photon OS 5",
     "rockylinux-8": "Rocky Linux 8",
     "rockylinux-9": "Rocky Linux 9",
-    "ubuntu-2004": "Ubuntu 20.04",
-    "ubuntu-2204": "Ubuntu 22.04",
-    "ubuntu-2404": "Ubuntu 24.04",
+    "ubuntu-20.04": "Ubuntu 20.04",
+    "ubuntu-22.04": "Ubuntu 22.04",
+    "ubuntu-24.04": "Ubuntu 24.04",
     "macos-12": "macOS 12",
     "macos-13": "macOS 13",
     "windows-2022": "Windows 2022",
