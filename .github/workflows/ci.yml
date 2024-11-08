@@ -124,6 +124,7 @@ jobs:
     with:
       distro-slug: macos-12
       display-name: macOS 12
+      container-slug: macos-12
       timeout: 20
       runs-on: macos-12
       instances: '["stable-3006", "stable-3006-8", "stable-3007", "stable-3007-1", "latest"]'
@@ -139,6 +140,7 @@ jobs:
     with:
       distro-slug: macos-13
       display-name: macOS 13
+      container-slug: macos-13
       timeout: 20
       runs-on: macos-13
       instances: '["stable-3006", "stable-3006-8", "stable-3007", "stable-3007-1", "latest"]'
@@ -155,6 +157,7 @@ jobs:
     with:
       distro-slug: windows-2022
       display-name: Windows 2022
+      container-slug: windows-2022
       timeout: 20
       runs-on: windows-2022
       instances: '["stable-3006", "stable-3006-8", "stable-3007", "stable-3007-1", "latest"]'
@@ -171,6 +174,7 @@ jobs:
     with:
       distro-slug: amazonlinux-2
       display-name: Amazon 2
+      container-slug: amazonlinux-2
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
@@ -185,6 +189,7 @@ jobs:
     with:
       distro-slug: amazonlinux-2023
       display-name: Amazon 2023
+      container-slug: amazonlinux-2023
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
@@ -199,6 +204,7 @@ jobs:
     with:
       distro-slug: debian-11
       display-name: Debian 11
+      container-slug: debian-11
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -213,6 +219,7 @@ jobs:
     with:
       distro-slug: debian-12
       display-name: Debian 12
+      container-slug: debian-12
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -227,6 +234,7 @@ jobs:
     with:
       distro-slug: debian-13
       display-name: Debian 13
+      container-slug: debian-13
       timeout: 20
       instances: '["stable-3006", "git-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -241,6 +249,7 @@ jobs:
     with:
       distro-slug: fedora-40
       display-name: Fedora 40
+      container-slug: fedora-40
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -255,6 +264,7 @@ jobs:
     with:
       distro-slug: photon-4
       display-name: Photon OS 4
+      container-slug: photon-4
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "latest", "default"]'
 
@@ -269,6 +279,7 @@ jobs:
     with:
       distro-slug: photon-5
       display-name: Photon OS 5
+      container-slug: photon-5
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "latest", "default"]'
 
@@ -283,6 +294,7 @@ jobs:
     with:
       distro-slug: rockylinux-8
       display-name: Rocky Linux 8
+      container-slug: rockylinux-8
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
@@ -297,11 +309,12 @@ jobs:
     with:
       distro-slug: rockylinux-9
       display-name: Rocky Linux 9
+      container-slug: rockylinux-9
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  ubuntu-20.04:
+  ubuntu-2004:
     name: Ubuntu 20.04
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -309,13 +322,14 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: ubuntu-20.04
+      distro-slug: ubuntu-2004
       display-name: Ubuntu 20.04
+      container-slug: ubuntu-20.04
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  ubuntu-22.04:
+  ubuntu-2204:
     name: Ubuntu 22.04
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -323,13 +337,14 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: ubuntu-22.04
+      distro-slug: ubuntu-2204
       display-name: Ubuntu 22.04
+      container-slug: ubuntu-22.04
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
 
-  ubuntu-24.04:
+  ubuntu-2404:
     name: Ubuntu 24.04
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
     uses: ./.github/workflows/test-linux.yml
@@ -337,8 +352,9 @@ jobs:
       - lint
       - generate-actions-workflow
     with:
-      distro-slug: ubuntu-24.04
+      distro-slug: ubuntu-2404
       display-name: Ubuntu 24.04
+      container-slug: ubuntu-24.04
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -364,9 +380,9 @@ jobs:
       - photon-5
       - rockylinux-8
       - rockylinux-9
-      - ubuntu-20.04
-      - ubuntu-22.04
-      - ubuntu-24.04
+      - ubuntu-2004
+      - ubuntu-2204
+      - ubuntu-2404
     if: always()
     steps:
 

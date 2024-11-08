@@ -17,9 +17,9 @@ LINUX_DISTROS = [
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-20.04",
-    "ubuntu-22.04",
-    "ubuntu-24.04",
+    "ubuntu-2004",
+    "ubuntu-2204",
+    "ubuntu-2404",
 ]
 
 WINDOWS = [
@@ -43,9 +43,9 @@ STABLE_DISTROS = [
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-20.04",
-    "ubuntu-22.04",
-    "ubuntu-24.04",
+    "ubuntu-2004",
+    "ubuntu-2204",
+    "ubuntu-2404",
 ]
 
 ONEDIR_DISTROS = [
@@ -61,9 +61,9 @@ ONEDIR_DISTROS = [
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
-    "ubuntu-20.04",
-    "ubuntu-22.04",
-    "ubuntu-24.04",
+    "ubuntu-2004",
+    "ubuntu-2204",
+    "ubuntu-2404",
 ]
 
 ONEDIR_RC_DISTROS = [
@@ -73,13 +73,13 @@ ONEDIR_RC_DISTROS = [
     "photon-4",
     "photon-5",
     "rockylinux-9",
-    "ubuntu-24.04",
+    "ubuntu-2404",
 ]
 
 BLACKLIST_3006 = [
     "debian-12",
     "fedora-40",
-    "ubuntu-24.04",
+    "ubuntu-2404",
 ]
 
 BLACKLIST_3007 = [
@@ -96,9 +96,9 @@ BLACKLIST_GIT_3006 = [
     "photon-4",
     "photon-5",
     "rockylinux-9",
-    "ubuntu-20.04",
-    "ubuntu-22.04",
-    "ubuntu-24.04",
+    "ubuntu-2004",
+    "ubuntu-2204",
+    "ubuntu-2404",
 ]
 
 BLACKLIST_GIT_3007 = [
@@ -111,9 +111,9 @@ BLACKLIST_GIT_3007 = [
     "photon-4",
     "photon-5",
     "rockylinux-9",
-    "ubuntu-20.04",
-    "ubuntu-22.04",
-    "ubuntu-24.04",
+    "ubuntu-2004",
+    "ubuntu-2204",
+    "ubuntu-2404",
 ]
 
 BLACKLIST_GIT_MASTER = [
@@ -193,12 +193,31 @@ DISTRO_DISPLAY_NAMES = {
     "photon-5": "Photon OS 5",
     "rockylinux-8": "Rocky Linux 8",
     "rockylinux-9": "Rocky Linux 9",
-    "ubuntu-20.04": "Ubuntu 20.04",
-    "ubuntu-22.04": "Ubuntu 22.04",
-    "ubuntu-24.04": "Ubuntu 24.04",
+    "ubuntu-2004": "Ubuntu 20.04",
+    "ubuntu-2204": "Ubuntu 22.04",
+    "ubuntu-2404": "Ubuntu 24.04",
     "macos-12": "macOS 12",
     "macos-13": "macOS 13",
     "windows-2022": "Windows 2022",
+}
+
+CONTAINER_SLUG_NAMES = {
+    "amazonlinux-2": "amazonlinux-2",
+    "amazonlinux-2023": "amazonlinux-2023",
+    "debian-11": "debian-11",
+    "debian-12": "debian-12",
+    "debian-13": "debian-13",
+    "fedora-40": "fedora-40",
+    "photon-4": "photon-4",
+    "photon-5": "photon-5",
+    "rockylinux-8": "rockylinux-8",
+    "rockylinux-9": "rockylinux-9",
+    "ubuntu-2004": "ubuntu-20.04",
+    "ubuntu-2204": "ubuntu-22.04",
+    "ubuntu-2404": "ubuntu-24.04",
+    "macos-12": "macos-12",
+    "macos-13": "macos-13",
+    "windows-2022": "windows-2022",
 }
 
 TIMEOUT_DEFAULT = 20
@@ -215,6 +234,7 @@ TEMPLATE = """
     with:
       distro-slug: {distro}
       display-name: {display_name}
+      container-slug: {container_name}
       timeout: {timeout_minutes}{runs_on}
       instances: '{instances}'
 """
@@ -265,6 +285,7 @@ def generate_test_jobs():
                 ifcheck=ifcheck,
                 instances=json.dumps(instances),
                 display_name=DISTRO_DISPLAY_NAMES[distro],
+                container_name=CONTAINER_SLUG_NAMES[distro],
                 timeout_minutes=timeout_minutes,
             )
 
@@ -310,6 +331,7 @@ def generate_test_jobs():
                 ifcheck=ifcheck,
                 instances=json.dumps(instances),
                 display_name=DISTRO_DISPLAY_NAMES[distro],
+                container_name=CONTAINER_SLUG_NAMES[distro],
                 timeout_minutes=timeout_minutes,
             )
 
@@ -409,6 +431,7 @@ def generate_test_jobs():
                 ifcheck=ifcheck,
                 instances=json.dumps(instances),
                 display_name=DISTRO_DISPLAY_NAMES[distro],
+                container_name=CONTAINER_SLUG_NAMES[distro],
                 timeout_minutes=timeout_minutes,
             )
 

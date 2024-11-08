@@ -17,6 +17,11 @@ on:
         required: true
         description: The Instances To Test
 
+      container-slug:
+        type: string
+        required: true
+        description: The Container Slug
+
       timeout:
         type: number
         required: false
@@ -28,7 +33,7 @@ jobs:
     name: ${{ matrix.instance }}
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.distro-slug}}
+      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
 
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
