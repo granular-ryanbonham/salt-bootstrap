@@ -47,8 +47,11 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          ## python3 -m pip install --break-system-packages -U pip
-          python3 -m pip install --break-system-packages -r tests/requirements.txt
+          if [[ ${{ inputs.distro-slug }} == "debian-11" || ${{ inputs.distro-slug }} == "debian-12" || ${{ inputs.distro-slug }} == "debian-13" || ${{ inputs.distro-slug }} == "ubuntu-2404" ]]; then
+            python3 -m pip install --break-system-packages -r tests/requirements.txt
+          else
+            python3 -m pip install -r tests/requirements.txt
+          fi
 
       - name: Bootstrap Salt
         run: |
