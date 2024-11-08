@@ -16,6 +16,7 @@ def path():
         if salt_path not in os.environ["path"]:
             os.environ["path"] = f'{os.environ["path"]};{salt_path}'
         yield os.environ["path"]
+    yield ""
 
 
 def run_salt_call(cmd):
