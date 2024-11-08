@@ -15,7 +15,7 @@ def path():
         salt_path = "C:\\Program Files\\Salt Project\\Salt"
         if salt_path not in os.environ["path"]:
             os.environ["path"] = f'{os.environ["path"]};{salt_path}'
-    yield os.environ["path"]
+        yield os.environ["path"]
 
 
 def run_salt_call(cmd):

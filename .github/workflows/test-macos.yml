@@ -53,7 +53,10 @@ jobs:
 
       - name: Bootstrap Salt
         run: |
-          sudo sh -x ./bootstrap-salt.sh
+          echo "matrix instance ,${{ matrix.instance }},"
+          bt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /')
+          echo "bt parms ,$bt_parms,"
+          sudo sh -x ./bootstrap-salt.sh $bt_parms
 
       - name: Test Bootstrap
         run: |
