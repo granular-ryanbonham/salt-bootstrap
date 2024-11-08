@@ -47,9 +47,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Pytest
+      - name: Install Python Dependencies
         run: |
-          pip install -U pytest
+          python3 -m pip install -U pip
+          python3 -m pip install -r tests/requirements.txt
 
       - name: Bootstrap Salt
         run: |
