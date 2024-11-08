@@ -22,6 +22,11 @@ on:
         required: true
         description: The Instances To Test
 
+      container-slug:
+        type: string
+        required: true
+        description: The Container Slug
+
       timeout:
         type: number
         required: false
