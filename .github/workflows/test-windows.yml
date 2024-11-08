@@ -53,7 +53,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          python3 -m pip install -U pip
+          ## python3 -m pip install -U pip
           python3 -m pip install -r tests/requirements.txt
 
       - name: Get Version

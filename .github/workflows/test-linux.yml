@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          python3 -m pip install --break-system-packages -U pip
+          ## python3 -m pip install --break-system-packages -U pip
           python3 -m pip install --break-system-packages -r tests/requirements.txt
 
       - name: Bootstrap Salt
