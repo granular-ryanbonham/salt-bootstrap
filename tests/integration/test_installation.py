@@ -3,6 +3,7 @@ import logging
 import os
 import platform
 import subprocess
+import tempfile
 
 import pytest
 
@@ -24,14 +25,26 @@ def run_salt_call(cmd):
     Runs salt call command and returns a dictionary
     Accepts cmd as a list
     """
-    cmd.append("--out=json")
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    print(
-        f"DGM run_salt_call, cmd '{cmd}', result '{result}', stdout '{result.stdout}'",
-        flush=True,
-    )
-    json_data = json.loads(result.stdout)
-    return json_data["local"]
+    tmpf = tempfile.NamedTemporaryFile(delete=False)
+    json_data = {"local": {}}
+
+    try:
+        cmd.append("--out=json")
+        cmd.append(f"--log-file={tmpf.name}")
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        print(
+            f"DGM run_salt_call, cmd '{cmd}', result '{result}', stdout '{result.stdout}'",
+            flush=True,
+        )
+        if 0 == result.returncode:
+            json_data = json.loads(result.stdout)
+        else:
+            log.error(f"failed to produce output result, '{result}'")
+
+    finally:
+        tmpf.close()
+        os.unlink(tmpf.name)
+        return json_data["local"]
 
 
 def test_ping(path):
