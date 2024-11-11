@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Python Dependencies with pip breakage
-        if: ${{ ( inputs.distro-slug = "debian-11" ) || ( inputs.distro-slug = "debian-12" ) || ( inputs.distro-slug = "debian-13" ) || ( inputs.distro-slug = "ubuntu-2404" ) }}
+        if: ${{ ( inputs.distro-slug == "debian-11" ) || ( inputs.distro-slug == "debian-12" ) || ( inputs.distro-slug == "debian-13" ) || ( inputs.distro-slug == "ubuntu-2404" ) }}
         run: |
           echo "DGM pip test for distro-slug ${{ inputs.distro-slug }}"
           echo "DGM doing break-system-packages for distro-slug ${{ inputs.distro-slug }}"
