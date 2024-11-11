@@ -634,7 +634,9 @@ if [ "$ITYPE" = "latest" ] || [ "$ITYPE" = "default" ]; then
     ONEDIR_REV="latest"
     _ONEDIR_REV="latest"
     ITYPE="onedir"
-    shift
+    if [ "$#" -gt 0 ];then
+        shift
+    fi
     echodebug "using ITYPE onedir for input 'latest' or 'default', cmd args left ,$#,"
 
 # If doing a git install, check what branch/tag/sha will be checked out

@@ -51,10 +51,6 @@ jobs:
           echo "DGM pip test for distro-slug ${{ inputs.distro-slug }}"
           echo "DGM doing break-system-packages for distro-slug ${{ inputs.distro-slug }}"
           python3 -m pip install --break-system-packages -r tests/requirements.txt
-          else
-            echo "DGM plain pip for distro-slug ${{ inputs.distro-slug }}"
-            python3 -m pip install -r tests/requirements.txt
-          fi
 
       - name: Install Python Dependencies without pip breakage
         if: ${{ ( inputs.distro-slug != 'debian-11' ) && ( inputs.distro-slug != 'debian-12' ) && ( inputs.distro-slug != 'debian-13' ) && ( inputs.distro-slug != 'ubuntu-2404' ) }}
