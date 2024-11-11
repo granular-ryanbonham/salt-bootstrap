@@ -3,7 +3,6 @@ import logging
 import os
 import platform
 import subprocess
-import tempfile
 
 import pytest
 
@@ -25,20 +24,12 @@ def run_salt_call(cmd):
     Runs salt call command and returns a dictionary
     Accepts cmd as a list
     """
-    tmpf = tempfile.NamedTemporaryFile(delete=False)
     json_data = {"local": {}}
-
-    try:
-        if platform.system() == "Windows":
-            cmdl = cmd
-        else:
-            cmdl = ["sudo"]
-            cmdl.extend(cmd)
-        cmdl.append("--out=json")
-        cmdl.append(f"--log-file={tmpf.name}")
-        result = subprocess.run(cmdl, capture_output=True, text=True)
+    if platform.system() == "Windows":
+        cmd.append("--out=json")
+        result = subprocess.run(cmd, capture_output=True, text=True)
         print(
-            f"DGM run_salt_call, cmdl '{cmdl}', result '{result}', stdout '{result.stdout}'",
+            f"DGM run_salt_call, cmd '{cmd}', result '{result}', stdout '{result.stdout}'",
             flush=True,
         )
         if 0 == result.returncode:
@@ -46,10 +37,23 @@ def run_salt_call(cmd):
         else:
             log.error(f"failed to produce output result, '{result}'")
 
-    finally:
-        tmpf.close()
-        os.unlink(tmpf.name)
-        return json_data["local"]
+    else:
+        try:
+            cmdl = ["sudo"]
+            cmdl.extend(cmd)
+            cmdl.append("--out=json")
+            result = subprocess.run(cmdl, capture_output=True, text=True)
+            print(
+                f"DGM run_salt_call, cmdl '{cmdl}', result '{result}', stdout '{result.stdout}'",
+                flush=True,
+            )
+            if 0 == result.returncode:
+                json_data = json.loads(result.stdout)
+            else:
+                log.error(f"failed to produce output result, '{result}'")
+
+        finally:
+            return json_data["local"]
 
 
 def test_ping(path):
