@@ -39,22 +39,20 @@ def run_salt_call(cmd):
             log.error(f"failed to produce output result, '{result}'")
 
     else:
-        try:
-            cmdl = ["sudo"]
-            cmdl.extend(cmd)
-            cmdl.append("--out=json")
-            result = subprocess.run(cmdl, capture_output=True, text=True)
-            print(
-                f"DGM run_salt_call, cmdl '{cmdl}', result '{result}', stdout '{result.stdout}'",
-                flush=True,
-            )
-            if 0 == result.returncode:
-                json_data = json.loads(result.stdout)
-            else:
-                log.error(f"failed to produce output result, '{result}'")
+        cmdl = ["sudo"]
+        cmdl.extend(cmd)
+        cmdl.append("--out=json")
+        result = subprocess.run(cmdl, capture_output=True, text=True)
+        print(
+            f"DGM run_salt_call, cmdl '{cmdl}', result '{result}', stdout '{result.stdout}'",
+            flush=True,
+        )
+        if 0 == result.returncode:
+            json_data = json.loads(result.stdout)
+        else:
+            log.error(f"failed to produce output result, '{result}'")
 
-        finally:
-            return json_data["local"]
+    return json_data["local"]
 
 
 def test_ping(path):

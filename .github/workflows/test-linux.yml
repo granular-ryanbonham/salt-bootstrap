@@ -61,10 +61,12 @@ jobs:
 
       - name: Bootstrap Salt
         run: |
+          # sed 1st - becomes space, 2nd - becomes dot
           echo "matrix instance ,${{ matrix.instance }},"
           bt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /')
-          echo "bt parms ,$bt_parms,"
-          sh -x ./bootstrap-salt.sh "$bt_parms"
+          bt_parms2=$(echo "$bt_parms" | sed 's/-/./')
+          echo "bt parms ,$bt_parms, bt_parms2 ,$bt_parms2,"
+          sh -x ./bootstrap-salt.sh "$bt_parms2"
 
       - name: Test Bootstrap
         run: |
