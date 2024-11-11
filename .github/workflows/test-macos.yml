@@ -58,7 +58,7 @@ jobs:
           bt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /')
           bt_parms2=$(echo "$bt_parms" | sed 's/-/./')
           echo "bt parms ,$bt_parms, bt_parms2 ,$bt_parms2,"
-          sh -x ./bootstrap-salt.sh "$bt_parms2"
+          sudo sh -x ./bootstrap-salt.sh "$bt_parms2"
 
       - name: Test Bootstrap
         run: |
