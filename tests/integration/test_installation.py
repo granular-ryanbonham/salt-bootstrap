@@ -29,11 +29,16 @@ def run_salt_call(cmd):
     json_data = {"local": {}}
 
     try:
-        cmd.append("--out=json")
-        cmd.append(f"--log-file={tmpf.name}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        if platform.system() == "Windows":
+            cmdl = cmd
+        else:
+            cmdl = ["sudo"]
+            cmdl.extend(cmd)
+        cmdl.append("--out=json")
+        cmdl.append(f"--log-file={tmpf.name}")
+        result = subprocess.run(cmdl, capture_output=True, text=True)
         print(
-            f"DGM run_salt_call, cmd '{cmd}', result '{result}', stdout '{result.stdout}'",
+            f"DGM run_salt_call, cmdl '{cmdl}', result '{result}', stdout '{result.stdout}'",
             flush=True,
         )
         if 0 == result.returncode:
