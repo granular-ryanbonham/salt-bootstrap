@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.07"
+__ScriptVersion="2024.11.11"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -221,6 +221,10 @@ __check_config_dir() {
 #  DESCRIPTION:  Checks the placed after the install arguments
 #----------------------------------------------------------------------------------------------------------------------
 __check_unparsed_options() {
+    # DGM debug
+    set -v
+    set -x
+
     shellopts="$1"
     # grep alternative for SunOS
     if [ -f /usr/xpg4/bin/grep ]; then
@@ -619,13 +623,22 @@ if [ "$#" -gt 0 ];then
 fi
 
 # Check installation type
-if [ "$(echo "$ITYPE" | grep -E '(stable|testing|git|onedir|onedir_rc)')" = "" ]; then
+if [ "$(echo "$ITYPE" | grep -E '(latest|default|stable|testing|git|onedir|onedir_rc)')" = "" ]; then
     echoerror "Installation type \"$ITYPE\" is not known..."
     exit 1
 fi
 
+## DGM added this to CI/CD easier, needs removal once get compund conditionals resolved in GitHub Actions
+if [ "$ITYPE" = "latest" ] || [ "$ITYPE" = "default" ]; then
+    STABLE_REV="latest"
+    ONEDIR_REV="latest"
+    _ONEDIR_REV="latest"
+    ITYPE="onedir"
+    shift
+    echodebug "using ITYPE onedir for input 'latest' or 'default', cmd args left ,$#,"
+
 # If doing a git install, check what branch/tag/sha will be checked out
-if [ "$ITYPE" = "git" ]; then
+elif [ "$ITYPE" = "git" ]; then
     if [ "$#" -eq 0 ];then
         GIT_REV="master"
     else
