@@ -3185,6 +3185,9 @@ install_ubuntu_deps() {
     # Additionally install procps and pciutils which allows for Docker bootstraps. See 366#issuecomment-39666813
     __PACKAGES="${__PACKAGES} procps pciutils"
 
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     ## include hwclock if not part of base OS (23.10 and up)
     if [ ! -f /usr/sbin/hwclock ]; then
         __PACKAGES="${__PACKAGES} util-linux-extra"
@@ -3273,6 +3276,9 @@ install_ubuntu_git_deps() {
     if [ ! -f /usr/sbin/hwclock ]; then
         __PACKAGES="${__PACKAGES} util-linux-extra"
     fi
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
     __apt_get_install_noinput ${__PACKAGES} || return 1
@@ -3724,6 +3730,9 @@ install_debian_onedir_deps() {
     # YAML module is used for generating custom master/minion configs
     __PACKAGES="${__PACKAGES} python${PY_PKG_VER}-yaml"
 
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     # shellcheck disable=SC2086
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
@@ -3764,6 +3773,9 @@ install_debian_git_deps() {
 
     __PACKAGES="python${PY_PKG_VER}-dev python${PY_PKG_VER}-pip python${PY_PKG_VER}-setuptools gcc"
     echodebug "install_debian_git_deps() Installing ${__PACKAGES}"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
     __apt_get_install_noinput ${__PACKAGES} || return 1
@@ -4061,6 +4073,9 @@ install_fedora_deps() {
         echoinfo "Installing the following extra packages as requested: ${_EXTRA_PACKAGES}"
     fi
 
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     # shellcheck disable=SC2086
     __dnf_install_noinput ${__PACKAGES} ${_EXTRA_PACKAGES} || return 1
 
@@ -4091,6 +4106,10 @@ install_fedora_git_deps() {
     __git_clone_and_checkout || return 1
 
     __PACKAGES="python${PY_PKG_VER}-devel python${PY_PKG_VER}-pip python${PY_PKG_VER}-setuptools gcc gcc-c++"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     # shellcheck disable=SC2086
     __dnf_install_noinput ${__PACKAGES} || return 1
 
@@ -4219,6 +4238,9 @@ install_fedora_onedir_deps() {
     fi
 
     __PACKAGES="dnf-utils chkconfig procps-ng"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
@@ -4368,6 +4390,9 @@ install_centos_stable_deps() {
 
     __PACKAGES="yum-utils chkconfig procps-ng findutils"
 
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
 
@@ -4413,6 +4438,9 @@ install_centos_stable() {
     if [ "$_INSTALL_SALT_API" -eq $BS_TRUE ]; then
         __PACKAGES="${__PACKAGES} salt-api$MINOR_VER_STRG"
     fi
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
@@ -4497,6 +4525,9 @@ install_centos_git_deps() {
     fi
 
     __PACKAGES="${__PACKAGES} python${PY_PKG_VER}-devel python${PY_PKG_VER}-pip python${PY_PKG_VER}-setuptools gcc"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
@@ -4602,6 +4633,9 @@ install_centos_onedir_deps() {
     fi
 
     __PACKAGES="yum-utils chkconfig procps-ng findutils"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
@@ -5714,6 +5748,9 @@ install_amazon_linux_ami_2_git_deps() {
 
     __PACKAGES="python${PY_PKG_VER}-pip python${PY_PKG_VER}-setuptools python${PY_PKG_VER}-devel gcc"
 
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
 
@@ -5734,7 +5771,12 @@ install_amazon_linux_ami_2_deps() {
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
-    __yum_install_noinput yum-utils
+    __PACKAGES="yum-utils"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
+    __yum_install_noinput ${__PACKAGES}
 
     # Do upgrade early
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
@@ -5778,7 +5820,12 @@ install_amazon_linux_ami_2_onedir_deps() {
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
-    __yum_install_noinput yum-utils
+    __PACKAGES="yum-utils"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
+    __yum_install_noinput ${__PACKAGES}
 
     # Do upgrade early
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
@@ -5890,6 +5937,9 @@ install_amazon_linux_ami_2023_git_deps() {
 
     __PACKAGES="python${PY_PKG_VER}-pip python${PY_PKG_VER}-setuptools python${PY_PKG_VER}-devel gcc"
 
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
     # shellcheck disable=SC2086
     __yum_install_noinput ${__PACKAGES} || return 1
 
@@ -5906,7 +5956,12 @@ install_amazon_linux_ami_2023_onedir_deps() {
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
-    __yum_install_noinput yum-utils
+    __PACKAGES="yum-utils"
+
+    # ensure sudo installed
+    __PACKAGES="${__PACKAGES} sudo"
+
+    __yum_install_noinput ${__PACKAGES}
 
     # Do upgrade early
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
