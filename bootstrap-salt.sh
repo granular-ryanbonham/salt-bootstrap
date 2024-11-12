@@ -665,7 +665,7 @@ elif [ "$ITYPE" = "stable" ]; then
             _ONEDIR_REV="$1"
             ITYPE="onedir"
             shift
-        elif [ "$(echo "$1" | grep -E '^([3-9][0-5]{2}[5-9](\.[0-9]*)?)')" != "" ]; then
+        elif [ "$(echo "$1" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
             STABLE_REV="$1"
             ONEDIR_REV="$1"
             _ONEDIR_REV="$1"
@@ -7453,7 +7453,7 @@ __macosx_get_packagesite_onedir() {
     SALT_MACOS_PKGDIR_URL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos"
     if [ "$(echo "$_ONEDIR_REV" | grep -E '^(latest)$')" != "" ]; then
       __macosx_get_packagesite_onedir_latest
-    elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*))')" != "" ]; then
+    elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*)?)')" != "" ]; then
       _PKG_VERSION=$_ONEDIR_REV
     else
       __macosx_get_packagesite_onedir_latest

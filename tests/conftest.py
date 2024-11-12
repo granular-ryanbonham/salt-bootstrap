@@ -18,12 +18,6 @@ def target_python_version():
 def target_salt_version():
 
     target_salt = os.environ.get("SaltVersion", "")
-
-    print(
-        f"DGM conftest target_salt_version, target_salt '{target_salt}', os.environ '{os.environ}'",
-        flush=True,
-    )
-
     html_response = requests.get(API_URL)
     content = json.loads(html_response.text)
     folders = content["children"]
@@ -36,11 +30,6 @@ def target_salt_version():
             maj_version = version.split(".")[0]
             versions[maj_version] = version
             versions["latest"] = version
-
-    print(
-        f"DGM conftest target_salt_version, target_salt '{target_salt}', versions '{versions}'",
-        flush=True,
-    )
 
     if target_salt.startswith("v"):
         target_salt = target_salt[1:]
