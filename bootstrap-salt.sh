@@ -618,9 +618,7 @@ __check_services_systemd_functional
 # Define installation type
 if [ "$#" -gt 0 ];then
     __check_unparsed_options "$*"
-    ## DGM ITYPE=$1
-    # get first arguement
-    ITYPE=$(echo $1 | awk -F ' ' '{print $1}')
+    ITYPE=$1
     shift
 fi
 
