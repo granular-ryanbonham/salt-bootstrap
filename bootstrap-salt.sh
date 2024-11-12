@@ -2992,6 +2992,8 @@ __enable_universe_repository() {
     set -v
     set -x
 
+    echodebug "__enable_universe_repository() entry"
+
     if [ "$(grep -R universe /etc/apt/sources.list /etc/apt/sources.list.d/ | grep -v '#')" != "" ]; then
         # The universe repository is already enabled
         return 0
@@ -3072,6 +3074,7 @@ __install_saltstack_ubuntu_onedir_repository() {
     set -x
 
     echodebug "__install_saltstack_ubuntu_onedir_repository() entry"
+
     # Workaround for latest non-LTS Ubuntu
     if { [ "$DISTRO_MAJOR_VERSION" -eq 20 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
        { [ "$DISTRO_MAJOR_VERSION" -eq 22 ] && [ "$DISTRO_MINOR_VERSION" -eq 10 ]; } || \
@@ -3306,6 +3309,8 @@ install_ubuntu_stable() {
     set -v
     set -x
 
+    __wait_for_apt apt-get update || return 1
+
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
@@ -3368,6 +3373,8 @@ install_ubuntu_onedir() {
     # DGM debug
     set -v
     set -x
+
+    __wait_for_apt apt-get update || return 1
 
     __PACKAGES=""
 
@@ -3735,6 +3742,11 @@ install_debian_git_deps() {
 }
 
 install_debian_stable() {
+    # DGM debug
+    set -v
+    set -x
+
+    __wait_for_apt apt-get update || return 1
 
     __PACKAGES=""
 
@@ -3774,6 +3786,9 @@ install_debian_12_git_deps() {
 }
 
 install_debian_git() {
+    # DGM debug
+    set -v
+    set -x
 
     if [ -n "$_PY_EXE" ]; then
         _PYEXE=${_PY_EXE}
@@ -3814,6 +3829,11 @@ install_debian_12_git() {
 }
 
 install_debian_onedir() {
+    # DGM debug
+    set -v
+    set -x
+
+    __wait_for_apt apt-get update || return 1
 
     __PACKAGES=""
 
@@ -3970,6 +3990,7 @@ __install_saltstack_fedora_onedir_repository() {
             dnf config-manager --set-enabled salt-repo-latest
         fi
         dnf clean expire-cache || return 1
+        dnf makecache || return 1
 
     elif [ "$ONEDIR_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
@@ -4264,6 +4285,7 @@ __install_saltstack_rhel_onedir_repository() {
             dnf config-manager --set-enabled salt-repo-latest
         fi
         dnf clean expire-cache || return 1
+        dnf makecache || return 1
     elif [ "$ONEDIR_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
         echowarn "Use -F (forced overwrite) to install $ONEDIR_REV."
@@ -5672,6 +5694,7 @@ install_amazon_linux_ami_2_deps() {
                 dnf config-manager --set-enabled salt-repo-latest
             fi
             dnf clean expire-cache || return 1
+            dnf makecache || return 1
         fi
     fi
 
@@ -5715,6 +5738,7 @@ install_amazon_linux_ami_2_onedir_deps() {
                 dnf config-manager --set-enabled salt-repo-latest
             fi
             dnf clean expire-cache || return 1
+            dnf makecache || return 1
         fi
     fi
 
@@ -5842,6 +5866,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
                 dnf config-manager --set-enabled salt-repo-latest
             fi
             dnf clean expire-cache || return 1
+            dnf makecache || return 1
         fi
     fi
 

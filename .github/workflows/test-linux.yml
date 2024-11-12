@@ -32,8 +32,10 @@ jobs:
   Test:
     name: ${{ matrix.instance }}
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
+    ## DGM use runner until have working systemd solution on containers
+    ## DGM runs-on: ubuntu-latest
+    ## DGM container:
+    ## DGM   image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
 
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
