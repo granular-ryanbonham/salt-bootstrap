@@ -3054,14 +3054,23 @@ __install_saltstack_ubuntu_repository() {
 
     if [ "$STABLE_REV" != "latest" ]; then
         # latest is default
-        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+        ## DGM STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+        ## DGM if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM fi
+        if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $STABLE_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+        elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $STABLE_REV" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
         fi
     fi
@@ -3110,14 +3119,23 @@ __install_saltstack_ubuntu_onedir_repository() {
 
     if [ "$ONEDIR_REV" != "latest" ]; then
         # latest is default
-        ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-        if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
+        ## DGM ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+        ## DGM if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM fi
+        if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $ONEDIR_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
+        elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $ONEDIR_REV" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
         fi
     fi
@@ -3593,14 +3611,23 @@ __install_saltstack_debian_repository() {
 
     if [ "$STABLE_REV" != "latest" ]; then
         # latest is default
-        STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-        if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+        ## DGM STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+        ## DGM if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM fi
+        if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $STABLE_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
+        elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $STABLE_REV" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
         fi
     fi
@@ -3637,14 +3664,23 @@ __install_saltstack_debian_onedir_repository() {
 
     if [ "$ONEDIR_REV" != "latest" ]; then
         # latest is default
-        ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-        if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
+        ## DGM ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+        ## DGM if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
+        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
+        ## DGM fi
+        if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $ONEDIR_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
+        elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-            echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
+            echo "Pin: version $ONEDIR_REV" >> /etc/apt/preferences.d/salt-pin-1001
             echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
         fi
     fi
@@ -7416,19 +7452,28 @@ daemons_running_voidlinux() {
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  __macosx_get_packagesite_onedir_latest
-#   DESCRIPTION:  Set _PKG_VERSION to the latest for MacOS
+#   DESCRIPTION:  Set _PKG_VERSION to the latest for MacOS or latest for major version input
 #----------------------------------------------------------------------------------------------------------------------
 __macosx_get_packagesite_onedir_latest() {
+    # DGM debug
+    set -v
+    set -x
 
-    echodebug "Find latest MacOS release from repository"
+    echodebug "Find latest MacOS release from repositoryi, input major version $1"
 
     # get dir listing from url, sort and pick highest
     macos_versions_tmpdir=$(mktemp -d)
     curr_pwd=$(pwd)
     cd  ${macos_versions_tmpdir} || return 1
     wget -r -np -nH --exclude-directories=onedir,relenv,windows -x -l 1 "$SALT_MACOS_PKGDIR_URL/"
-    # shellcheck disable=SC2010
-    _PKG_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | tail -n 1)
+    if [ -n "$1" ]; then
+        MAJOR_VER="$1"
+        # shellcheck disable=SC2010
+        _PKG_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | grep -E "$MAJOR_VER" | tail -n 1)
+    else
+        # shellcheck disable=SC2010
+        _PKG_VERSION=$(ls artifactory/saltproject-generic/macos/ | grep -v 'index.html' | sort -V -u | tail -n 1)
+    fi
     cd ${curr_pwd} || return "${_PKG_VERSION}"
     rm -fR ${macos_versions_tmpdir}
 
@@ -7438,6 +7483,9 @@ __macosx_get_packagesite_onedir_latest() {
 
 
 __macosx_get_packagesite_onedir() {
+    # DGM debug
+    set -v
+    set -x
 
     echodebug "Get package site for onedir from repository"
 
@@ -7452,11 +7500,15 @@ __macosx_get_packagesite_onedir() {
     _ONEDIR_TYPE="saltproject-generic"
     SALT_MACOS_PKGDIR_URL="https://${_REPO_URL}/${_ONEDIR_TYPE}/macos"
     if [ "$(echo "$_ONEDIR_REV" | grep -E '^(latest)$')" != "" ]; then
-      __macosx_get_packagesite_onedir_latest
+        __macosx_get_packagesite_onedir_latest
+    elif [ "$(echo "$_ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+        # need to get latest for major version
+        __macosx_get_packagesite_onedir_latest "$_ONEDIR_REV"
     elif [ "$(echo "$_ONEDIR_REV" | grep -E '^([3-9][0-9]{3}(\.[0-9]*)?)')" != "" ]; then
-      _PKG_VERSION=$_ONEDIR_REV
+        _PKG_VERSION=$_ONEDIR_REV
     else
-      __macosx_get_packagesite_onedir_latest
+        # default to getting latest
+        __macosx_get_packagesite_onedir_latest
     fi
 
     PKG="salt-${_PKG_VERSION}-py3-${DARWIN_ARCH}.pkg"
