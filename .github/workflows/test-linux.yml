@@ -82,7 +82,8 @@ jobs:
           bt_arg1=$(echo "$bt_parms" | awk -F ' ' '{print $1}')
           bt_arg2=$(echo "$bt_parms" | awk -F ' ' '{print $2}')
           echo "bt parms ,$bt_parms, bt_arg1 ,$bt_arg1, bt_arg2 ,$bt_arg2,"
-          sudo sh -x ./bootstrap-salt.sh "$bt_arg1" "$bt_arg2"
+          ## DGM sudo sh -x ./bootstrap-salt.sh "$bt_arg1" "$bt_arg2"
+          sh -x ./bootstrap-salt.sh "$bt_arg1" "$bt_arg2"
 
       - name: Test Bootstrap
         run: |
