@@ -3329,33 +3329,23 @@ install_ubuntu_stable() {
 
     __wait_for_apt apt-get update || return 1
 
-    if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
-        # Major version Salt, config and repo already setup
-        MINOR_VER_STRG=""
-    elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
-        # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$STABLE_REV"
-    else
-        MINOR_VER_STRG=""
-    fi
-
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
-        __PACKAGES="${__PACKAGES} salt-cloud$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-cloud"
     fi
     if [ "$_INSTALL_MASTER" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-master$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-master"
     fi
     if [ "$_INSTALL_MINION" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-minion$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-minion"
     fi
     if [ "$_INSTALL_SYNDIC" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-syndic$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-syndic"
     fi
 
     if [ "$_INSTALL_SALT_API" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-api$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-api"
     fi
 
     # shellcheck disable=SC2086
@@ -3404,33 +3394,23 @@ install_ubuntu_onedir() {
 
     __wait_for_apt apt-get update || return 1
 
-    if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
-        # Major version Salt, config and repo already setup
-        MINOR_VER_STRG=""
-    elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
-        # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$ONEDIR_REV"
-    else
-        MINOR_VER_STRG=""
-    fi
-
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
-        __PACKAGES="${__PACKAGES} salt-cloud$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-cloud"
     fi
     if [ "$_INSTALL_MASTER" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-master$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-master"
     fi
     if [ "$_INSTALL_MINION" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-minion$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-minion"
     fi
     if [ "$_INSTALL_SYNDIC" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-syndic$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-syndic"
     fi
 
     if [ "$_INSTALL_SALT_API" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-api$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-api"
     fi
 
     # shellcheck disable=SC2086
@@ -3804,33 +3784,23 @@ install_debian_stable() {
 
     __wait_for_apt apt-get update || return 1
 
-    if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
-        # Major version Salt, config and repo already setup
-        MINOR_VER_STRG=""
-    elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
-        # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$STABLE_REV"
-    else
-        MINOR_VER_STRG=""
-    fi
-
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
-        __PACKAGES="${__PACKAGES} salt-cloud$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-cloud"
     fi
     if [ "$_INSTALL_MASTER" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-master$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-master"
     fi
     if [ "$_INSTALL_MINION" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-minion$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-minion"
     fi
     if [ "$_INSTALL_SYNDIC" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-syndic$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-syndic"
     fi
 
     if [ "$_INSTALL_SALT_API" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-api$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-api"
     fi
 
     # shellcheck disable=SC2086
@@ -3901,33 +3871,23 @@ install_debian_onedir() {
 
     __wait_for_apt apt-get update || return 1
 
-    if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
-        # Major version Salt, config and repo already setup
-        MINOR_VER_STRG=""
-    elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
-        # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$ONEDIR_REV"
-    else
-        MINOR_VER_STRG=""
-    fi
-
     __PACKAGES=""
 
     if [ "$_INSTALL_CLOUD" -eq $BS_TRUE ];then
-        __PACKAGES="${__PACKAGES} salt-cloud$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-cloud"
     fi
     if [ "$_INSTALL_MASTER" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-master$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-master"
     fi
     if [ "$_INSTALL_MINION" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-minion$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-minion"
     fi
     if [ "$_INSTALL_SYNDIC" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-syndic$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-syndic"
     fi
 
     if [ "$_INSTALL_SALT_API" -eq $BS_TRUE ]; then
-        __PACKAGES="${__PACKAGES} salt-api$MINOR_VER_STRG"
+        __PACKAGES="${__PACKAGES} salt-api"
     fi
 
     # shellcheck disable=SC2086
@@ -4283,7 +4243,7 @@ install_fedora_onedir() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$STABLE_REV"
+        MINOR_VER_STRG="=$STABLE_REV"
     else
         MINOR_VER_STRG=""
     fi
@@ -4430,7 +4390,7 @@ install_centos_stable() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$STABLE_REV"
+        MINOR_VER_STRG="=$STABLE_REV"
     else
         MINOR_VER_STRG=""
     fi
@@ -4665,7 +4625,7 @@ install_centos_onedir() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$ONEDIR_REV"
+        MINOR_VER_STRG="=$ONEDIR_REV"
     else
         MINOR_VER_STRG=""
     fi
@@ -6643,7 +6603,7 @@ install_photon_onedir() {
         MINOR_VER_STRG="$_GENERIC_PKG_VERSION"
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$STABLE_REV"
+        MINOR_VER_STRG="=$STABLE_REV"
     else
         # default to latest version Salt, config and repo already setup
         __get_packagesite_onedir_latest
@@ -6855,7 +6815,7 @@ install_opensuse_stable() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="-$STABLE_REV"
+        MINOR_VER_STRG="=$STABLE_REV"
     else
         MINOR_VER_STRG=""
     fi
