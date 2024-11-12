@@ -74,5 +74,10 @@ def test_target_salt_version(path, target_salt_version):
         pytest.skip(f"No target version specified")
     cmd = ["salt-call", "--local", "grains.item", "saltversion", "--timeout=120"]
     result = run_salt_call(cmd)
+    dgm_saltversion = result["saltversion"]
+    print(
+        f"DGM test_target_salt_version, target_salt_version '{target_salt_version}', result saltversion '{dgm_saltversion }', result '{result}'",
+        flush=True,
+    )
     # Returns: {'saltversion': '3006.9+217.g53cfa53040'}
     assert result["saltversion"] == target_salt_version
