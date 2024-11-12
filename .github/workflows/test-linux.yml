@@ -33,7 +33,7 @@ jobs:
     name: ${{ matrix.instance }}
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/saltstack/salt-ci-containers/testing:systemd-${{ inputs.container-slug }}
+      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
       options: --privileged
 
     timeout-minutes: ${{ inputs.timeout }}

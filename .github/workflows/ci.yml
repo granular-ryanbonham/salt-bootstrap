@@ -174,7 +174,7 @@ jobs:
     with:
       distro-slug: amazonlinux-2
       display-name: Amazon 2
-      container-slug: amazonlinux-2
+      container-slug: systemd-amazonlinux-2
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
@@ -189,7 +189,7 @@ jobs:
     with:
       distro-slug: amazonlinux-2023
       display-name: Amazon 2023
-      container-slug: amazonlinux-2023
+      container-slug: systemd-amazonlinux-2023
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
@@ -204,7 +204,7 @@ jobs:
     with:
       distro-slug: debian-11
       display-name: Debian 11
-      container-slug: debian-11
+      container-slug: systemd-debian-11
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -219,7 +219,7 @@ jobs:
     with:
       distro-slug: debian-12
       display-name: Debian 12
-      container-slug: debian-12
+      container-slug: systemd-debian-12
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -234,7 +234,7 @@ jobs:
     with:
       distro-slug: debian-13
       display-name: Debian 13
-      container-slug: debian-13
+      container-slug: systemd-debian-13
       timeout: 20
       instances: '["stable-3006", "git-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -249,7 +249,7 @@ jobs:
     with:
       distro-slug: fedora-40
       display-name: Fedora 40
-      container-slug: fedora-40
+      container-slug: systemd-fedora-40
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -264,7 +264,7 @@ jobs:
     with:
       distro-slug: photon-4
       display-name: Photon OS 4
-      container-slug: photon-4
+      container-slug: systemd-photon-4
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "latest", "default"]'
 
@@ -279,7 +279,7 @@ jobs:
     with:
       distro-slug: photon-5
       display-name: Photon OS 5
-      container-slug: photon-5
+      container-slug: systemd-photon-5
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "latest", "default"]'
 
@@ -294,7 +294,7 @@ jobs:
     with:
       distro-slug: rockylinux-8
       display-name: Rocky Linux 8
-      container-slug: rockylinux-8
+      container-slug: systemd-rockylinux-8
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
@@ -309,7 +309,7 @@ jobs:
     with:
       distro-slug: rockylinux-9
       display-name: Rocky Linux 9
-      container-slug: rockylinux-9
+      container-slug: systemd-rockylinux-9
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -324,7 +324,7 @@ jobs:
     with:
       distro-slug: ubuntu-2004
       display-name: Ubuntu 20.04
-      container-slug: ubuntu-20.04
+      container-slug: systemd-ubuntu-20.04
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -339,7 +339,7 @@ jobs:
     with:
       distro-slug: ubuntu-2204
       display-name: Ubuntu 22.04
-      container-slug: ubuntu-22.04
+      container-slug: systemd-ubuntu-22.04
       timeout: 20
       instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
@@ -354,7 +354,7 @@ jobs:
     with:
       distro-slug: ubuntu-2404
       display-name: Ubuntu 24.04
-      container-slug: ubuntu-24.04
+      container-slug: systemd-ubuntu-24.04
       timeout: 20
       instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
 
