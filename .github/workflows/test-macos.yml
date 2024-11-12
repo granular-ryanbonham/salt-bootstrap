@@ -62,7 +62,7 @@ jobs:
           vt_parms2=$(echo "$vt_parms" | sed 's/-/./')
           vt_parm_ver=$(echo "$vt_parms2" | awk -F ' ' '{print $2}')
           echo "bt parms ,$vt_parms, vt_parms2 ,$vt_parms2, vt_parms_ver ,$vt_parm_ver,"
-          echo ""SaltVersion=$vt_parm_ver" >> $GITHUB_ENV
+          echo "SaltVersion=$vt_parm_ver" >> $GITHUB_ENV
 
       - name: Bootstrap Salt
         run: |
