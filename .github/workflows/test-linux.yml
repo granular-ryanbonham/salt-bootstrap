@@ -32,10 +32,8 @@ jobs:
   Test:
     name: ${{ matrix.instance }}
     runs-on: ubuntu-latest
-    ## DGM use runner until have working systemd solution on containers
-    ## DGM runs-on: ubuntu-latest
-    ## DGM container:
-    ## DGM   image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
+    container:
+      image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
 
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
@@ -69,10 +67,9 @@ jobs:
           # sed 1st - becomes space, 2nd - becomes dot
           ## DGM needs cleanup
           echo "matrix instance ,${{ matrix.instance }},"
-          vt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /')
-          vt_parms2=$(echo "$vt_parms" | sed 's/-/./')
-          vt_parm_ver=$(echo "$vt_parms2" | awk -F ' ' '{print $2}')
-          echo "vt parms ,$vt_parms, vt_parms2 ,$vt_parms2, vt_parms_ver ,$vt_parm_ver,"
+          vt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /' | sed 's/-/./')
+          vt_parm_ver=$(echo "$vt_parms" | awk -F ' ' '{print $2}')
+          echo "vt parms ,$vt_parms, vt_parms_ver ,$vt_parm_ver,"
           echo "SaltVersion=$vt_parm_ver" >> $GITHUB_ENV
 
       - name: Bootstrap Salt
@@ -80,11 +77,10 @@ jobs:
           # sed 1st - becomes space, 2nd - becomes dot
           ## DGM needs cleanup
           echo "matrix instance ,${{ matrix.instance }},"
-          bt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /')
-          bt_parms2=$(echo "$bt_parms" | sed 's/-/./')
-          bt_arg1=$(echo "$bt_parms2" | awk -F ' ' '{print $1}')
-          bt_arg2=$(echo "$bt_parms2" | awk -F ' ' '{print $2}')
-          echo "bt parms ,$bt_parms, bt_parms2 ,$bt_parms2, bt_arg1 ,$bt_arg1, bt_arg2 ,$bt_arg2,"
+          bt_parms=$(echo "${{ matrix.instance }}" | sed 's/-/ /' | sed 's/-/./')
+          bt_arg1=$(echo "$bt_parms" | awk -F ' ' '{print $1}')
+          bt_arg2=$(echo "$bt_parms" | awk -F ' ' '{print $2}')
+          echo "bt parms ,$bt_parms, bt_arg1 ,$bt_arg1, bt_arg2 ,$bt_arg2,"
           sudo sh -x ./bootstrap-salt.sh "$bt_arg1" "$bt_arg2"
 
       - name: Test Bootstrap
