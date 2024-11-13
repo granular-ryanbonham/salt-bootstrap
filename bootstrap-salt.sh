@@ -865,7 +865,7 @@ if [ "$ITYPE" != "git" ]; then
     fi
 fi
 
-# Set the _REPO_URL value based on if -R was passed or not. Defaults to packages.broadcom.com
+# Set the _REPO_URL value based on if -R was passed or not. Defaults to packages.broadcom.com/artifactory
 if [ "$_CUSTOM_REPO_URL" != "null" ]; then
     _REPO_URL="$_CUSTOM_REPO_URL"
 
@@ -2478,10 +2478,12 @@ __check_services_systemd() {
 
     _SYSTEMD_ACTIVE=$(/bin/systemctl daemon-reload 2>&1 | grep 'System has not been booted with systemd')
     echodebug "__check_services_systemd _SYSTEMD_ACTIVE result ,$_SYSTEMD_ACTIVE,"
-    if [ "$_SYSTEMD_ACTIVE" != "" ]; then
+    if [ -n "$_SYSTEMD_ACTIVE" ]; then
         _SYSTEMD_FUNCTIONAL=$BS_FALSE
         echodebug "systemd is not functional, despite systemctl being present, setting _SYSTEMD_FUNCTIONAL false, $_SYSTEMD_FUNCTIONAL"
         return 1
+    else
+        echodebug "systemd is functional, _SYSTEMD_FUNCTIONAL true, $_SYSTEMD_FUNCTIONAL"
     fi
 
     servicename=$1
@@ -6320,7 +6322,7 @@ __get_packagesite_onedir_latest() {
     cd  ${generic_versions_tmpdir} || return 1
 
     # leverage the windows directories since release Windows and Linux
-    wget -r -np -nH --exclude-directories=onedir,relenv,macos -x -l 1 "https://packages.broadcom.com/artifactory/saltproject-generic/"
+    wget -r -np -nH --exclude-directories=onedir,relenv,macos -x -l 1 "https://${_REPO_URL}/saltproject-generic/"
     if [ "$#" -gt 0 ] && [ -n "$1" ]; then
         MAJOR_VER="$1"
         # shellcheck disable=SC2010
@@ -6359,26 +6361,26 @@ __install_saltstack_photon_onedir_repository() {
                 ## tdnf config-manager --set-enabled salt-repo-3007-sts
                 echo "[salt-repo-3007-sts]" > "${YUM_REPO_FILE}"
                 echo "name=Salt Repo for Salt v3007 STS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://packages.broadcom.com/artifactory/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                 echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                 echo "priority=10" >> "${YUM_REPO_FILE}"
                 echo "enabled=1" >> "${YUM_REPO_FILE}"
                 echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
                 echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
                 echo "exclude=*3006* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
-                echo "gpgkey=https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
+                echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
             else
                 # Salt 3006 repo
                 echo "[salt-repo-3006-lts]" > "${YUM_REPO_FILE}"
                 echo "name=Salt Repo for Salt v3006 LTS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://packages.broadcom.com/artifactory/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                 echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                 echo "priority=10" >> "${YUM_REPO_FILE}"
                 echo "enabled=1" >> "${YUM_REPO_FILE}"
                 echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
                 echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
                 echo "exclude=*3007* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
-                echo "gpgkey=https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
+                echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
             fi
         else
             # Enable the Salt LATEST repo
@@ -6386,13 +6388,13 @@ __install_saltstack_photon_onedir_repository() {
             ## tdnf config-manager --set-enabled salt-repo-latest
             echo "[salt-repo-latest]" > "${YUM_REPO_FILE}"
             echo "name=Salt Repo for Salt LATEST release" >> "${YUM_REPO_FILE}"
-            echo "baseurl=https://packages.broadcom.com/artifactory/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+            echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
             echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
             echo "priority=10" >> "${YUM_REPO_FILE}"
             echo "enabled=1" >> "${YUM_REPO_FILE}"
             echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
             echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
-            echo "gpgkey=https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
+            echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
         fi
         tdnf makecache || return 1
     elif [ "$ONEDIR_REV" != "latest" ]; then
