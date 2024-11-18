@@ -414,21 +414,19 @@ Debian and derivatives
 - Devuan GNU/Linux 1/2/3/4/5
 - Kali Linux 1.0 (based on Debian 7)
 - Linux Mint Debian Edition 1 (based on Debian 8)
-- Raspbian 8 (``armhf`` packages) and 9 (using ``git`` installation mode only)
 
 
 Red Hat family
 ~~~~~~~~~~~~~~
 
-- Amazon Linux 2012.3 and later
 - Amazon Linux 2
 - Amazon Linux 2023
-- CentOS 7/8/9
+- CentOS 8/9
 - Cloud Linux 6/7
-- Fedora 38/39/40 (install latest stable from standard repositories)
-- Oracle Linux 7/8/9
-- Red Hat Enterprise Linux 7/8/9
-- Scientific Linux 7/8/9
+- Fedora 40 (install latest stable from standard repositories)
+- Oracle Linux 8/9
+- Red Hat Enterprise Linux 8/9
+- Scientific Linux 8/9
 
 
 SUSE family
@@ -461,8 +459,8 @@ repositories are not provided on the `Salt Project's Ubuntu repository`_ for the
 the bootstrap script will attempt to install the packages for the most closely related LTS Ubuntu
 release instead.
 
-For example, when installing Salt on Ubuntu 21.10, the bootstrap script will setup the repository
-for Ubuntu 20.04 from the `Salt Project's Ubuntu repository`_ and install the 20.04 packages.
+For example, when installing Salt on Ubuntu 24.10, the bootstrap script will setup the repository
+for Ubuntu 24.04 from the `Salt Project's Ubuntu repository`_ and install the 24.04 packages.
 
 Non-LTS Ubuntu releases are not supported once the release reaches End-of-Life as defined by
 `Ubuntu's release schedule`_.
