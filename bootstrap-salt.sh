@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.11"
+__ScriptVersion="2024.11.18"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -2679,8 +2679,10 @@ __install_pip_pkgs() {
         else
             __PACKAGES="${__PACKAGES} ${_py_pkg}-devel"
             if [ "$DISTRO_NAME_L" = "fedora" ];then
+              dnf makecache || return 1
               __dnf_install_noinput ${__PACKAGES} || return 1
             else
+              yum makecache || return 1
               __yum_install_noinput ${__PACKAGES} || return 1
             fi
         fi
@@ -4292,6 +4294,7 @@ install_fedora_onedir() {
     fi
 
     # shellcheck disable=SC2086
+    dnf makecache || return 1
     __yum_install_noinput ${__PACKAGES} || return 1
 
     return 0
@@ -4445,6 +4448,7 @@ install_centos_stable() {
     __PACKAGES="${__PACKAGES} sudo"
 
     # shellcheck disable=SC2086
+    yum makecache || return 1
     __yum_install_noinput ${__PACKAGES} || return 1
 
     # Workaround for 3.11 broken on CentOS Stream 8.x
@@ -4686,6 +4690,7 @@ install_centos_onedir() {
     fi
 
     # shellcheck disable=SC2086
+    dnf makecache || return 1
     __yum_install_noinput ${__PACKAGES} || return 1
 
     return 0
