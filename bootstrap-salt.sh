@@ -4691,6 +4691,7 @@ install_centos_onedir() {
 
     # shellcheck disable=SC2086
     dnf makecache || return 1
+    dnf list salt-* || return 1
     __yum_install_noinput ${__PACKAGES} || return 1
 
     return 0
