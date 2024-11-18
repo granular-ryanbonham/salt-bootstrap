@@ -4029,12 +4029,27 @@ __install_saltstack_fedora_onedir_repository() {
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$ONEDIR_REV" != "latest" ]; then
-            # 3006.x is default
-            REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-            if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
-                # Enable the Salt 3007 STS repo
-                dnf config-manager --set-disable salt-repo-*
-                dnf config-manager --set-enabled salt-repo-3007-sts
+            # 3006.x is default, and latest for 3006.x branch
+            if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+                # latest version for branch 3006 | 3007
+                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                    # Enable the Salt 3007 STS repo
+                    dnf config-manager --set-disable salt-repo-*
+                    dnf config-manager --set-enabled salt-repo-3007-sts
+                fi
+            elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
+                # using minor version
+                echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
+                # shellcheck disable=SC2129
+                echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                echo "priority=10" >> "${YUM_REPO_FILE}"
+                echo "enabled=1" >> "${YUM_REPO_FILE}"
+                echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
             fi
         else
             # Enable the Salt LATEST repo
@@ -4344,12 +4359,27 @@ __install_saltstack_rhel_onedir_repository() {
         FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
         __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         if [ "$ONEDIR_REV" != "latest" ]; then
-            # 3006.x is default
-            REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-            if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
-                # Enable the Salt 3007 STS repo
-                dnf config-manager --set-disable salt-repo-*
-                dnf config-manager --set-enabled salt-repo-3007-sts
+            # 3006.x is default, and latest for 3006.x branch
+            if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+                # latest version for branch 3006 | 3007
+                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                    # Enable the Salt 3007 STS repo
+                    dnf config-manager --set-disable salt-repo-*
+                    dnf config-manager --set-enabled salt-repo-3007-sts
+                fi
+            elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
+                # using minor version
+                echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
+                # shellcheck disable=SC2129
+                echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                echo "priority=10" >> "${YUM_REPO_FILE}"
+                echo "enabled=1" >> "${YUM_REPO_FILE}"
+                echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
             fi
         else
             # Enable the Salt LATEST repo
@@ -5797,12 +5827,27 @@ install_amazon_linux_ami_2_deps() {
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
             if [ "$STABLE_REV" != "latest" ]; then
-                # 3006.x is default
-                REPO_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
-                    # Enable the Salt 3007 STS repo
-                    dnf config-manager --set-disable salt-repo-*
-                    dnf config-manager --set-enabled salt-repo-3007-sts
+                # 3006.x is default, and latest for 3006.x branch
+                if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+                    # latest version for branch 3006 | 3007
+                    REPO_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
+                    if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                        # Enable the Salt 3007 STS repo
+                        dnf config-manager --set-disable salt-repo-*
+                        dnf config-manager --set-enabled salt-repo-3007-sts
+                    fi
+                elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
+                    # using minor version
+                    echo "[salt-repo-${STABLE_REV}-lts]" > "${YUM_REPO_FILE}"
+                    # shellcheck disable=SC2129
+                    echo "name=Salt Repo for Salt v${STABLE_REV} LTS" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${STABLE_REV}/" >> "${YUM_REPO_FILE}"
+                    echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                    echo "priority=10" >> "${YUM_REPO_FILE}"
+                    echo "enabled=1" >> "${YUM_REPO_FILE}"
+                    echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
                 fi
             else
                 # Enable the Salt LATEST repo
@@ -5846,12 +5891,27 @@ install_amazon_linux_ami_2_onedir_deps() {
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
             if [ "$ONEDIR_REV" != "latest" ]; then
-                # 3006.x is default
-                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
-                    # Enable the Salt 3007 STS repo
-                    dnf config-manager --set-disable salt-repo-*
-                    dnf config-manager --set-enabled salt-repo-3007-sts
+                # 3006.x is default, and latest for 3006.x branch
+                if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+                    # latest version for branch 3006 | 3007
+                    REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+                    if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                        # Enable the Salt 3007 STS repo
+                        dnf config-manager --set-disable salt-repo-*
+                        dnf config-manager --set-enabled salt-repo-3007-sts
+                    fi
+                elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
+                    # using minor version
+                    echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
+                    # shellcheck disable=SC2129
+                    echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                    echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                    echo "priority=10" >> "${YUM_REPO_FILE}"
+                    echo "enabled=1" >> "${YUM_REPO_FILE}"
+                    echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
                 fi
             else
                 # Enable the Salt LATEST repo
@@ -5982,12 +6042,27 @@ install_amazon_linux_ami_2023_onedir_deps() {
             FETCH_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
             __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
             if [ "$ONEDIR_REV" != "latest" ]; then
-                # 3006.x is default
-                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
-                    # Enable the Salt 3007 STS repo
-                    dnf config-manager --set-disable salt-repo-*
-                    dnf config-manager --set-enabled salt-repo-3007-sts
+                # 3006.x is default, and latest for 3006.x branch
+                if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+                    # latest version for branch 3006 | 3007
+                    REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+                    if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                        # Enable the Salt 3007 STS repo
+                        dnf config-manager --set-disable salt-repo-*
+                        dnf config-manager --set-enabled salt-repo-3007-sts
+                    fi
+                elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
+                    # using minor version
+                    echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
+                    # shellcheck disable=SC2129
+                    echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                    echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                    echo "priority=10" >> "${YUM_REPO_FILE}"
+                    echo "enabled=1" >> "${YUM_REPO_FILE}"
+                    echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
                 fi
             else
                 # Enable the Salt LATEST repo
@@ -6360,33 +6435,47 @@ __install_saltstack_photon_onedir_repository() {
         ## __fetch_url "${YUM_REPO_FILE}" "${FETCH_URL}"
         # shellcheck disable=SC2129
         if [ "$ONEDIR_REV" != "latest" ]; then
-            # 3006.x is default
-            REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-            if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
-                # Enable the Salt 3007 STS repo
-                ## tdnf config-manager --set-disable salt-repo-*
-                ## tdnf config-manager --set-enabled salt-repo-3007-sts
-                echo "[salt-repo-3007-sts]" > "${YUM_REPO_FILE}"
-                echo "name=Salt Repo for Salt v3007 STS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+            # 3006.x is default, and latest for 3006.x branch
+            if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
+                # latest version for branch 3006 | 3007
+                REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
+                if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
+                    # Enable the Salt 3007 STS repo
+                    ## tdnf config-manager --set-disable salt-repo-*
+                    ## tdnf config-manager --set-enabled salt-repo-3007-sts
+                    echo "[salt-repo-3007-sts]" > "${YUM_REPO_FILE}"
+                    echo "name=Salt Repo for Salt v3007 STS" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+                    echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                    echo "priority=10" >> "${YUM_REPO_FILE}"
+                    echo "enabled=1" >> "${YUM_REPO_FILE}"
+                    echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                    echo "exclude=*3006* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
+                    echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
+                else
+                    # Salt 3006 repo
+                    echo "[salt-repo-3006-lts]" > "${YUM_REPO_FILE}"
+                    echo "name=Salt Repo for Salt v3006 LTS" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
+                    echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
+                    echo "priority=10" >> "${YUM_REPO_FILE}"
+                    echo "enabled=1" >> "${YUM_REPO_FILE}"
+                    echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
+                    echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
+                    echo "exclude=*3007* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
+                    echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
+                fi
+            elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
+                # using minor version
+                echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
+                echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
                 echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                 echo "priority=10" >> "${YUM_REPO_FILE}"
                 echo "enabled=1" >> "${YUM_REPO_FILE}"
                 echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
                 echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
-                echo "exclude=*3006* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
-                echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
-            else
-                # Salt 3006 repo
-                echo "[salt-repo-3006-lts]" > "${YUM_REPO_FILE}"
-                echo "name=Salt Repo for Salt v3006 LTS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
-                echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
-                echo "priority=10" >> "${YUM_REPO_FILE}"
-                echo "enabled=1" >> "${YUM_REPO_FILE}"
-                echo "enabled_metadata=1" >> "${YUM_REPO_FILE}"
-                echo "gpgcheck=1" >> "${YUM_REPO_FILE}"
-                echo "exclude=*3007* *3008* *3009* *3010*" >> "${YUM_REPO_FILE}"
                 echo "gpgkey=https://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" >> "${YUM_REPO_FILE}"
             fi
         else
