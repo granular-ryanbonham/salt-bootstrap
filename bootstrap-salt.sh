@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.18"
+__ScriptVersion="2024.11.19"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -221,9 +221,6 @@ __check_config_dir() {
 #  DESCRIPTION:  Checks the placed after the install arguments
 #----------------------------------------------------------------------------------------------------------------------
 __check_unparsed_options() {
-    # DGM debug
-    set -v
-    set -x
 
     shellopts="$1"
     # grep alternative for SunOS
@@ -628,7 +625,7 @@ if [ "$(echo "$ITYPE" | grep -E '(latest|default|stable|testing|git|onedir|onedi
     exit 1
 fi
 
-## DGM added this to CI/CD easier, needs removal once get compund conditionals resolved in GitHub Actions
+## allows GitHub Actions CI/CD easier handling of latest and default
 if [ "$ITYPE" = "latest" ] || [ "$ITYPE" = "default" ]; then
     STABLE_REV="latest"
     ONEDIR_REV="latest"
@@ -936,9 +933,6 @@ fi
 #  DESCRIPTION:  Retrieves a URL and writes it to a given path
 #----------------------------------------------------------------------------------------------------------------------
 __fetch_url() {
-    # DGM debug
-    set -v
-    set -x
 
     # shellcheck disable=SC2086
     curl $_CURL_ARGS -L -s -f -o "$1" "$2" >/dev/null 2>&1     ||
@@ -954,10 +948,6 @@ __fetch_url() {
 #  DESCRIPTION:  Retrieves a URL, verifies its content and writes it to standard output
 #----------------------------------------------------------------------------------------------------------------------
 __fetch_verify() {
-    # DGM debug
-    set -v
-    set -x
-
 
     fetch_verify_url="$1"
     fetch_verify_sum="$2"
@@ -980,10 +970,6 @@ __fetch_verify() {
 #  DESCRIPTION:  Checks if a URL exists
 #----------------------------------------------------------------------------------------------------------------------
 __check_url_exists() {
-    # DGM debug
-    set -v
-    set -x
-
 
   _URL="$1"
   if curl --output /dev/null --silent --fail "${_URL}"; then
@@ -1952,9 +1938,6 @@ __function_defined() {
 #                 process is finished so the script doesn't exit on a locked proc.
 #----------------------------------------------------------------------------------------------------------------------
 __wait_for_apt(){
-    # DGM debug
-    set -v
-    set -x
 
     # Timeout set at 15 minutes
     WAIT_TIMEOUT=900
@@ -1993,10 +1976,6 @@ __wait_for_apt(){
 #    PARAMETERS:  packages
 #----------------------------------------------------------------------------------------------------------------------
 __apt_get_install_noinput() {
-    # DGM debug
-    set -v
-    set -x
-
 
     __wait_for_apt apt-get install -y -o DPkg::Options::=--force-confold "${@}"; return $?
 }   # ----------  end of function __apt_get_install_noinput  ----------
@@ -2007,9 +1986,6 @@ __apt_get_install_noinput() {
 #   DESCRIPTION:  (DRY) apt-get upgrade with noinput options
 #----------------------------------------------------------------------------------------------------------------------
 __apt_get_upgrade_noinput() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get upgrade -y -o DPkg::Options::=--force-confold; return $?
 }   # ----------  end of function __apt_get_upgrade_noinput  ----------
@@ -2041,9 +2017,6 @@ __temp_gpg_pub() {
 #    PARAMETERS:  url
 #----------------------------------------------------------------------------------------------------------------------
 __apt_key_fetch() {
-    # DGM debug
-    set -v
-    set -x
 
     url=$1
 
@@ -2654,9 +2627,6 @@ __activate_virtualenv() {
 #----------------------------------------------------------------------------------------------------------------------
 
 __install_pip_pkgs() {
-    # DGM debug
-    set -v
-    set -x
 
     _pip_pkgs="$1"
     _py_exe="$2"
@@ -2701,9 +2671,6 @@ __install_pip_pkgs() {
 #    PARAMETERS:  requirements_file
 #----------------------------------------------------------------------------------------------------------------------
 __install_pip_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     # Install virtualenv to system pip before activating virtualenv if thats going to be used
     # We assume pip pkg is installed since that is distro specific
@@ -2741,9 +2708,6 @@ __install_pip_deps() {
 #    PARAMETERS:  py_exe
 #----------------------------------------------------------------------------------------------------------------------
 __install_salt_from_repo() {
-    # DGM debug
-    set -v
-    set -x
 
     _py_exe="$1"
 
@@ -2752,7 +2716,6 @@ __install_salt_from_repo() {
     fi
 
     echodebug "__install_salt_from_repo py_exe=$_py_exe"
-    echodebug "DGM checking python version $(${_py_exe} --version)"
 
     _py_version=$(${_py_exe} -c "import sys; print('{0}.{1}'.format(*sys.version_info))")
     _pip_cmd="pip${_py_version}"
@@ -2992,9 +2955,6 @@ fi
 #   Ubuntu Install Functions
 #
 __enable_universe_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "__enable_universe_repository() entry"
 
@@ -3011,9 +2971,6 @@ __enable_universe_repository() {
 }
 
 __install_saltstack_ubuntu_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     # Workaround for latest non-LTS Ubuntu
     echodebug "__install_saltstack_ubuntu_repository() entry"
@@ -3058,16 +3015,6 @@ __install_saltstack_ubuntu_repository() {
 
     if [ "$STABLE_REV" != "latest" ]; then
         # latest is default
-        ## DGM STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-        ## DGM if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM fi
         if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version $STABLE_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
@@ -3082,9 +3029,6 @@ __install_saltstack_ubuntu_repository() {
 }
 
 __install_saltstack_ubuntu_onedir_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "__install_saltstack_ubuntu_onedir_repository() entry"
 
@@ -3123,16 +3067,6 @@ __install_saltstack_ubuntu_onedir_repository() {
 
     if [ "$ONEDIR_REV" != "latest" ]; then
         # latest is default
-        ## DGM ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-        ## DGM if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM fi
         if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version $ONEDIR_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
@@ -3146,9 +3080,6 @@ __install_saltstack_ubuntu_onedir_repository() {
 }
 
 install_ubuntu_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_ubuntu_deps() entry"
     if [ "$_DISABLE_REPOS" -eq $BS_FALSE ]; then
@@ -3210,9 +3141,6 @@ install_ubuntu_deps() {
 }
 
 install_ubuntu_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_ubuntu_stable_deps() entry"
 
@@ -3248,9 +3176,6 @@ install_ubuntu_stable_deps() {
 }
 
 install_ubuntu_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "install_ubuntu_git_deps() entry"
 
@@ -3297,9 +3222,6 @@ install_ubuntu_git_deps() {
 }
 
 install_ubuntu_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_START_DAEMONS" -eq $BS_FALSE ]; then
         echowarn "Not starting daemons on Debian based distributions is not working mostly because starting them is the default behaviour."
@@ -3333,9 +3255,6 @@ install_ubuntu_onedir_deps() {
 }
 
 install_ubuntu_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get update || return 1
 
@@ -3365,9 +3284,6 @@ install_ubuntu_stable() {
 }
 
 install_ubuntu_git() {
-    # DGM debug
-    set -v
-    set -x
 
     # Activate virtualenv before install
     if [ "${_VIRTUALENV_DIR}" != "null" ]; then
@@ -3398,9 +3314,6 @@ install_ubuntu_git() {
 }
 
 install_ubuntu_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get update || return 1
 
@@ -3430,9 +3343,6 @@ install_ubuntu_onedir() {
 }
 
 install_ubuntu_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -3443,7 +3353,6 @@ install_ubuntu_stable_post() {
         [ $fname = "master" ] && [ "$_INSTALL_MASTER" -eq $BS_FALSE ] && continue
         [ $fname = "syndic" ] && [ "$_INSTALL_SYNDIC" -eq $BS_FALSE ] && continue
 
-        ## if [ -f /bin/systemctl ]; then
         if [ "$_SYSTEMD_FUNCTIONAL" -eq $BS_TRUE ]; then
             # Using systemd
             /bin/systemctl is-enabled salt-$fname.service > /dev/null 2>&1 || (
@@ -3461,9 +3370,6 @@ install_ubuntu_stable_post() {
 }
 
 install_ubuntu_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip if not meant to be installed
@@ -3509,9 +3415,6 @@ install_ubuntu_git_post() {
 }
 
 install_ubuntu_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
@@ -3554,9 +3457,6 @@ install_ubuntu_restart_daemons() {
 }
 
 install_ubuntu_check_services() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -3610,27 +3510,12 @@ __install_saltstack_debian_repository() {
     # shellcheck disable=SC2086,SC2090
     __apt_get_install_noinput ${__PACKAGES} || return 1
 
-    ## SALTSTACK_DEBIAN_URL="${HTTP_VAL}://${_REPO_URL}/${_ONEDIR_DIR}/${__PY_VERSION_REPO}/debian/${DEBIAN_RELEASE}/${__REPO_ARCH}/${STABLE_REV}"
-    ## echo "$__REPO_ARCH_DEB $SALTSTACK_DEBIAN_URL $DEBIAN_CODENAME main" > "/etc/apt/sources.list.d/salt.list"
-    ## __apt_key_fetch "$SALTSTACK_DEBIAN_URL/SALT-PROJECT-GPG-PUBKEY-2023.gpg" || return 1
-    ## __wait_for_apt apt-get update || return 1
-
     __fetch_url "/etc/apt/sources.list.d/salt.sources" "https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.sources"
     __apt_key_fetch "${HTTP_VAL}://${_REPO_URL}/api/security/keypair/SaltProjectKey/public" || return 1
     __wait_for_apt apt-get update || return 1
 
     if [ "$STABLE_REV" != "latest" ]; then
         # latest is default
-        ## DGM STABLE_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
-        ## DGM if [ "$STABLE_REV_MAJOR" -eq "3006" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM elif [ "$STABLE_REV_MAJOR" -eq "3007" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM fi
         if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version $STABLE_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
@@ -3674,16 +3559,6 @@ __install_saltstack_debian_onedir_repository() {
 
     if [ "$ONEDIR_REV" != "latest" ]; then
         # latest is default
-        ## DGM ONEDIR_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
-        ## DGM if [ "$ONEDIR_REV_MAJOR" -eq "3006" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3006.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM elif [ "$ONEDIR_REV_MAJOR" -eq "3007" ]; then
-        ## DGM     echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin: version 3007.*" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/salt-pin-1001
-        ## DGM fi
         if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
             echo "Package: salt-*" > /etc/apt/preferences.d/salt-pin-1001
             echo "Pin: version $ONEDIR_REV.*" >> /etc/apt/preferences.d/salt-pin-1001
@@ -3794,9 +3669,6 @@ install_debian_git_deps() {
 }
 
 install_debian_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get update || return 1
 
@@ -3838,9 +3710,6 @@ install_debian_12_git_deps() {
 }
 
 install_debian_git() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ -n "$_PY_EXE" ]; then
         _PYEXE=${_PY_EXE}
@@ -3881,9 +3750,6 @@ install_debian_12_git() {
 }
 
 install_debian_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     __wait_for_apt apt-get update || return 1
 
@@ -4346,9 +4212,6 @@ install_fedora_onedir_post() {
 #   CentOS Install Functions
 #
 __install_saltstack_rhel_onedir_repository() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ -n "$_PY_EXE" ] && [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -4397,9 +4260,6 @@ __install_saltstack_rhel_onedir_repository() {
 }
 
 install_centos_stable_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_UPGRADE_SYS" -eq $BS_TRUE ]; then
         yum -y update || return 1
@@ -4441,9 +4301,6 @@ install_centos_stable_deps() {
 }
 
 install_centos_stable() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$(echo "$STABLE_REV" | grep -E '^(3006|3007)$')" != "" ]; then
         # Major version Salt, config and repo already setup
@@ -4492,9 +4349,6 @@ install_centos_stable() {
 }
 
 install_centos_stable_post() {
-    # DGM debug
-    set -v
-    set -x
 
     SYSTEMD_RELOAD=$BS_FALSE
 
@@ -4527,9 +4381,6 @@ install_centos_stable_post() {
 }
 
 install_centos_git_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     # First try stable deps then fall back to onedir deps if that one fails
     # if we're installing on a Red Hat based host that doesn't have the classic
@@ -4579,9 +4430,6 @@ install_centos_git_deps() {
 }
 
 install_centos_git() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "${_PY_EXE}" != "" ]; then
         _PYEXE=${_PY_EXE}
@@ -4598,9 +4446,6 @@ install_centos_git() {
 }
 
 install_centos_git_post() {
-    # DGM debug
-    set -v
-    set -x
 
     SYSTEMD_RELOAD=$BS_FALSE
 
@@ -4643,9 +4488,6 @@ install_centos_git_post() {
 }
 
 install_centos_onedir_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$_UPGRADE_SYS" -eq "$BS_TRUE" ]; then
         yum -y update || return 1
@@ -4686,9 +4528,6 @@ install_centos_onedir_deps() {
 }
 
 install_centos_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     if [ "$(echo "$ONEDIR_REV" | grep -E '^(3006|3007)$')" != "" ]; then
         # Major version Salt, config and repo already setup
@@ -4721,7 +4560,6 @@ install_centos_onedir() {
 
     # shellcheck disable=SC2086
     dnf makecache || return 1
-    echo "DGM install_centos_onedir, __PACKAGES '${__PACKAGES}'"
     dnf list salt-minion || return 1
     __yum_install_noinput ${__PACKAGES} || return 1
 
@@ -4729,9 +4567,6 @@ install_centos_onedir() {
 }
 
 install_centos_onedir_post() {
-    # DGM debug
-    set -v
-    set -x
 
     SYSTEMD_RELOAD=$BS_FALSE
 
@@ -4764,9 +4599,6 @@ install_centos_onedir_post() {
 }
 
 install_centos_restart_daemons() {
-    # DGM debug
-    set -v
-    set -x
 
     [ "$_START_DAEMONS" -eq $BS_FALSE ] && return
 
@@ -4797,9 +4629,6 @@ install_centos_restart_daemons() {
 }
 
 install_centos_testing_deps() {
-    # DGM debug
-    set -v
-    set -x
 
     install_centos_stable_deps || return 1
     return 0
@@ -4818,9 +4647,6 @@ install_centos_testing_post() {
 }
 
 install_centos_check_services() {
-    # DGM debug
-    set -v
-    set -x
 
     for fname in api master minion syndic; do
         # Skip salt-api since the service should be opt-in and not necessarily started on boot
@@ -6392,9 +6218,6 @@ install_arch_linux_onedir_post() {
 #   DESCRIPTION:  Set _GENERIC_PKG_VERSION to the latest for RPM or latest for major version input
 #----------------------------------------------------------------------------------------------------------------------
 __get_packagesite_onedir_latest() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "Find latest rpm release from repository"
 
@@ -7699,9 +7522,6 @@ daemons_running_voidlinux() {
 #   DESCRIPTION:  Set _PKG_VERSION to the latest for MacOS or latest for major version input
 #----------------------------------------------------------------------------------------------------------------------
 __macosx_get_packagesite_onedir_latest() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "Find latest MacOS release from repository"
 
@@ -7727,9 +7547,6 @@ __macosx_get_packagesite_onedir_latest() {
 
 
 __macosx_get_packagesite_onedir() {
-    # DGM debug
-    set -v
-    set -x
 
     echodebug "Get package site for onedir from repository"
 
