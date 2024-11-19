@@ -4284,7 +4284,7 @@ install_fedora_onedir() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="=$STABLE_REV"
+        MINOR_VER_STRG="-$STABLE_REV"
     else
         MINOR_VER_STRG=""
     fi
@@ -4450,7 +4450,7 @@ install_centos_stable() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="=$STABLE_REV"
+        MINOR_VER_STRG="-$STABLE_REV"
     else
         MINOR_VER_STRG=""
     fi
@@ -4695,7 +4695,7 @@ install_centos_onedir() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="=$ONEDIR_REV"
+        MINOR_VER_STRG="-$ONEDIR_REV"
     else
         MINOR_VER_STRG=""
     fi
@@ -6404,7 +6404,7 @@ __get_packagesite_onedir_latest() {
     cd  ${generic_versions_tmpdir} || return 1
 
     # leverage the windows directories since release Windows and Linux
-    wget -r -np -nH --exclude-directories=onedir,relenv,macos -x -l 1 "https://${_REPO_URL}/saltproject-generic/"
+    wget -r -np -nH --exclude-directories=onedir,relenv,macos -x -l 1 "https://${_REPO_URL}/saltproject-generic/windows/"
     if [ "$#" -gt 0 ] && [ -n "$1" ]; then
         MAJOR_VER="$1"
         # shellcheck disable=SC2010
@@ -6756,7 +6756,7 @@ install_photon_onedir() {
         MINOR_VER_STRG="$_GENERIC_PKG_VERSION"
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="=$STABLE_REV"
+        MINOR_VER_STRG="-$STABLE_REV"
     else
         # default to latest version Salt, config and repo already setup
         __get_packagesite_onedir_latest
@@ -6968,7 +6968,7 @@ install_opensuse_stable() {
         MINOR_VER_STRG=""
     elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
         # Minor version Salt, need to add specific minor version
-        MINOR_VER_STRG="=$STABLE_REV"
+        MINOR_VER_STRG="-$STABLE_REV"
     else
         MINOR_VER_STRG=""
     fi
