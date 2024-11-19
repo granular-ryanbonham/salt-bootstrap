@@ -2827,9 +2827,17 @@ EOM
 
     echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel ${_setuptools_dep}"
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel "${_setuptools_dep}"
+    __retn="$?"
 
+    echodebug "DGM DEBUG 0 return code from installing setuptools '$__retn'"
     echodebug "DGM DEBUG 1 checking pip list for setuptools, ${_pip_cmd} list"
     ${_pip_cmd} list
+
+    echodebug "DGM DEBUG 1a checking pip list for setuptools"
+    python3 -m pip list
+
+    echodebug "DGM DEBUG 1b checking pip list for setuptools"
+    ${_py_exe} -m pip list
 
     echoinfo "Installing salt using ${_py_exe}, $(${_py_exe} --version)"
     cd "${_SALT_GIT_CHECKOUT_DIR}" || return 1
