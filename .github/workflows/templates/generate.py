@@ -130,6 +130,7 @@ BLACKLIST_GIT_MASTER = [
     "amazonlinux-2023",
     "photon-4",
     "photon-5",
+    "rockylinux-9",
 ]
 
 SALT_VERSIONS = [
