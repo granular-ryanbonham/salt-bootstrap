@@ -4043,7 +4043,7 @@ __install_saltstack_fedora_onedir_repository() {
                 echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
                 # shellcheck disable=SC2129
                 echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                 echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                 echo "priority=10" >> "${YUM_REPO_FILE}"
                 echo "enabled=1" >> "${YUM_REPO_FILE}"
@@ -4373,7 +4373,7 @@ __install_saltstack_rhel_onedir_repository() {
                 echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
                 # shellcheck disable=SC2129
                 echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                 echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                 echo "priority=10" >> "${YUM_REPO_FILE}"
                 echo "enabled=1" >> "${YUM_REPO_FILE}"
@@ -5841,7 +5841,7 @@ install_amazon_linux_ami_2_deps() {
                     echo "[salt-repo-${STABLE_REV}-lts]" > "${YUM_REPO_FILE}"
                     # shellcheck disable=SC2129
                     echo "name=Salt Repo for Salt v${STABLE_REV} LTS" >> "${YUM_REPO_FILE}"
-                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${STABLE_REV}/" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                     echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                     echo "priority=10" >> "${YUM_REPO_FILE}"
                     echo "enabled=1" >> "${YUM_REPO_FILE}"
@@ -5905,7 +5905,7 @@ install_amazon_linux_ami_2_onedir_deps() {
                     echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
                     # shellcheck disable=SC2129
                     echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
-                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                     echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                     echo "priority=10" >> "${YUM_REPO_FILE}"
                     echo "enabled=1" >> "${YUM_REPO_FILE}"
@@ -6056,7 +6056,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
                     echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
                     # shellcheck disable=SC2129
                     echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
-                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                    echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                     echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                     echo "priority=10" >> "${YUM_REPO_FILE}"
                     echo "enabled=1" >> "${YUM_REPO_FILE}"
@@ -6470,7 +6470,7 @@ __install_saltstack_photon_onedir_repository() {
                 # using minor version
                 echo "[salt-repo-${ONEDIR_REV}-lts]" > "${YUM_REPO_FILE}"
                 echo "name=Salt Repo for Salt v${ONEDIR_REV} LTS" >> "${YUM_REPO_FILE}"
-                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/${ONEDIR_REV}/" >> "${YUM_REPO_FILE}"
+                echo "baseurl=https://${_REPO_URL}/saltproject-rpm/" >> "${YUM_REPO_FILE}"
                 echo "skip_if_unavailable=True" >> "${YUM_REPO_FILE}"
                 echo "priority=10" >> "${YUM_REPO_FILE}"
                 echo "enabled=1" >> "${YUM_REPO_FILE}"
