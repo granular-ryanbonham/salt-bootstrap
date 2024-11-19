@@ -2849,6 +2849,9 @@ EOM
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/* || return 1
     rm -f /tmp/git/deps/*
 
+    echodebug "DGM DEBUG checking pip list for setuptools, ${_pip_cmd} list"
+    ${_pip_cmd} list
+
     echoinfo "Building Salt Python Wheel"
 
     if [ "$_ECHO_DEBUG" -eq $BS_TRUE ]; then
