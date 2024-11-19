@@ -2752,6 +2752,7 @@ __install_salt_from_repo() {
     fi
 
     echodebug "__install_salt_from_repo py_exe=$_py_exe"
+    echodebug "DGM checking python version $(${_py_exe} --version)"
 
     _py_version=$(${_py_exe} -c "import sys; print('{0}.{1}'.format(*sys.version_info))")
     _pip_cmd="pip${_py_version}"
@@ -2827,6 +2828,9 @@ EOM
     echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel ${_setuptools_dep}"
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel "${_setuptools_dep}"
 
+    echodebug "DGM DEBUG 1 checking pip list for setuptools, ${_pip_cmd} list"
+    ${_pip_cmd} list
+
     echoinfo "Installing salt using ${_py_exe}, $(${_py_exe} --version)"
     cd "${_SALT_GIT_CHECKOUT_DIR}" || return 1
 
@@ -2849,7 +2853,7 @@ EOM
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/* || return 1
     rm -f /tmp/git/deps/*
 
-    echodebug "DGM DEBUG checking pip list for setuptools, ${_pip_cmd} list"
+    echodebug "DGM DEBUG 2 checking pip list for setuptools, ${_pip_cmd} list"
     ${_pip_cmd} list
 
     echoinfo "Building Salt Python Wheel"
