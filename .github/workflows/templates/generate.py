@@ -31,6 +31,7 @@ WINDOWS = [
 OSX = [
     "macos-12",
     "macos-13",
+    "macos-14",
 ]
 
 # only test against current containers with systemd
@@ -208,6 +209,7 @@ DISTRO_DISPLAY_NAMES = {
     "ubuntu-2404": "Ubuntu 24.04",
     "macos-12": "macOS 12",
     "macos-13": "macOS 13",
+    "macos-14": "macOS 14",
     "windows-2022": "Windows 2022",
 }
 
@@ -227,6 +229,7 @@ CONTAINER_SLUG_NAMES = {
     "ubuntu-2404": "systemd-ubuntu-24.04",
     "macos-12": "macos-12",
     "macos-13": "macos-13",
+    "macos-14": "macOS 14",
     "windows-2022": "windows-2022",
 }
 

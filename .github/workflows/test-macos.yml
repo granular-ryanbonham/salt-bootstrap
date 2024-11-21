@@ -36,8 +36,8 @@ on:
 jobs:
   Test:
     name: ${{ matrix.instance }}
-    ## runs-on: ${{ inputs.runs-on }}
-    runs-on: macos-13
+    runs-on: ${{ inputs.runs-on }}
+    ## runs-on: macos-13
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
       fail-fast: false

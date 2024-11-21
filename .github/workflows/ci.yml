@@ -146,6 +146,22 @@ jobs:
       instances: '["stable-3006", "stable-3006-8", "stable-3007", "stable-3007-1", "latest"]'
 
 
+  macos-14:
+    name: macOS 14
+    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
+    uses: ./.github/workflows/test-macos.yml
+    needs:
+      - lint
+      - generate-actions-workflow
+    with:
+      distro-slug: macos-14
+      display-name: macOS 14
+      container-slug: macOS 14
+      timeout: 20
+      runs-on: macos-14
+      instances: '["stable-3006", "stable-3006-8", "stable-3007", "stable-3007-1", "latest"]'
+
+
 
   windows-2022:
     name: Windows 2022
@@ -234,6 +250,7 @@ jobs:
       - generate-actions-workflow
       - macos-12
       - macos-13
+      - macos-14
       - windows-2022
       - photon-5
       - rockylinux-8
