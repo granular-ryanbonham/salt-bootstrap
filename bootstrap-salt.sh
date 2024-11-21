@@ -3053,7 +3053,7 @@ __install_saltstack_ubuntu_onedir_repository() {
     fi
 
     ## include hwclock if not part of base OS (23.10 and up)
-    if [ ! -f /usr/sbin/hwclock ]; then
+    if [ "$DISTRO_MAJOR_VERSION" -ge 23 ] && [ ! -f /usr/sbin/hwclock ]; then
         __PACKAGES="${__PACKAGES} util-linux-extra"
     fi
 
