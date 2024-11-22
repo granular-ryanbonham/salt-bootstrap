@@ -388,7 +388,7 @@ If an operating system is listed below, but is not listed on the official suppor
 systems document, the level of support is "best-effort".
 
 Since Salt is written in Python, the packages available from the `Salt Project's repository
-<packages.broardcom.com>`_ are
+<packages.broadcom.com>`_ are
 CPU architecture independent and could be installed on any hardware supported by Linux kernel.
 However, the Salt Project does package Salt's binary dependencies only for ``x86_64`` (``amd64``)
 and ``AArch64`` (``arm64``).
