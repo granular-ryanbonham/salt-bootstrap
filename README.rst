@@ -325,7 +325,7 @@ Installing the latest stable release of Salt (default):
 
 .. code:: console
 
-  curl -L  https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh
+  curl -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh
 
 Using ``wget`` to install your distribution's stable packages:
 
