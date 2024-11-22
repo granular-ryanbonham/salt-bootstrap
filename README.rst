@@ -264,8 +264,7 @@ Using ``wget`` to install your distribution's stable packages:
 
 .. code:: console
 
-  wget -O bootstrap-salt.sh
-  https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
+  wget -O bootstrap-salt.sh https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh
 
 Installing a specific version from git using ``wget``:
@@ -359,8 +358,7 @@ Using ``PowerShell`` to install latest stable version:
 
   [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]'Tls12'
   Invoke-WebRequest -Uri https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.ps1 -OutFile "$env:TEMP\bootstrap-salt.ps1"
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-  & "$env:TEMP\bootstrap-salt.ps1"
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser & "$env:TEMP\bootstrap-salt.ps1"
 
 Display information about the install script parameters:
 

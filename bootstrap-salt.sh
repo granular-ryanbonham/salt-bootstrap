@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.21"
+__ScriptVersion="2024.11.22"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -314,6 +314,9 @@ __usage() {
 
   Usage :  ${__ScriptName} [options] <install-type> [install-type-args]
 
+
+  Usage :  bootstrap-salt.sh [options] <install-type> [install-type-args]
+
   Installation types:
     - stable               Install latest stable release. This is the default
                            install type
@@ -351,7 +354,6 @@ __usage() {
     - ${__ScriptName} onedir_rc
     - ${__ScriptName} onedir_rc 3008
 
-
   Options:
     -a  Pip install all Python pkg dependencies for Salt. Requires -V to install
         all pip pkgs into the virtualenv.
@@ -373,7 +375,7 @@ __usage() {
     -f  Force shallow cloning for git installations.
         This may result in an "n/a" in the version number.
     -F  Allow copied files to overwrite existing (config, init.d, etc)
-    -g  Salt Git repository URL. Default: ${_SALTSTACK_REPO_URL}
+    -g  Salt Git repository URL. Default: https://github.com/saltstack/salt.git
     -h  Display this message
     -H  Use the specified HTTP proxy for all download URLs (including https://).
         For example: http://myproxy.example.com:3128
@@ -419,7 +421,7 @@ __usage() {
         "packages.broadcom.com". If -R is passed, -r is also set. Currently only
         works on CentOS/RHEL and Debian based distributions and macOS.
     -s  Sleep time used when waiting for daemons to start, restart and when
-        checking for the services running. Default: ${__DEFAULT_SLEEP}
+        checking for the services running. Default: 3
     -S  Also install salt-syndic
     -r  Disable all repository configuration performed by this script. This
         option assumes all necessary repository configuration is already present
