@@ -223,8 +223,8 @@ Using ``curl`` to install latest development version from GitHub:
 
 .. code:: console
 
-  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh sudo sh
-  bootstrap-salt.sh git master
+  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
+  sudo sh bootstrap-salt.sh git master
 
 To install a specific branch from a Git fork:
 
