@@ -343,8 +343,7 @@ Installing the latest master branch of Salt from git:
 
 .. code:: console
 
-  curl -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh |
-  sudo sh -s -- git master
+  curl -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh -s -- git master
 
 Note: use of git is recommended for development environments, for example: testing new features of
 Salt which have not yet been released.
