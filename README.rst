@@ -253,8 +253,7 @@ If your host has Internet access only via HTTP proxy, installing via Git:
 .. code:: console
 
   PROXY='http://user:password@myproxy.example.com:3128'
-  curl -o bootstrap-salt.sh -L -x "$PROXY"
-  https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
+  curl -o bootstrap-salt.sh -L -x "$PROXY" https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -H "$PROXY" git
 
 
