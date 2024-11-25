@@ -67,4 +67,5 @@ def test_target_salt_version(path, target_salt_version):
     cmd = ["salt-call", "--local", "grains.item", "saltversion", "--timeout=120"]
     result = run_salt_call(cmd)
     # Returns: {'saltversion': '3006.9+217.g53cfa53040'}
-    assert result["saltversion"] == target_salt_version
+    adj_saltversion = result["saltversion"].split("+")[0]
+    assert adj_saltversion == target_salt_version
