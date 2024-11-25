@@ -2741,11 +2741,6 @@ __install_salt_from_repo() {
     __check_pip_allowed
 
     echodebug "Installed pip version: $(${_pip_cmd} --version)"
-    echodebug "Upgrading pip to latest, running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} -U pip>=${_MINIMUM_PIP_VERSION}'"
-    ## DGM ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v -U "pip>=${_MINIMUM_PIP_VERSION}"
-    ${_py_exe} -m pip install ${_PIP_INSTALL_ARGS} -v -U "pip>=${_MINIMUM_PIP_VERSION}"
-
-    echodebug "Upgraded pip version: $(${_pip_cmd} --version)"
 
     _setuptools_dep="setuptools>=${_MINIMUM_SETUPTOOLS_VERSION},<${_MAXIMUM_SETUPTOOLS_VERSION}"
     if [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
