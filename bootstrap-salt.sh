@@ -2103,7 +2103,7 @@ __git_clone_and_checkout() {
     fi
 
     if [ "$(echo "$GIT_REV" | grep -E '^(3006|3007)$')" != "" ]; then
-        GIT_REV_ADJ="$1.x"  # branches are 3006.x or 3007.x
+        GIT_REV_ADJ="$GIT_REV.x"  # branches are 3006.x or 3007.x
     else
         GIT_REV_ADJ="$GIT_REV"
     fi
