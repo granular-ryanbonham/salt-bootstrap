@@ -2742,6 +2742,44 @@ __install_salt_from_repo() {
 
     echodebug "Installed pip version: $(${_pip_cmd} --version)"
 
+    CHECK_PIP_VERSION_SCRIPT=$(cat << EOM
+import sys
+try:
+    import pip
+    installed_pip_version=tuple([int(part.strip()) for part in pip.__version__.split('.') if part.isdigit()])
+    desired_pip_version=($(echo ${_MINIMUM_PIP_VERSION} | sed 's/\./, /g' ))
+    if installed_pip_version < desired_pip_version:
+        print('Desired pip version {!r} > Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
+        sys.exit(1)
+    print('Desired pip version {!r} < Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
+    sys.exit(0)
+except ImportError:
+    print('Failed to import pip')
+    sys.exit(1)
+EOM
+)
+    if ! ${_py_exe} -c "$CHECK_PIP_VERSION_SCRIPT"; then
+        # Upgrade pip to at least 1.2 which is when we can start using "python3 -m pip"
+        echodebug "Running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} pip>=${_MINIMUM_PIP_VERSION}'"
+        ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v "pip>=${_MINIMUM_PIP_VERSION}"
+        sleep 1
+        echodebug "PATH: ${PATH}"
+        _pip_cmd="pip${_py_version}"
+        if ! __check_command_exists "${_pip_cmd}"; then
+            echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
+            _pip_cmd="pip$(echo "${_py_version}" | cut -c -1)"
+            if ! __check_command_exists "${_pip_cmd}"; then
+                echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
+                _pip_cmd="pip"
+                if ! __check_command_exists "${_pip_cmd}"; then
+                    echoerror "Unable to find a pip binary"
+                    return 1
+                fi
+            fi
+        fi
+        echodebug "Installed pip version: $(${_pip_cmd} --version)"
+    fi
+
     _setuptools_dep="setuptools>=${_MINIMUM_SETUPTOOLS_VERSION},<${_MAXIMUM_SETUPTOOLS_VERSION}"
     if [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
