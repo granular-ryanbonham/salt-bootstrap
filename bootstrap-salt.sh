@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.22"
+__ScriptVersion="2024.11.21"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -314,9 +314,6 @@ __usage() {
 
   Usage :  ${__ScriptName} [options] <install-type> [install-type-args]
 
-
-  Usage :  bootstrap-salt.sh [options] <install-type> [install-type-args]
-
   Installation types:
     - stable               Install latest stable release. This is the default
                            install type
@@ -354,6 +351,7 @@ __usage() {
     - ${__ScriptName} onedir_rc
     - ${__ScriptName} onedir_rc 3008
 
+
   Options:
     -a  Pip install all Python pkg dependencies for Salt. Requires -V to install
         all pip pkgs into the virtualenv.
@@ -375,7 +373,7 @@ __usage() {
     -f  Force shallow cloning for git installations.
         This may result in an "n/a" in the version number.
     -F  Allow copied files to overwrite existing (config, init.d, etc)
-    -g  Salt Git repository URL. Default: https://github.com/saltstack/salt.git
+    -g  Salt Git repository URL. Default: ${_SALTSTACK_REPO_URL}
     -h  Display this message
     -H  Use the specified HTTP proxy for all download URLs (including https://).
         For example: http://myproxy.example.com:3128
@@ -421,7 +419,7 @@ __usage() {
         "packages.broadcom.com". If -R is passed, -r is also set. Currently only
         works on CentOS/RHEL and Debian based distributions and macOS.
     -s  Sleep time used when waiting for daemons to start, restart and when
-        checking for the services running. Default: 3
+        checking for the services running. Default: ${__DEFAULT_SLEEP}
     -S  Also install salt-syndic
     -r  Disable all repository configuration performed by this script. This
         option assumes all necessary repository configuration is already present
@@ -546,8 +544,8 @@ __exit_cleanup() {
             echodebug "Cleaning up the Salt Temporary Git Repository"
             # shellcheck disable=SC2164
             cd "${__SALT_GIT_CHECKOUT_PARENT_DIR}"
-            rm -rf "${_SALT_GIT_CHECKOUT_DIR}"
-            #rm -rf "${_SALT_GIT_CHECKOUT_DIR}/deps"
+            rm -fR "${_SALT_GIT_CHECKOUT_DIR}"
+            #rm -fR "${_SALT_GIT_CHECKOUT_DIR}/deps"
         else
             echowarn "Not cleaning up the Salt Temporary git repository on request"
             echowarn "Note that if you intend to re-run this script using the git approach, you might encounter some issues"
@@ -603,7 +601,6 @@ fi
 echoinfo "Running version: ${__ScriptVersion}"
 echoinfo "Executed by: ${CALLER}"
 echoinfo "Command line: '${__ScriptFullName} ${__ScriptArgs}'"
-echowarn "Running the unstable version of ${__ScriptName}"
 
 # Defaults
 STABLE_REV="latest"
@@ -2737,44 +2734,10 @@ __install_salt_from_repo() {
     __check_pip_allowed
 
     echodebug "Installed pip version: $(${_pip_cmd} --version)"
+    echodebug "Upgrading pip to latest, running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} -U pip>=${_MINIMUM_PIP_VERSION}'"
+    ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v -U "pip>=${_MINIMUM_PIP_VERSION}"
 
-    CHECK_PIP_VERSION_SCRIPT=$(cat << EOM
-import sys
-try:
-    import pip
-    installed_pip_version=tuple([int(part.strip()) for part in pip.__version__.split('.') if part.isdigit()])
-    desired_pip_version=($(echo ${_MINIMUM_PIP_VERSION} | sed 's/\./, /g' ))
-    if installed_pip_version < desired_pip_version:
-        print('Desired pip version {!r} > Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
-        sys.exit(1)
-    print('Desired pip version {!r} < Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
-    sys.exit(0)
-except ImportError:
-    print('Failed to import pip')
-    sys.exit(1)
-EOM
-)
-    if ! ${_py_exe} -c "$CHECK_PIP_VERSION_SCRIPT"; then
-        # Upgrade pip to at least 1.2 which is when we can start using "python3 -m pip"
-        echodebug "Running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} pip>=${_MINIMUM_PIP_VERSION}'"
-        ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v "pip>=${_MINIMUM_PIP_VERSION}"
-        sleep 1
-        echodebug "PATH: ${PATH}"
-        _pip_cmd="pip${_py_version}"
-        if ! __check_command_exists "${_pip_cmd}"; then
-            echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
-            _pip_cmd="pip$(echo "${_py_version}" | cut -c -1)"
-            if ! __check_command_exists "${_pip_cmd}"; then
-                echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
-                _pip_cmd="pip"
-                if ! __check_command_exists "${_pip_cmd}"; then
-                    echoerror "Unable to find a pip binary"
-                    return 1
-                fi
-            fi
-        fi
-        echodebug "Installed pip version: $(${_pip_cmd} --version)"
-    fi
+    echodebug "Upgraded pip version: $(${_pip_cmd} --version)"
 
     _setuptools_dep="setuptools>=${_MINIMUM_SETUPTOOLS_VERSION},<${_MAXIMUM_SETUPTOOLS_VERSION}"
     if [ "$_PY_MAJOR_VERSION" -ne 3 ]; then

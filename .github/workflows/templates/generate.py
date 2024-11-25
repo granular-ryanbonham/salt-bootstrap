@@ -18,6 +18,10 @@ os.chdir(os.path.abspath(os.path.dirname(__file__)))
 #    "ubuntu-2004",
 #    "ubuntu-2404",
 LINUX_DISTROS = [
+    "amazonlinux-2",
+    "amazonlinux-2023",
+    "debian-11",
+    "debian-12",
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
@@ -36,17 +40,16 @@ OSX = [
 
 # only test against current containers with systemd
 # will add these when they become available with systemd
-#    "amazonlinux-2",
-#    "amazonlinux-2023",
-#    "centos-stream9",
-#    "debian-11",
-#    "debian-12",
 #    "debian-13",
 #    "fedora-40",
 #    "photon-4",
 #    "ubuntu-2004",
 #    "ubuntu-2404",
 STABLE_DISTROS = [
+    "amazonlinux-2",
+    "amazonlinux-2023",
+    "debian-11",
+    "debian-12",
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
@@ -55,16 +58,16 @@ STABLE_DISTROS = [
 
 # only test against current containers with systemd
 # will add these when they become available with systemd
-#    "amazonlinux-2",
-#    "amazonlinux-2023",
-#    "debian-11",
-#    "debian-12",
 #    "debian-13",
 #    "fedora-40",
 #    "photon-4",
 #    "ubuntu-2004",
 #    "ubuntu-2404",
 ONEDIR_DISTROS = [
+    "amazonlinux-2",
+    "amazonlinux-2023",
+    "debian-11",
+    "debian-12",
     "photon-5",
     "rockylinux-8",
     "rockylinux-9",
@@ -75,12 +78,12 @@ ONEDIR_DISTROS = [
 # will add these when they become available with systemd
 #    "amazonlinux-2",
 #    "amazonlinux-2023",
-#    "debian-12",
 #    "photon-4",
 #    "photon-5",
-#    "rockylinux-9",
+#    "rockylinux-8",
 #    "ubuntu-2404",
 ONEDIR_RC_DISTROS = [
+    "debian-12",
     "photon-5",
     "rockylinux-9",
     "ubuntu-2204",
@@ -97,41 +100,41 @@ BLACKLIST_3007 = [
     "photon-5",
 ]
 
+#    "debian-12",
+#    "rockylinux-9",
+#    "ubuntu-2204",
 BLACKLIST_GIT_3006 = [
     "amazonlinux-2",
     "amazonlinux-2023",
     "debian-11",
-    "debian-12",
     "fedora-40",
     "photon-4",
     "photon-5",
-    "rockylinux-9",
     "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 
+#    "debian-12",
+#    "rockylinux-9",
+#    "ubuntu-2204",
 BLACKLIST_GIT_3007 = [
     "amazonlinux-2",
     "amazonlinux-2023",
     "debian-11",
-    "debian-12",
     "debian-13",
     "fedora-40",
     "photon-4",
     "photon-5",
-    "rockylinux-9",
     "ubuntu-2004",
-    "ubuntu-2204",
     "ubuntu-2404",
 ]
 
+##    "rockylinux-9",
 BLACKLIST_GIT_MASTER = [
     "amazonlinux-2",
     "amazonlinux-2023",
     "photon-4",
     "photon-5",
-    "rockylinux-9",
 ]
 
 SALT_VERSIONS = [
