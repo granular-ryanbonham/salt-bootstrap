@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.21"
+__ScriptVersion="2024.11.25"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -640,7 +640,11 @@ elif [ "$ITYPE" = "git" ]; then
     if [ "$#" -eq 0 ];then
         GIT_REV="master"
     else
-        GIT_REV="$1"
+        if [ "$(echo "$1" | grep -E '^(3006|3007)$')" != "" ]; then
+            GIT_REV="$1.x"  # branches are 3006.x or 3007.x
+        else
+            GIT_REV="$1"
+        fi
         shift
     fi
 
@@ -3085,7 +3089,7 @@ install_ubuntu_deps() {
     # Additionally install procps and pciutils which allows for Docker bootstraps. See 366#issuecomment-39666813
     __PACKAGES="${__PACKAGES} procps pciutils"
 
-    # ensure sudo installed
+    # ensure sudo, ps installed
     __PACKAGES="${__PACKAGES} sudo"
 
     ## include hwclock if not part of base OS (23.10 and up)
@@ -3170,6 +3174,9 @@ install_ubuntu_git_deps() {
     if [ ! -f /usr/sbin/hwclock ]; then
         __PACKAGES="${__PACKAGES} util-linux-extra"
     fi
+
+    # Additionally install procps and pciutils which allows for Docker bootstraps. See 366#issuecomment-39666813
+    __PACKAGES="${__PACKAGES} procps pciutils"
 
     # ensure sudo installed
     __PACKAGES="${__PACKAGES} sudo"
@@ -3617,6 +3624,9 @@ install_debian_git_deps() {
 
     __PACKAGES="python${PY_PKG_VER}-dev python${PY_PKG_VER}-pip python${PY_PKG_VER}-setuptools gcc"
     echodebug "install_debian_git_deps() Installing ${__PACKAGES}"
+
+    # Additionally install procps and pciutils which allows for Docker bootstraps. See 366#issuecomment-39666813
+    __PACKAGES="${__PACKAGES} procps pciutils"
 
     # ensure sudo installed
     __PACKAGES="${__PACKAGES} sudo"
