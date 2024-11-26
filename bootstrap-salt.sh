@@ -2815,27 +2815,47 @@ __install_salt_from_repo() {
         fi
     fi
 
-    echoinfo "Downloading Salt Dependencies from PyPi"
-    if [ "${OS_NAME}" = "Linux" ]; then
-        echodebug "Solving jaraco.functools splat issue, installing jaraco.functools v4.0.0"
-        ${_pip_cmd} install "jaraco.functools==4.0.0" || return 1
-        echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
-        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
-    else
-        echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
-        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
-    fi
+    ## DGM echoinfo "Downloading Salt Dependencies from PyPi"
+    ## DGM if [ "${OS_NAME}" = "Linux" ]; then
+    ## DGM     echodebug "Solving jaraco.functools splat issue, installing jaraco.functools v4.0.0"
+    ## DGM     ${_pip_cmd} install "jaraco.functools==4.0.0" || return 1
+    ## DGM     echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
+    ## DGM     ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
+    ## DGM else
+    ## DGM     echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
+    ## DGM     ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
+    ## DGM fi
+    ## DGM # shellcheck disable=SC2181
+    ## DGM if [ $? -ne 0 ]; then
+    ## DGM     echo "Failed to download salt dependencies"
+    ## DGM     return 1
+    ## DGM fi
+
+
+    ## DGM echoinfo "Installing Downloaded Salt Dependencies"
+    ## DGM echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/*'"
+    ## DGM ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/* || return 1
+
+    rm -f /tmp/git/deps/*
+
+    ## DGM different attempt, try installing requirements
+    echoinfo "DGM Installing Salt reuqirements from PyPi, ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
+    ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
-        echo "Failed to download salt dependencies"
+        echo "Failed to install salt requirements for the version of Python ${_py_version}"
         return 1
     fi
 
+    if [ "${OS_NAME}" = "Linux" ]; then
+        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.functools==4.1.0" || return 1
+        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.text==4.0.0" || return 1
+        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.collections==5.1.0" || return 1
+        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.context==6.0.1" || return 1
+        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.classes==3.4.0" || return 1
 
-    echoinfo "Installing Downloaded Salt Dependencies"
-    echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/*'"
-    ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/* || return 1
-    rm -f /tmp/git/deps/*
+        ${_pip_cmd} list
+    fi
 
     echoinfo "Building Salt Python Wheel"
     if [ "$_ECHO_DEBUG" -eq $BS_TRUE ]; then
