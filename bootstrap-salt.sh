@@ -2742,43 +2742,43 @@ __install_salt_from_repo() {
 
     echodebug "Installed pip version: $(${_pip_cmd} --version)"
 
-    CHECK_PIP_VERSION_SCRIPT=$(cat << EOM
-import sys
-try:
-    import pip
-    installed_pip_version=tuple([int(part.strip()) for part in pip.__version__.split('.') if part.isdigit()])
-    desired_pip_version=($(echo ${_MINIMUM_PIP_VERSION} | sed 's/\./, /g' ))
-    if installed_pip_version < desired_pip_version:
-        print('Desired pip version {!r} > Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
-        sys.exit(1)
-    print('Desired pip version {!r} < Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
-    sys.exit(0)
-except ImportError:
-    print('Failed to import pip')
-    sys.exit(1)
-EOM
-)
-    if ! ${_py_exe} -c "$CHECK_PIP_VERSION_SCRIPT"; then
-        # Upgrade pip to at least 1.2 which is when we can start using "python3 -m pip"
-        echodebug "Running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} pip>=${_MINIMUM_PIP_VERSION}'"
-        ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v "pip>=${_MINIMUM_PIP_VERSION}"
-        sleep 1
-        echodebug "PATH: ${PATH}"
-        _pip_cmd="pip${_py_version}"
-        if ! __check_command_exists "${_pip_cmd}"; then
-            echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
-            _pip_cmd="pip$(echo "${_py_version}" | cut -c -1)"
-            if ! __check_command_exists "${_pip_cmd}"; then
-                echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
-                _pip_cmd="pip"
-                if ! __check_command_exists "${_pip_cmd}"; then
-                    echoerror "Unable to find a pip binary"
-                    return 1
-                fi
-            fi
-        fi
-        echodebug "Installed pip version: $(${_pip_cmd} --version)"
-    fi
+## DGM     CHECK_PIP_VERSION_SCRIPT=$(cat << EOM
+## DGM import sys
+## DGM try:
+## DGM     import pip
+## DGM     installed_pip_version=tuple([int(part.strip()) for part in pip.__version__.split('.') if part.isdigit()])
+## DGM     desired_pip_version=($(echo ${_MINIMUM_PIP_VERSION} | sed 's/\./, /g' ))
+## DGM     if installed_pip_version < desired_pip_version:
+## DGM         print('Desired pip version {!r} > Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
+## DGM         sys.exit(1)
+## DGM     print('Desired pip version {!r} < Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
+## DGM     sys.exit(0)
+## DGM except ImportError:
+## DGM     print('Failed to import pip')
+## DGM     sys.exit(1)
+## DGM EOM
+## DGM )
+## DGM     if ! ${_py_exe} -c "$CHECK_PIP_VERSION_SCRIPT"; then
+## DGM         # Upgrade pip to at least 1.2 which is when we can start using "python3 -m pip"
+## DGM         echodebug "Running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} pip>=${_MINIMUM_PIP_VERSION}'"
+## DGM         ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v "pip>=${_MINIMUM_PIP_VERSION}"
+## DGM         sleep 1
+## DGM         echodebug "PATH: ${PATH}"
+## DGM         _pip_cmd="pip${_py_version}"
+## DGM         if ! __check_command_exists "${_pip_cmd}"; then
+## DGM             echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
+## DGM             _pip_cmd="pip$(echo "${_py_version}" | cut -c -1)"
+## DGM             if ! __check_command_exists "${_pip_cmd}"; then
+## DGM                 echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
+## DGM                 _pip_cmd="pip"
+## DGM                 if ! __check_command_exists "${_pip_cmd}"; then
+## DGM                     echoerror "Unable to find a pip binary"
+## DGM                     return 1
+## DGM                 fi
+## DGM             fi
+## DGM         fi
+## DGM         echodebug "Installed pip version: $(${_pip_cmd} --version)"
+## DGM     fi
 
     _setuptools_dep="setuptools>=${_MINIMUM_SETUPTOOLS_VERSION},<${_MAXIMUM_SETUPTOOLS_VERSION}"
     if [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
@@ -2816,8 +2816,13 @@ EOM
     fi
 
     echoinfo "Downloading Salt Dependencies from PyPi"
-    echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
-    ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
+    if [ "${OS_NAME}" = "Linux" ]; then
+        echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
+        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
+    else
+        echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
+        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
+    fi
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         echo "Failed to download salt dependencies"
