@@ -59,8 +59,9 @@ If you're looking for a *one-liner* to install Salt, please scroll to the bottom
 instructions for `Installing via an Insecure One-Liner`_.
 
 There are also .sha256 files for verifying against in the repo for the stable branch.  You can also
-get the correct sha256 sum for the stable release from https://bootstrap.saltproject.io/sha256 and
-https://winbootstrap.saltproject.io/sha256
+get the correct sha256 sum for the stable release from
+https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh.sha256 and
+https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.ps1.sha256
 
 Contributing
 ------------
@@ -86,9 +87,9 @@ To view the latest options and descriptions for ``salt-bootstrap``, use ``-h`` a
     - stable              Install latest stable release. This is the default
                           install type
     - stable [branch]     Install latest version on a branch. Only supported
-                          for packages available at repo.saltproject.io
+                          for packages available at packages.broadcom.com
     - stable [version]    Install a specific version. Only supported for
-                          packages available at repo.saltproject.io
+                          packages available at packages.broadcom.com
                           To pin a 3xxx minor version, specify it as 3xxx.0
     - testing             RHEL-family specific: configure EPEL testing repo
     - git                 Install from the head of the master branch
@@ -171,8 +172,8 @@ To view the latest options and descriptions for ``salt-bootstrap``, use ``-h`` a
         on the system.
     -R  Specify a custom repository URL. Assumes the custom repository URL
         points to a repository that mirrors Salt packages located at
-        repo.saltproject.io. The option passed with -R replaces the
-        "repo.saltproject.io". If -R is passed, -r is also set. Currently only
+        packages.broadcom.com. The option passed with -R replaces the
+        "packages.broadcom.com". If -R is passed, -r is also set. Currently only
         works on CentOS/RHEL and Debian based distributions.
     -J  Replace the Master config file with data passed in as a JSON string. If
         a Master config file is found, a reasonable effort will be made to save
@@ -208,35 +209,35 @@ If you want to install a package of a specific release version, from the Salt Pr
 
 .. code:: console
 
-  curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -P stable 3006.1
 
 If you want to install a specific release version, based on the Git tags:
 
 .. code:: console
 
-  curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh git v3006.1
 
 Using ``curl`` to install latest development version from GitHub:
 
 .. code:: console
 
-  curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh git master
 
 To install a specific branch from a Git fork:
 
 .. code:: console
 
-  curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -g https://github.com/myuser/salt.git git mybranch
 
 If all you want is to install a ``salt-master`` using latest Git:
 
 .. code:: console
 
-  curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -M -N git master
 
 If your host has Internet access only via HTTP proxy, from the Salt Project repo:
@@ -244,7 +245,7 @@ If your host has Internet access only via HTTP proxy, from the Salt Project repo
 .. code:: console
 
   PROXY='http://user:password@myproxy.example.com:3128'
-  curl -o bootstrap-salt.sh -L -x "$PROXY" https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L -x "$PROXY" https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -P -H "$PROXY" stable
 
 If your host has Internet access only via HTTP proxy, installing via Git:
@@ -252,7 +253,7 @@ If your host has Internet access only via HTTP proxy, installing via Git:
 .. code:: console
 
   PROXY='http://user:password@myproxy.example.com:3128'
-  curl -o bootstrap-salt.sh -L -x "$PROXY" https://bootstrap.saltproject.io
+  curl -o bootstrap-salt.sh -L -x "$PROXY" https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -H "$PROXY" git
 
 
@@ -263,22 +264,22 @@ Using ``wget`` to install your distribution's stable packages:
 
 .. code:: console
 
-  wget -O bootstrap-salt.sh https://bootstrap.saltproject.io
+  wget -O bootstrap-salt.sh https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
   sudo sh bootstrap-salt.sh
 
 Installing a specific version from git using ``wget``:
 
 .. code:: console
 
-  wget -O bootstrap-salt.sh https://bootstrap.saltproject.io
-  sudo sh bootstrap-salt.sh git v3004.1
+  wget -O bootstrap-salt.sh https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
+  sudo sh bootstrap-salt.sh git v3006.8
 
 Installing a specific version package from the Salt Project repo using ``wget``:
 
 .. code:: console
 
-  wget -O bootstrap-salt.sh https://bootstrap.saltproject.io
-  sudo sh bootstrap-salt.sh -P stable 3006.1
+  wget -O bootstrap-salt.sh https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh
+  sudo sh bootstrap-salt.sh -P stable 3006.8
 
 **NOTE**
 
@@ -293,14 +294,14 @@ If you already have Python installed, ``python 3.10``, then it's as easy as:
 
 .. code:: console
 
-  python -m urllib "https://bootstrap.saltproject.io" > bootstrap-salt.sh
+  python -m urllib "https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh" > bootstrap-salt.sh
   sudo sh bootstrap-salt.sh -P stable 3006.1
 
 With python version 3:
 
 .. code:: console
 
-  python3 -c 'import urllib.request; print(urllib.request.urlopen("https://bootstrap.saltproject.io").read().decode("ascii"))' > bootstrap-salt.sh
+  python3 -c 'import urllib.request; print(urllib.request.urlopen("https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh").read().decode("ascii"))' > bootstrap-salt.sh
   sudo sh bootstrap-salt.sh git v3006.1
 
 Note: Python 2.x is no longer supported given it reached it's End-Of-Life Jan. 1st, 2020
@@ -323,25 +324,25 @@ Installing the latest stable release of Salt (default):
 
 .. code:: console
 
-  curl -L https://bootstrap.saltproject.io | sudo sh
+  curl -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh
 
 Using ``wget`` to install your distribution's stable packages:
 
 .. code:: console
 
-  wget -O - https://bootstrap.saltproject.io | sudo sh
+  wget -O - https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh
 
 Installing a target version package of Salt from the Salt Project repo:
 
 .. code:: console
 
-  curl -L https://bootstrap.saltproject.io | sudo sh -s -- stable 3006.8
+  curl -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh -s -- stable 3006.8
 
 Installing the latest master branch of Salt from git:
 
 .. code:: console
 
-  curl -L https://bootstrap.saltproject.io | sudo sh -s -- git master
+  curl -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh | sudo sh -s -- git master
 
 Note: use of git is recommended for development environments, for example: testing new features of
 Salt which have not yet been released.
@@ -356,9 +357,8 @@ Using ``PowerShell`` to install latest stable version:
 .. code:: powershell
 
   [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]'Tls12'
-  Invoke-WebRequest -Uri https://winbootstrap.saltproject.io -OutFile "$env:TEMP\bootstrap-salt.ps1"
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-  & "$env:TEMP\bootstrap-salt.ps1"
+  Invoke-WebRequest -Uri https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.ps1 -OutFile "$env:TEMP\bootstrap-salt.ps1"
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser & "$env:TEMP\bootstrap-salt.ps1"
 
 Display information about the install script parameters:
 
@@ -370,7 +370,7 @@ Using ``cygwin`` to install latest stable version:
 
 .. code:: console
 
-  curl -o bootstrap-salt.ps1 -L https://winbootstrap.saltproject.io
+  curl -o bootstrap-salt.ps1 -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.ps1
   "/cygdrive/c/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ./bootstrap-salt.ps1"
 
 
@@ -380,13 +380,13 @@ Supported Operating Systems
 The salt-bootstrap script officially supports the distributions outlined in
 `Salt's Supported Operating Systems
 <https://docs.saltproject.io/salt/install-guide/en/latest/topics/salt-supported-operating-systems.html>`_
-document, (BSD-based OSs, Solaris and AIX are no longer
-supported).  The operating systems listed below should reflect this document but may become out of
-date. If an operating system is listed below, but is not listed on the official supported operating
+document, (BSD-based OSs, Solaris and AIX are no longer supported).
+The operating systems listed below should reflect this document but may become out of date.
+If an operating system is listed below, but is not listed on the official supported operating
 systems document, the level of support is "best-effort".
 
 Since Salt is written in Python, the packages available from the `Salt Project's repository
-<https://repo.saltproject.io/salt/py3>`_ are
+<packages.broadcom.com>`_ are
 CPU architecture independent and could be installed on any hardware supported by Linux kernel.
 However, the Salt Project does package Salt's binary dependencies only for ``x86_64`` (``amd64``)
 and ``AArch64`` (``arm64``).
