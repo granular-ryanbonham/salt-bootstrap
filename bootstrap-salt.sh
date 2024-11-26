@@ -2807,12 +2807,27 @@ EOM
     if [ ${DISTRO_NAME_L} = "ubuntu" ] && [ "$DISTRO_MAJOR_VERSION" -eq 22 ]; then
         echodebug "Ubuntu 22.04 has problem with base.txt requirements file, not parsing sys_platform == 'win32', upgrading from default pip works"
         echodebug "${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade  pip"
-        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade  pip || (echo "Failed to upgrade pip" && return 1)
+        ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade  pip
+        # shellcheck disable=SC2181
+        if [ $? -ne 0 ]; then
+            echo "Failed to upgrade pip"
+            return 1
+        fi
     fi
 
     echoinfo "Downloading Salt Dependencies from PyPi"
     echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
-    ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} . || (echo "Failed to download salt dependencies" && return 1)
+    if [ "${OS_NAME}" = "Linux" ]; then
+        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/pkg/py${_py_version}/linux.txt"
+    else
+        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
+    fi
+    # shellcheck disable=SC2181
+    if [ $? -ne 0 ]; then
+        echo "Failed to download salt dependencies"
+        return 1
+    fi
+
 
     echoinfo "Installing Downloaded Salt Dependencies"
     echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/*'"
