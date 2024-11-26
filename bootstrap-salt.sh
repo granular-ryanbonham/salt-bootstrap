@@ -2817,11 +2817,7 @@ EOM
 
     echoinfo "Downloading Salt Dependencies from PyPi"
     echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
-    if [ "${OS_NAME}" = "Linux" ]; then
-        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/pkg/py${_py_version}/linux.txt"
-    else
-        ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
-    fi
+    ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         echo "Failed to download salt dependencies"
