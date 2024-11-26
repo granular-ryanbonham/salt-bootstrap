@@ -2817,6 +2817,8 @@ __install_salt_from_repo() {
 
     echoinfo "Downloading Salt Dependencies from PyPi"
     if [ "${OS_NAME}" = "Linux" ]; then
+        echodebug "Solving jaraco.functools splat issue, installing jaraco.functools v4.0.0"
+        ${_pip_cmd} install "jaraco.functools==4.0.0" || return 1
         echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
         ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
     else
