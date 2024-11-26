@@ -180,51 +180,6 @@ jobs:
 
 
 
-  amazonlinux-2:
-    name: Amazon 2
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: amazonlinux-2
-      display-name: Amazon 2
-      container-slug: systemd-amazonlinux-2
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
-
-
-  amazonlinux-2023:
-    name: Amazon 2023
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: amazonlinux-2023
-      display-name: Amazon 2023
-      container-slug: systemd-amazonlinux-2023
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
-
-
-  debian-11:
-    name: Debian 11
-    if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
-    uses: ./.github/workflows/test-linux.yml
-    needs:
-      - lint
-      - generate-actions-workflow
-    with:
-      distro-slug: debian-11
-      display-name: Debian 11
-      container-slug: systemd-debian-11
-      timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
-
-
   debian-12:
     name: Debian 12
     if: github.event_name == 'push' || needs.collect-changed-files.outputs.run-tests == 'true'
@@ -237,7 +192,7 @@ jobs:
       display-name: Debian 12
       container-slug: systemd-debian-12
       timeout: 20
-      instances: '["stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
+      instances: '["stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
 
   photon-5:
@@ -282,7 +237,7 @@ jobs:
       display-name: Rocky Linux 9
       container-slug: systemd-rockylinux-9
       timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
+      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
 
   ubuntu-2204:
@@ -312,9 +267,6 @@ jobs:
       - macos-13
       - macos-14
       - windows-2022
-      - amazonlinux-2
-      - amazonlinux-2023
-      - debian-11
       - debian-12
       - photon-5
       - rockylinux-8
