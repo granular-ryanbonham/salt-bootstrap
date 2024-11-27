@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.26"
+__ScriptVersion="2024.11.27"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -2797,6 +2797,9 @@ __install_salt_from_repo() {
     echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel ${_setuptools_dep}"
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel "${_setuptools_dep}"
 
+    echodebug "DGM doing pip list"
+    ${_pip_cmd} list
+
     echoinfo "Installing salt using ${_py_exe}, $(${_py_exe} --version)"
     cd "${_SALT_GIT_CHECKOUT_DIR}" || return 1
 
@@ -2836,10 +2839,16 @@ __install_salt_from_repo() {
     ## DGM echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/*'"
     ## DGM ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/* || return 1
 
+    echodebug "DGM doing pip list"
+    ${_pip_cmd} list
+
     rm -f /tmp/git/deps/*
 
+    echodebug "DGM doing pip list"
+    ${_pip_cmd} list
+
     ## DGM different attempt, try installing requirements
-    echoinfo "DGM Installing Salt reuqirements from PyPi, ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
+    echoinfo "DGM Installing Salt requirements from PyPi, ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
@@ -2854,6 +2863,7 @@ __install_salt_from_repo() {
         ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.context==6.0.1" || return 1
         ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.classes==3.4.0" || return 1
 
+        echodebug "DGM doing pip list"
         ${_pip_cmd} list
     fi
 
@@ -6400,7 +6410,7 @@ install_photon_deps() {
     __PACKAGES="${__PACKAGES} libyaml procps-ng python${PY_PKG_VER}-crypto python${PY_PKG_VER}-jinja2"
     __PACKAGES="${__PACKAGES} python${PY_PKG_VER}-msgpack python${PY_PKG_VER}-requests python${PY_PKG_VER}-zmq"
     __PACKAGES="${__PACKAGES} python${PY_PKG_VER}-pip python${PY_PKG_VER}-m2crypto python${PY_PKG_VER}-pyyaml"
-    __PACKAGES="${__PACKAGES} python${PY_PKG_VER}-systemd"
+    __PACKAGES="${__PACKAGES} python${PY_PKG_VER}-systemd sudo shadow"
 
     if [ "${_EXTRA_PACKAGES}" != "" ]; then
         echoinfo "Installing the following extra packages as requested: ${_EXTRA_PACKAGES}"
@@ -6450,6 +6460,14 @@ install_photon_git_deps() {
         __PACKAGES="${__PACKAGES} git"
     fi
 
+    if ! __check_command_exists sudo; then
+        __PACKAGES="${__PACKAGES} sudo"
+    fi
+
+    if ! __check_command_exists usermod; then
+        __PACKAGES="${__PACKAGES} shadow"
+    fi
+
     if [ -n "${__PACKAGES}" ]; then
         # shellcheck disable=SC2086
         __tdnf_install_noinput ${__PACKAGES} || return 1
@@ -6497,6 +6515,8 @@ install_photon_git() {
         echoerror "Python 2 is no longer supported, only Python 3"
         return 1
     fi
+
+    install_photon_git_deps
 
     if [ -f "${_SALT_GIT_CHECKOUT_DIR}/salt/syspaths.py" ]; then
         ${_PYEXE} setup.py --salt-config-dir="$_SALT_ETC_DIR" --salt-cache-dir="${_SALT_CACHE_DIR}" ${SETUP_PY_INSTALL_ARGS} install --prefix=/usr || return 1
@@ -6606,7 +6626,7 @@ install_photon_onedir_deps() {
         __install_saltstack_photon_onedir_repository || return 1
     fi
 
-    __PACKAGES="procps-ng"
+    __PACKAGES="procps-ng sudo shadow"
 
     # shellcheck disable=SC2086
     __tdnf_install_noinput ${__PACKAGES} || return 1
