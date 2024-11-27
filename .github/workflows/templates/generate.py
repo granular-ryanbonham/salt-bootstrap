@@ -91,12 +91,11 @@ BLACKLIST_3006 = [
     "ubuntu-2404",
 ]
 
+#    "photon-5",
 BLACKLIST_3007 = [
     "photon-4",
-    "photon-5",
 ]
 
-#    "rockylinux-9",
 #    "ubuntu-2204",
 BLACKLIST_GIT_3006 = [
     "amazonlinux-2",
@@ -106,12 +105,12 @@ BLACKLIST_GIT_3006 = [
     "fedora-40",
     "photon-4",
     "photon-5",
+    "rockylinux-9",
     "ubuntu-2004",
     "ubuntu-2404",
 ]
 
 #    "debian-12",
-#    "rockylinux-9",
 #    "ubuntu-2204",
 BLACKLIST_GIT_3007 = [
     "amazonlinux-2",
@@ -121,12 +120,12 @@ BLACKLIST_GIT_3007 = [
     "fedora-40",
     "photon-4",
     "photon-5",
+    "rockylinux-9",
     "ubuntu-2004",
     "ubuntu-2404",
 ]
 
 #    "debian-12",
-#    "rockylinux-9",
 BLACKLIST_GIT_MASTER = [
     "amazonlinux-2",
     "amazonlinux-2023",
@@ -135,6 +134,7 @@ BLACKLIST_GIT_MASTER = [
     "fedora-40",
     "photon-4",
     "photon-5",
+    "rockylinux-9",
 ]
 
 SALT_VERSIONS = [

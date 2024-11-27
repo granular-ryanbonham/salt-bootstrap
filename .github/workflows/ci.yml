@@ -207,7 +207,7 @@ jobs:
       display-name: Photon OS 5
       container-slug: systemd-photon-5
       timeout: 20
-      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "latest", "default"]'
+      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
 
   rockylinux-8:
@@ -237,7 +237,7 @@ jobs:
       display-name: Rocky Linux 9
       container-slug: systemd-rockylinux-9
       timeout: 20
-      instances: '["stable-3006", "git-3006", "onedir-3006", "stable-3006-8", "stable-3007", "git-3007", "onedir-3007", "stable-3007-1", "git-master", "latest", "default"]'
+      instances: '["stable-3006", "onedir-3006", "stable-3006-8", "stable-3007", "onedir-3007", "stable-3007-1", "latest", "default"]'
 
 
   ubuntu-2204:

@@ -2742,44 +2742,6 @@ __install_salt_from_repo() {
 
     echodebug "Installed pip version: $(${_pip_cmd} --version)"
 
-## DGM     CHECK_PIP_VERSION_SCRIPT=$(cat << EOM
-## DGM import sys
-## DGM try:
-## DGM     import pip
-## DGM     installed_pip_version=tuple([int(part.strip()) for part in pip.__version__.split('.') if part.isdigit()])
-## DGM     desired_pip_version=($(echo ${_MINIMUM_PIP_VERSION} | sed 's/\./, /g' ))
-## DGM     if installed_pip_version < desired_pip_version:
-## DGM         print('Desired pip version {!r} > Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
-## DGM         sys.exit(1)
-## DGM     print('Desired pip version {!r} < Installed pip version {!r}'.format('.'.join(map(str, desired_pip_version)), '.'.join(map(str, installed_pip_version))))
-## DGM     sys.exit(0)
-## DGM except ImportError:
-## DGM     print('Failed to import pip')
-## DGM     sys.exit(1)
-## DGM EOM
-## DGM )
-## DGM     if ! ${_py_exe} -c "$CHECK_PIP_VERSION_SCRIPT"; then
-## DGM         # Upgrade pip to at least 1.2 which is when we can start using "python3 -m pip"
-## DGM         echodebug "Running '${_pip_cmd} install ${_PIP_INSTALL_ARGS} pip>=${_MINIMUM_PIP_VERSION}'"
-## DGM         ${_pip_cmd} install ${_PIP_INSTALL_ARGS} -v "pip>=${_MINIMUM_PIP_VERSION}"
-## DGM         sleep 1
-## DGM         echodebug "PATH: ${PATH}"
-## DGM         _pip_cmd="pip${_py_version}"
-## DGM         if ! __check_command_exists "${_pip_cmd}"; then
-## DGM             echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
-## DGM             _pip_cmd="pip$(echo "${_py_version}" | cut -c -1)"
-## DGM             if ! __check_command_exists "${_pip_cmd}"; then
-## DGM                 echodebug "The pip binary '${_pip_cmd}' was not found in PATH"
-## DGM                 _pip_cmd="pip"
-## DGM                 if ! __check_command_exists "${_pip_cmd}"; then
-## DGM                     echoerror "Unable to find a pip binary"
-## DGM                     return 1
-## DGM                 fi
-## DGM             fi
-## DGM         fi
-## DGM         echodebug "Installed pip version: $(${_pip_cmd} --version)"
-## DGM     fi
-
     _setuptools_dep="setuptools>=${_MINIMUM_SETUPTOOLS_VERSION},<${_MAXIMUM_SETUPTOOLS_VERSION}"
     if [ "$_PY_MAJOR_VERSION" -ne 3 ]; then
         echoerror "Python version is no longer supported, only Python 3"
@@ -2797,15 +2759,11 @@ __install_salt_from_repo() {
     echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel ${_setuptools_dep}"
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --upgrade ${_PIP_INSTALL_ARGS}  wheel "${_setuptools_dep}"
 
-    echodebug "DGM doing pip list"
-    ${_pip_cmd} list
-
     echoinfo "Installing salt using ${_py_exe}, $(${_py_exe} --version)"
     cd "${_SALT_GIT_CHECKOUT_DIR}" || return 1
 
     mkdir -p /tmp/git/deps
     echodebug "Created directory /tmp/git/deps"
-    echodebug "Installing Salt dependencies for Salt version $(python3 salt/version.py)"
 
     if [ ${DISTRO_NAME_L} = "ubuntu" ] && [ "$DISTRO_MAJOR_VERSION" -eq 22 ]; then
         echodebug "Ubuntu 22.04 has problem with base.txt requirements file, not parsing sys_platform == 'win32', upgrading from default pip works"
@@ -2818,37 +2776,9 @@ __install_salt_from_repo() {
         fi
     fi
 
-    ## DGM echoinfo "Downloading Salt Dependencies from PyPi"
-    ## DGM if [ "${OS_NAME}" = "Linux" ]; then
-    ## DGM     echodebug "Solving jaraco.functools splat issue, installing jaraco.functools v4.0.0"
-    ## DGM     ${_pip_cmd} install "jaraco.functools==4.0.0" || return 1
-    ## DGM     echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
-    ## DGM     ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
-    ## DGM else
-    ## DGM     echodebug "Running '${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .'"
-    ## DGM     ${_pip_cmd} download -d /tmp/git/deps ${_PIP_DOWNLOAD_ARGS} .
-    ## DGM fi
-    ## DGM # shellcheck disable=SC2181
-    ## DGM if [ $? -ne 0 ]; then
-    ## DGM     echo "Failed to download salt dependencies"
-    ## DGM     return 1
-    ## DGM fi
-
-
-    ## DGM echoinfo "Installing Downloaded Salt Dependencies"
-    ## DGM echodebug "Running '${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/*'"
-    ## DGM ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} /tmp/git/deps/* || return 1
-
-    echodebug "DGM doing pip list"
-    ${_pip_cmd} list
-
     rm -f /tmp/git/deps/*
 
-    echodebug "DGM doing pip list"
-    ${_pip_cmd} list
-
-    ## DGM different attempt, try installing requirements
-    echoinfo "DGM Installing Salt requirements from PyPi, ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
+    echodebug "Installing Salt requirements from PyPi, ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r requirements/static/ci/py${_py_version}/linux.txt"
     ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed ${_PIP_INSTALL_ARGS} -r "requirements/static/ci/py${_py_version}/linux.txt"
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
@@ -2862,9 +2792,6 @@ __install_salt_from_repo() {
         ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.collections==5.1.0" || return 1
         ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.context==6.0.1" || return 1
         ${_pip_cmd} install ${_USE_BREAK_SYSTEM_PACKAGES} --ignore-installed --upgrade ${_PIP_INSTALL_ARGS} "jaraco.classes==3.4.0" || return 1
-
-        echodebug "DGM doing pip list"
-        ${_pip_cmd} list
     fi
 
     echoinfo "Building Salt Python Wheel"
