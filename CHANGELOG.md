@@ -1,5 +1,9 @@
 # v2024.11.27
 
+**Full Changelog**: https://github.com/saltstack/salt-bootstrap/compare/v2024.11.27...v2024.11.27
+
+# v2024.11.27
+
 ## What's Changed
 
 - Testing git install methods by @dmurphy18 in https://github.com/saltstack/salt-bootstrap/pull/2057
