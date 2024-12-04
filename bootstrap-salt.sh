@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.11.29"
+__ScriptVersion="2024.12.03"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -6634,36 +6634,39 @@ __ZYPPER_REQUIRES_REPLACE_FILES=-1
 
 __set_suse_pkg_repo() {
 
-    # Set distro repo variable
-    if [ "${DISTRO_MAJOR_VERSION}" -gt 2015 ]; then
-        DISTRO_REPO="openSUSE_Tumbleweed"
-    elif [ "${DISTRO_MAJOR_VERSION}" -eq 15 ] && [ "${DISTRO_MINOR_VERSION}" -ge 4 ]; then
-        DISTRO_REPO="${DISTRO_MAJOR_VERSION}.${DISTRO_MINOR_VERSION}"
-    elif [ "${DISTRO_MAJOR_VERSION}" -ge 42 ] || [ "${DISTRO_MAJOR_VERSION}" -eq 15 ]; then
-        DISTRO_REPO="openSUSE_Leap_${DISTRO_MAJOR_VERSION}.${DISTRO_MINOR_VERSION}"
-    else
-        DISTRO_REPO="SLE_${DISTRO_MAJOR_VERSION}_SP${SUSE_PATCHLEVEL}"
-    fi
+    ## DGM # Set distro repo variable
+    ## DGM if [ "${DISTRO_MAJOR_VERSION}" -gt 2015 ]; then
+    ## DGM     DISTRO_REPO="openSUSE_Tumbleweed"
+    ## DGM elif [ "${DISTRO_MAJOR_VERSION}" -eq 15 ] && [ "${DISTRO_MINOR_VERSION}" -ge 4 ]; then
+    ## DGM     DISTRO_REPO="${DISTRO_MAJOR_VERSION}.${DISTRO_MINOR_VERSION}"
+    ## DGM elif [ "${DISTRO_MAJOR_VERSION}" -ge 42 ] || [ "${DISTRO_MAJOR_VERSION}" -eq 15 ]; then
+    ## DGM     DISTRO_REPO="openSUSE_Leap_${DISTRO_MAJOR_VERSION}.${DISTRO_MINOR_VERSION}"
+    ## DGM else
+    ## DGM     DISTRO_REPO="SLE_${DISTRO_MAJOR_VERSION}_SP${SUSE_PATCHLEVEL}"
+    ## DGM fi
 
-    suse_pkg_url_base="https://download.opensuse.org/repositories/systemsmanagement:/saltstack"
-    suse_pkg_url_path="${DISTRO_REPO}/systemsmanagement:saltstack.repo"
-    SUSE_PKG_URL="$suse_pkg_url_base/$suse_pkg_url_path"
+    ## DGM suse_pkg_url_base="https://download.opensuse.org/repositories/systemsmanagement:/saltstack"
+    ## DGM suse_pkg_url_path="${DISTRO_REPO}/systemsmanagement:saltstack.repo"
+    ## DGM SUSE_PKG_URL="$suse_pkg_url_base/$suse_pkg_url_path"
+    SUSE_PKG_URL="https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo"
 }
 
 __check_and_refresh_suse_pkg_repo() {
     # Check to see if systemsmanagement_saltstack exists
-    __zypper repos | grep -q systemsmanagement_saltstack
+    ## DGM __zypper repos | grep -q systemsmanagement_saltstack
+    __zypper repos | grep -q 'salt.repo'
 
     if [ $? -eq 1 ]; then
-        # zypper does not yet know anything about systemsmanagement_saltstack
+        ## DGM # zypper does not yet know anything about systemsmanagement_saltstack
+        # zypper does not yet know anything about salt.repo
         __zypper addrepo --refresh "${SUSE_PKG_URL}" || return 1
     fi
 }
 
 __version_lte() {
-    if ! __check_command_exists python; then
-        zypper --non-interactive install --replacefiles --auto-agree-with-licenses python || \
-             zypper --non-interactive install --auto-agree-with-licenses python || return 1
+    if ! __check_command_exists python3; then
+        zypper --non-interactive install --replacefiles --auto-agree-with-licenses python3 || \
+             zypper --non-interactive install --auto-agree-with-licenses python3 || return 1
     fi
 
     if [ "$(${_PY_EXE} -c 'import sys; V1=tuple([int(i) for i in sys.argv[1].split(".")]); V2=tuple([int(i) for i in sys.argv[2].split(".")]); print(V1<=V2)' "$1" "$2")" = "True" ]; then
