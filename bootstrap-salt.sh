@@ -4224,8 +4224,8 @@ __install_saltstack_rhel_onedir_repository() {
                 REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
                 if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                     # Enable the Salt 3007 STS repo
-                    dnf config-manager --set-disable salt-repo-*
-                    dnf config-manager --set-enabled salt-repo-3007-sts
+                    yum config-manager --set-disable salt-repo-*
+                    yum config-manager --set-enabled salt-repo-3007-sts
                 fi
             elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
                 # using minor version
@@ -4243,11 +4243,11 @@ __install_saltstack_rhel_onedir_repository() {
             fi
         else
             # Enable the Salt LATEST repo
-            dnf config-manager --set-disable salt-repo-*
-            dnf config-manager --set-enabled salt-repo-latest
+            yum config-manager --set-disable salt-repo-*
+            yum config-manager --set-enabled salt-repo-latest
         fi
-        dnf clean expire-cache || return 1
-        dnf makecache || return 1
+        yum clean expire-cache || return 1
+        yum makecache || return 1
     elif [ "$ONEDIR_REV" != "latest" ]; then
         echowarn "salt.repo already exists, ignoring salt version argument."
         echowarn "Use -F (forced overwrite) to install $ONEDIR_REV."
@@ -4559,8 +4559,8 @@ install_centos_onedir() {
     fi
 
     # shellcheck disable=SC2086
-    dnf makecache || return 1
-    dnf list salt-minion || return 1
+    yum makecache || return 1
+    yum list salt-minion || return 1
     __yum_install_noinput ${__PACKAGES} || return 1
 
     return 0
@@ -5661,8 +5661,8 @@ install_amazon_linux_ami_2_deps() {
                     REPO_REV_MAJOR=$(echo "$STABLE_REV" | cut -d '.' -f 1)
                     if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                         # Enable the Salt 3007 STS repo
-                        dnf config-manager --set-disable salt-repo-*
-                        dnf config-manager --set-enabled salt-repo-3007-sts
+                        yum config-manager --set-disable salt-repo-*
+                        yum config-manager --set-enabled salt-repo-3007-sts
                     fi
                 elif [ "$(echo "$STABLE_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
                     # using minor version
@@ -5680,11 +5680,11 @@ install_amazon_linux_ami_2_deps() {
                 fi
             else
                 # Enable the Salt LATEST repo
-                dnf config-manager --set-disable salt-repo-*
-                dnf config-manager --set-enabled salt-repo-latest
+                yum config-manager --set-disable salt-repo-*
+                yum config-manager --set-enabled salt-repo-latest
             fi
-            dnf clean expire-cache || return 1
-            dnf makecache || return 1
+            yum clean expire-cache || return 1
+            yum makecache || return 1
         fi
     fi
 
@@ -5726,8 +5726,8 @@ install_amazon_linux_ami_2_onedir_deps() {
                     REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
                     if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                         # Enable the Salt 3007 STS repo
-                        dnf config-manager --set-disable salt-repo-*
-                        dnf config-manager --set-enabled salt-repo-3007-sts
+                        yum config-manager --set-disable salt-repo-*
+                        yum config-manager --set-enabled salt-repo-3007-sts
                     fi
                 elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
                     # using minor version
@@ -5745,11 +5745,11 @@ install_amazon_linux_ami_2_onedir_deps() {
                 fi
             else
                 # Enable the Salt LATEST repo
-                dnf config-manager --set-disable salt-repo-*
-                dnf config-manager --set-enabled salt-repo-latest
+                yum config-manager --set-disable salt-repo-*
+                yum config-manager --set-enabled salt-repo-latest
             fi
-            dnf clean expire-cache || return 1
-            dnf makecache || return 1
+            yum clean expire-cache || return 1
+            yum makecache || return 1
         fi
     fi
 
@@ -5879,8 +5879,8 @@ install_amazon_linux_ami_2023_onedir_deps() {
                     REPO_REV_MAJOR=$(echo "$ONEDIR_REV" | cut -d '.' -f 1)
                     if [ "$REPO_REV_MAJOR" -eq "3007" ]; then
                         # Enable the Salt 3007 STS repo
-                        dnf config-manager --set-disable salt-repo-*
-                        dnf config-manager --set-enabled salt-repo-3007-sts
+                        yum config-manager --set-disable salt-repo-*
+                        yum config-manager --set-enabled salt-repo-3007-sts
                     fi
                 elif [ "$(echo "$ONEDIR_REV" | grep -E '^([3-9][0-5]{2}[6-9](\.[0-9]*)?)')" != "" ]; then
                     # using minor version
@@ -5898,11 +5898,11 @@ install_amazon_linux_ami_2023_onedir_deps() {
                 fi
             else
                 # Enable the Salt LATEST repo
-                dnf config-manager --set-disable salt-repo-*
-                dnf config-manager --set-enabled salt-repo-latest
+                yum config-manager --set-disable salt-repo-*
+                yum config-manager --set-enabled salt-repo-latest
             fi
-            dnf clean expire-cache || return 1
-            dnf makecache || return 1
+            yum clean expire-cache || return 1
+            yum makecache || return 1
         fi
     fi
 
