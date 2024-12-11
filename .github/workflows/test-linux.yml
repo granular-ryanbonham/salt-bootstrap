@@ -94,22 +94,20 @@ jobs:
           pwd
           ls -alh
 
-      - name: Download requirements file tests/requirements.txt
-        uses: actions/download-artifact@v4
-        with:
-          - name: requirements.txt
+      ## DGM - name: Download requirements file tests/requirements.txt
+      ## DGM   uses: actions/download-artifact@v4
+      ## DGM   with:
+      ## DGM     - name: requirements.txt
 
       - name: "Install Python Dependencies with pip breakage in container ${{ inputs.container-slug }}"
         if: ${{ ( inputs.distro-slug == 'debian-11' ) || ( inputs.distro-slug == 'debian-12' ) || ( inputs.distro-slug == 'debian-13' ) || ( inputs.distro-slug == 'ubuntu-2404' ) }}
         run: |
-          ## docker exec ${{ github.run_id}}_salt-test python3 -m pip install --break-system-packages -r tests/requirements.txt
-          docker exec ${{ github.run_id}}_salt-test python3 -m pip install --break-system-packages -r requirements.txt
+          docker exec ${{ github.run_id}}_salt-test python3 -m pip install --break-system-packages -r tests/requirements.txt
 
       - name: "Install Python Dependencies without pip breakage in container ${{ inputs.container-slug }}"
         if: ${{ ( inputs.distro-slug != 'debian-11' ) && ( inputs.distro-slug != 'debian-12' ) && ( inputs.distro-slug != 'debian-13' ) && ( inputs.distro-slug != 'ubuntu-2404' ) }}
         run: |
-          ## docker exec ${{ github.run_id}}_salt-test python3 -m pip install -r tests/requirements.txt
-          docker exec ${{ github.run_id}}_salt-test python3 -m pip install -r requirements.txt
+          docker exec ${{ github.run_id}}_salt-test python3 -m pip install -r tests/requirements.txt
 
       - name: Get Version
         run: |
