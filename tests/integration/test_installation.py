@@ -35,10 +35,12 @@ def run_salt_call(cmd):
             log.error(f"failed to produce output result, '{result}'")
 
     else:
-        cmdl = ["sudo"]
+        ## DGM cmdl = ["sudo"]
+        cmdl = []
         cmdl.extend(cmd)
         cmdl.append("--out=json")
         result = subprocess.run(cmdl, capture_output=True, text=True)
+        print(f"DGM run_salt_call result '{result}'", flush=True)
         if 0 == result.returncode:
             json_data = json.loads(result.stdout)
         else:
@@ -50,6 +52,7 @@ def run_salt_call(cmd):
 def test_ping(path):
     cmd = ["salt-call", "--local", "test.ping"]
     result = run_salt_call(cmd)
+    print(f"DGM test_ping result '{result}'", flush=True)
     assert result == True
 
 
@@ -57,6 +60,7 @@ def test_target_python_version(path, target_python_version):
     cmd = ["salt-call", "--local", "grains.item", "pythonversion", "--timeout=120"]
     result = run_salt_call(cmd)
     # Returns: {'pythonversion': [3, 10, 11, 'final', 0]}
+    print(f"DGM test_target_python_version result '{result}'", flush=True)
     py_maj_ver = result["pythonversion"][0]
     assert py_maj_ver == target_python_version
 
@@ -67,5 +71,6 @@ def test_target_salt_version(path, target_salt_version):
     cmd = ["salt-call", "--local", "grains.item", "saltversion", "--timeout=120"]
     result = run_salt_call(cmd)
     # Returns: {'saltversion': '3006.9+217.g53cfa53040'}
+    print(f"DGM test_target_salt_version result '{result}'", flush=True)
     adj_saltversion = result["saltversion"].split("+")[0]
     assert adj_saltversion == target_salt_version
