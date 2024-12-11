@@ -89,10 +89,15 @@ jobs:
         run: |
           /usr/bin/docker start ${{ github.run_id }}_salt-test
 
+      - name: Download  requirements file tests/requirements.txt
+        uses: actions/download-artifact@v4
+        with:
+          - name: tests/requirements.txt
+
       - name: "Install Python Dependencies with pip breakage in container ${{ inputs.container-slug }}"
         if: ${{ ( inputs.distro-slug == 'debian-11' ) || ( inputs.distro-slug == 'debian-12' ) || ( inputs.distro-slug == 'debian-13' ) || ( inputs.distro-slug == 'ubuntu-2404' ) }}
         run: |
-          python3 -m pip install --break-system-packages -r tests/requirements.txt
+          docker exec ${{ github.run_id}}_salt-test python3 -m pip install --break-system-packages -r tests/requirements.txt
 
       - name: "Install Python Dependencies without pip breakage in container ${{ inputs.container-slug }}"
         if: ${{ ( inputs.distro-slug != 'debian-11' ) && ( inputs.distro-slug != 'debian-12' ) && ( inputs.distro-slug != 'debian-13' ) && ( inputs.distro-slug != 'ubuntu-2404' ) }}
