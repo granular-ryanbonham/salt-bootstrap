@@ -5731,7 +5731,7 @@ install_amazon_linux_ami_2_onedir_deps() {
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
-    __PACKAGES="yum-utils"
+    __PACKAGES="yum-utils chkconfig procps-ng findutils"
 
     # ensure sudo installed
     __PACKAGES="${__PACKAGES} sudo"
@@ -5919,7 +5919,7 @@ install_amazon_linux_ami_2023_onedir_deps() {
 
     # We need to install yum-utils before doing anything else when installing on
     # Amazon Linux ECS-optimized images. See issue #974.
-    __PACKAGES="yum-utils"
+    __PACKAGES="yum-utils chkconfig procps-ng findutils"
 
     # ensure sudo installed
     __PACKAGES="${__PACKAGES} sudo"
