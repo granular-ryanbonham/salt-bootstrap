@@ -35,11 +35,18 @@ def run_salt_call(cmd):
             log.error(f"failed to produce output result, '{result}'")
 
     else:
-        ## DGM cmdl = ["sudo"]
-        cmdl = []
+        print(f"DGM run_salt_call platform.system '{platform.system()}'", flush=True)
+        if platform.system() == "Darwin":
+            cmdl = ["sudo"]
+        else:
+            cmdl = []
         cmdl.extend(cmd)
         cmdl.append("--out=json")
         result = subprocess.run(cmdl, capture_output=True, text=True)
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+        except TypeError:
+            result = subprocess.run(cmd, text=True)
         print(f"DGM run_salt_call result '{result}'", flush=True)
         if 0 == result.returncode:
             json_data = json.loads(result.stdout)
