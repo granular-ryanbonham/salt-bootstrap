@@ -46,7 +46,10 @@ def run_salt_call(cmd):
             result = subprocess.run(cmdl, capture_output=True, text=True)
         except TypeError:
             result = subprocess.run(
-                cmdl, stdout=PIPE, stderr=PIPE, universal_newlines=True
+                cmdl,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
             )
         print(f"DGM run_salt_call result '{result}'", flush=True)
         if 0 == result.returncode:
