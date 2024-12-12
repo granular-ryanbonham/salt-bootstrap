@@ -32,10 +32,6 @@ jobs:
   Test:
     name: ${{ matrix.instance }}
     runs-on: ubuntu-latest
-    ## DGM container:
-    ## DGM   image: ghcr.io/saltstack/salt-ci-containers/testing:${{ inputs.container-slug }}
-    ## DGM   options: --privileged
-
     timeout-minutes: ${{ inputs.timeout }}
     strategy:
       max-parallel: 2
@@ -45,37 +41,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      ## DGM - name: Install Python Dependencies with pip breakage
-      ## DGM   if: ${{ ( inputs.distro-slug == 'debian-11' ) || ( inputs.distro-slug == 'debian-12' ) || ( inputs.distro-slug == 'debian-13' ) || ( inputs.distro-slug == 'ubuntu-2404' ) }}
-      ## DGM   run: |
-      ## DGM     python3 -m pip install --break-system-packages -r tests/requirements.txt
-
-      ## DGM - name: Install Python Dependencies without pip breakage
-      ## DGM   if: ${{ ( inputs.distro-slug != 'debian-11' ) && ( inputs.distro-slug != 'debian-12' ) && ( inputs.distro-slug != 'debian-13' ) && ( inputs.distro-slug != 'ubuntu-2404' ) }}
-      ## DGM   run: |
-      ## DGM     python3 -m pip install -r tests/requirements.txt
-
-      ## DGM - name: Get Version
-      ## DGM   run: |
-      ## DGM     # We need to get the version here and make it an environment variable
-      ## DGM     # It is used to install via bootstrap and in the test
-      ## DGM     # The version is in the instance name
-      ## DGM     # sed 1st - becomes space, 2nd - becomes dot
-      ## DGM     vt_parm_ver=$(echo "${{ matrix.instance }}" | sed 's/-/ /' | sed 's/-/./' | awk -F ' ' '{print $2}')
-      ## DGM     echo "SaltVersion=$vt_parm_ver" >> $GITHUB_ENV
-
-      ## DGM - name: Bootstrap Salt
-      ## DGM   run: |
-      ## DGM     # sed 1st - becomes space, 2nd - becomes dot
-      ## DGM     bt_arg1=$(echo "${{ matrix.instance }}" | sed 's/-/ /' | sed 's/-/./' | awk -F ' ' '{print $1}')
-      ## DGM     bt_arg2=$(echo "${{ matrix.instance }}" | sed 's/-/ /' | sed 's/-/./' | awk -F ' ' '{print $2}')
-      ## DGM     echo "bt parms ,$bt_parms, bt_arg1 ,$bt_arg1, bt_arg2 ,$bt_arg2,"
-      ## DGM     sh -x ./bootstrap-salt.sh "$bt_arg1" "$bt_arg2"
-
-      ## DGM - name: Test Bootstrap
-      ## DGM   run: |
-      ## DGM     pytest --cache-clear -v -s -ra --log-cli-level=debug tests/integration/
 
       - name: Get Version
         run: |
@@ -98,23 +63,13 @@ jobs:
         run: |
           /usr/bin/docker start ${{ github.run_id }}_salt-test
 
-      - name: Current Directory
-        run: |
-          pwd
-          ls -alh
-
-      ## DGM - name: Download requirements file tests/requirements.txt
-      ## DGM   uses: actions/download-artifact@v4
-      ## DGM   with:
-      ## DGM     - name: requirements.txt
-
       - name: "Install Python Dependencies with pip breakage in container ${{ inputs.container-slug }}"
-        if: ${{ ( inputs.distro-slug == 'debian-11' ) || ( inputs.distro-slug == 'debian-12' ) || ( inputs.distro-slug == 'debian-13' ) || ( inputs.distro-slug == 'ubuntu-2404' ) }}
+        if: ${{ ( inputs.distro-slug == 'debian-12' ) || ( inputs.distro-slug == 'debian-13' ) || ( inputs.distro-slug == 'ubuntu-2404' ) }}
         run: |
           docker exec ${{ github.run_id}}_salt-test python3 -m pip install --break-system-packages -r /_w/btstrap/tests/requirements.txt
 
       - name: "Install Python Dependencies without pip breakage in container ${{ inputs.container-slug }}"
-        if: ${{ ( inputs.distro-slug != 'debian-11' ) && ( inputs.distro-slug != 'debian-12' ) && ( inputs.distro-slug != 'debian-13' ) && ( inputs.distro-slug != 'ubuntu-2404' ) }}
+        if: ${{ ( inputs.distro-slug != 'debian-12' ) && ( inputs.distro-slug != 'debian-13' ) && ( inputs.distro-slug != 'ubuntu-2404' ) }}
         run: |
           docker exec ${{ github.run_id}}_salt-test python3 -m pip install -r /_w/btstrap/tests/requirements.txt
 
