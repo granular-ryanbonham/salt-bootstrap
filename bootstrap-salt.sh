@@ -26,7 +26,7 @@
 #======================================================================================================================
 set -o nounset                              # Treat unset variables as an error
 
-__ScriptVersion="2024.12.09"
+__ScriptVersion="2024.12.12"
 __ScriptName="bootstrap-salt.sh"
 
 __ScriptFullName="$0"
@@ -2467,6 +2467,12 @@ __check_services_systemd() {
 
     servicename=$1
     echodebug "Checking if service ${servicename} is enabled"
+
+    ## DGM
+    if [ "${DISTRO_NAME_L}" = "amazon_linux_ami" ] && [ "${DISTRO_VERSION}" = "2" ]; then
+        echoinfo "DGM skipping the is-enabled test on AMZN2, since command 'systemctl is-enabled salt-minion' is generating error msg 'Failed to get D-Bus connection: No such file or directory' on AMZN2 container"
+        return 0
+    fi
 
     if [ "$(systemctl is-enabled "${servicename}")" = "enabled" ]; then
         echodebug "Service ${servicename} is enabled"

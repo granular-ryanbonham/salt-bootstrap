@@ -45,7 +45,9 @@ def run_salt_call(cmd):
         try:
             result = subprocess.run(cmdl, capture_output=True, text=True)
         except TypeError:
-            result = subprocess.run(cmdl, text=True)
+            result = subprocess.run(
+                cmdl, stdout=PIPE, stderr=PIPE, universal_newlines=True
+            )
         print(f"DGM run_salt_call result '{result}'", flush=True)
         if 0 == result.returncode:
             json_data = json.loads(result.stdout)
