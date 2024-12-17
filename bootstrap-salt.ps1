@@ -694,6 +694,17 @@ if( $RunService ) {
     }
 }
 
+# Run the command
+$saltPipInstall = Start-Process -FilePath "salt-pip" -ArgumentList "install credstash" -NoNewWindow -Wait -PassThru
+
+# Check the exit code
+if ($saltPipInstall.ExitCode -ne 0) {
+    Write-Host "Credstash install failed with exit code $($saltPipInstall.ExitCode)"
+    exit 1
+} else {
+    Write-Host "Credstash install succeeded"
+}
+
 #===============================================================================
 # Script Complete
 #===============================================================================
