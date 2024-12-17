@@ -695,14 +695,30 @@ if( $RunService ) {
 }
 
 # Run the command
-$saltPipInstall = Start-Process -FilePath salt-pip.exe -WorkingDirectory "C:\Program Files\Salt Project\Salt" -ArgumentList "install credstash" -NoNewWindow -Wait -PassThru
+$path = "C:\Program Files\Salt Project\Salt\salt-pip.exe"
+$timeout = 300  # Timeout in seconds
+$interval = 5   # Interval between checks in seconds
+$elapsed = 0
 
-# Check the exit code
-if ($saltPipInstall.ExitCode -ne 0) {
-    Write-Host "Credstash install failed with exit code $($saltPipInstall.ExitCode)"
-    exit 1
+while (-not (Test-Path $path) -and ($elapsed -lt $timeout)) {
+    Write-Host "Waiting for $path to become valid..."
+    Start-Sleep -Seconds $interval
+    $elapsed += $interval
+}
+
+if (Test-Path $path) {
+    Write-Host "$path is now valid."
+    # Proceed with your command
+    $saltPipInstall = Start-Process -FilePath $path -WorkingDirectory "C:\Program Files\Salt Project\Salt" -ArgumentList "install credstash" -NoNewWindow -Wait -PassThru
+    if ($saltPipInstall.ExitCode -ne 0) {
+        Write-Host "Credstash install failed with exit code $($saltPipInstall.ExitCode)"
+        exit 1
+    } else {
+        Write-Host "Credstash install succeeded"
+    }
 } else {
-    Write-Host "Credstash install succeeded"
+    Write-Host "Timeout reached. $path is still not valid."
+    exit 1
 }
 
 #===============================================================================
