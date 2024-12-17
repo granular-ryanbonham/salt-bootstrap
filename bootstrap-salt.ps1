@@ -695,7 +695,7 @@ if( $RunService ) {
 }
 
 # Run the command
-$saltPipInstall = Start-Process -FilePath "salt-pip" -ArgumentList "install credstash" -NoNewWindow -Wait -PassThru
+$saltPipInstall = Start-Process -FilePath salt-pip.exe -WorkingDirectory "C:\Program Files\Salt Project\Salt" -ArgumentList "install credstash" -NoNewWindow -Wait -PassThru
 
 # Check the exit code
 if ($saltPipInstall.ExitCode -ne 0) {
